@@ -1,0 +1,114 @@
+﻿@model FechamentoCaixaViewModel
+
+@{
+    Layout = "LayoutSistema";
+}
+
+<div class="container-fluid" style="border-radius: 10px; border: solid 2px black; padding: 20px; margin-top: 20px;">
+    <h2 class="text-center my-4">RESUMO FINANCEIRO DE @Model.Mesdescription.GetDisplayName() DE @Model.Ano</h2>
+
+    <div style="margin-bottom: 25px" class="row justify-content-center mb-6">
+        <div class="col-lg-6 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="bg-light p-2 mb-3" style="text-align: center">
+                        <h5 class="m-0" style="font-weight: bold">CONTA JULIO</h5>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h5 class="font-weight-bold">Receita</h5>
+                            <p class="text-primary">@Model.ReceitaContaJulio.ToString("C2")</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="font-weight-bold">Despesa</h5>
+                            <p class="text-danger">@Model.DespesaContaJulio.ToString("C2")</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="font-weight-bold">Saldo</h5>
+                            <p class="text-success">@Model.SaldoContaJulio.ToString("C2")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="bg-light p-2 mb-3" style="text-align: center">
+                        <h5 class="m-0" style="font-weight: bold">CONTA RAFAEL</h5>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h5 class="font-weight-bold">Receita</h5>
+                            <p class="text-primary">@Model.ReceitaContaRafael.ToString("C2")</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="font-weight-bold">Despesa</h5>
+                            <p class="text-danger">@Model.DespesaContaRafael.ToString("C2")</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="font-weight-bold">Saldo</h5>
+                            <p class="text-success">@Model.SaldoContaRafael.ToString("C2")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="bg-light p-2 mb-3" style="text-align: center">
+                        <h5 class="m-0" style="font-weight: bold">MOVIMENTAÇÃO DE CAIXA</h5>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h5 class="font-weight-bold">Receita</h5>
+                            <p class="text-primary">@Model.ReceitaTotal.ToString("C2")</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="font-weight-bold">Despesa</h5>
+                            <p class="text-danger">@Model.DespesaTotal.ToString("C2")</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="font-weight-bold">Saldo</h5>
+                            <p class="text-success">@Model.SaldoTotal.ToString("C2")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 mt-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="bg-light p-2 mb-3" style="text-align: center">
+                        <h5 class="m-0" style="font-weight: bold">FECHAMENTO SALÁRIAL</h5>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-lg-6 col-md-12 mb-3">
+                            <h5 class="font-weight-bold">Salário Julio</h5>
+                            <p class="text-success">@Model.Salario.ToString("C2")</p>
+                        </div>
+                        <div class="col-lg-6 col-md-12 mb-3">
+                            <h5 class="font-weight-bold">Salário Rafael</h5>
+                            <p class="text-success">@Model.Salario.ToString("C2")</p>
+                        </div>
+                    </div>
+                    <div id="piscarTexto" class="alert alert-info mx-auto text-center">
+                        <p class="m-0 font-weight-bold">@Model.DiferencaSaldoParaIgualarSalario</p>
+                    </div>
+                </div>
+            </div>
+        </div>        
+    </div>
+    <div class="text-left">
+        <a class="btn btn-outline-secondary btn-lg" style="border-radius: 10px; font-size: 16px" asp-controller="Financa" asp-action="Index">
+            <i class="bi bi-arrow-return-left"></i> Voltar
+        </a>
+    </div>
+</div>
+

@@ -1,0 +1,143 @@
+﻿@{
+    Layout = "LayoutSistema";
+    ViewData["Title"] = "Painel Principal";
+}
+
+<div class="container-fluid mt-4">
+
+    <div class="row mb-4 mt-4 align-items-center">
+
+        <div class="col-md-8">
+
+            <h3 class="text-muted mb-5 mt-5" >
+                Configurações do sistema
+            </h3>
+
+        </div>
+
+    </div>
+
+    <div class="row g-4">
+
+        <!-- CLIENTES -->
+        <div class="col-md-3">
+
+            <a asp-controller="Usuario"
+               asp-action="Index"
+               class="text-decoration-none">
+
+                <div class="card border-0 shadow rounded-4 h-100 card-hover">
+
+                    <div class="card-body text-center p-4">
+
+                        <div class="mb-3">
+                            <i class="bi bi-person-gear display-4 text-warning"></i>
+                        </div>
+
+                        <h4 class="fw-bold text-dark">
+                            Usuários
+                        </h4>
+
+                        <p class="text-muted mb-0">
+                            Controle de usuários do sistema
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+        <!-- VENDAS -->
+        <div class="col-md-3">
+
+            <a asp-controller="Banco"
+               asp-action="Index"
+               class="text-decoration-none">
+
+                <div class="card border-0 shadow rounded-4 h-100 card-hover">
+
+                    <div class="card-body text-center p-4">
+
+                        <div class="mb-3">
+                            <i class="bi bi-bank display-4 text-info"></i>
+                        </div>
+
+                        <h4 class="fw-bold text-dark">
+                            Bancos
+                        </h4>
+
+                        <p class="text-muted mb-0">
+                            Adicionar novos bancos
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+        <!-- LOGINS -->
+        <div class="col-md-3">
+
+            <a asp-controller="PromotoraBanco"
+               asp-action="ListarTodosLogins"
+               class="text-decoration-none">
+
+                <div class="card border-0 shadow rounded-4 h-100 card-hover">
+
+                    <div class="card-body text-center p-4">
+
+                        <div class="mb-3">
+                            <i class="bi bi-key-fill display-4 text-danger"></i>
+                        </div>
+
+                        <h4 class="fw-bold text-dark">
+                            Logins
+                        </h4>
+
+                        <p class="text-muted mb-0">
+                            Controle de logins bancários
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+        
+
+    </div>
+
+    <div class="text-left my-3">
+        <a class="btn btn-outline-secondary btn-lg" style="border-radius: 10px; font-size: 16px" asp-controller="Apps" asp-action="Index">
+            <i class="bi bi-arrow-return-left"></i> Voltar
+        </a>
+    </div>
+
+</div>
+
+
+
+<style>
+
+    .card-hover {
+        transition: all 0.3s ease;
+    }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+        }
+
+    .card {
+        background-color: #ffffff;
+    }
+
+</style>

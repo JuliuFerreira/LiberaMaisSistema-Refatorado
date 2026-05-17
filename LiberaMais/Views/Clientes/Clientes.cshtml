@@ -1,0 +1,239 @@
+﻿@model IEnumerable<Cliente>
+@{
+    Layout = "LayoutSistema";
+}
+
+
+<div class="container-fluid">
+    <h2 style="text-align:center; margin-top: 50px; margin-bottom: 20px">CLIENTES LIBERA MAIS</h2>
+    @* <div class="row justify-content-around mb-4">
+        <div class="col-md-8 col-lg-4">
+            <form method="get" asp-controller="Clientes" asp-action="Clientes" class="my-4">
+                <div class="form-row">
+                    <div class="col-12 mb-2">
+                        <div id="searchField">
+                            <label for="searchString" class="sr-only">Buscar</label>
+                            <div class="input-group">
+                                <input class="form-control" type="search" placeholder="Buscar" aria-label="Buscar" name="searchString" id="searchString" value="@ViewBag.SearchString">
+                                <div class="input-group-append ml-2">
+                                    <button class="btn btn-outline-success mr-1" type="button" onclick="validarCampo()">
+                                        <i class="bi bi-search"></i>
+                                        Buscar
+                                    </button>
+                                    <button class="btn btn-outline-danger" type="button" onclick="limparCampos()">
+                                        <i class="bi bi-x-circle"></i>
+                                        Limpar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div> *@
+
+
+    <form method="get" action="/ListarPromotora" class="search-form">
+        <div class="row justify-content-start mb-4">
+            <a class="icon-link" asp-controller="Clientes" asp-action="Criar">
+                <div class="icon-container-fluid">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-personal-add icon" viewBox="0 0 16 16">
+                        <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4" />
+                        <path d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z" />
+                    </svg>
+                    <h4 class="card-text" style="text-align:center; font-size: 16px">Adicionar  <br />Cliente</h4>
+                </div>
+            </a>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover" id="table-cliente" style="width: 100%">
+            <thead style="background-color: #666; color: white">
+                <tr>
+                    <th style="text-align: start">CPF</th>
+                    <th>Nome</th>
+                    <th>Senha do INSS</th>
+                    <th>Idade</th>
+                    <th>Usuário</th>
+                    <th style="text-align: center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var iten in Model.OrderBy(c => c.Nome))
+                {
+                    <tr style="font-size: 16px; border-color: black;">
+                        <td style="text-align: start">@iten.Cpf</td>
+                        <td>@iten.Nome</td>
+                        <td>@iten.SenhaInss</td>
+                        <td>@iten.Idade Anos</td>
+                        <td>@iten.UsuarioNome</td>
+                        <td style="border-color: black;">
+                            <div class="d-flex justify-content-center">
+
+                                <a role="button" href="@Url.Action("CadastroVenda", "Venda", new { cpf = iten.Cpf, nome = iten.Nome })">
+                                    <div class="d-flex flex-column align-items-center mr-2">
+                                        <button type="button" class="btn btn-success" style="width: 100px">
+                                            <i class="bi bi-cart-plus text-white" style="font-size: 16px"></i>
+                                        </button>
+                                    </div>
+                                </a>
+
+                                <a role="button" asp-route-idcliente="@iten.IdCliente" asp-controller="Clientes" asp-action="DetalheCliente">
+                                    <div class="d-flex flex-column align-items-center mr-2">
+                                        <button type="button" class="btn btn-primary">
+                                            <i class="bi bi-eye text-white" style="font-size: 16px;"></i>
+                                        </button>
+                                    </div>
+                                </a>
+
+                                <a role="button" asp-route-idcliente="@iten.IdCliente" asp-controller="Clientes" asp-action="EditarCliente">
+                                    <div class="d-flex flex-column align-items-center mr-2">
+                                        <button type="button" class="btn btn-warning">
+                                            <i class="bi bi-pencil-square text-white" style="font-size: 16px"></i>
+                                        </button>
+                                    </div>
+                                </a>
+
+                                <button class="btn btn-danger btn-excluir" data-nome="@iten.Nome" data-id="@iten.IdCliente" data-url="@Url.Action("Apagar", "Clientes", new { idCliente = iten.IdCliente })">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                            </div>
+
+                        </td>
+                    </tr>                    
+                }
+            </tbody>
+        </table>
+        @if (ViewBag.Aniversariantes != null && ViewBag.Aniversariantes.Count > 0)
+        {
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Construa a lista de aniversariantes diretamente em JavaScript
+                    let aniversariantes = [
+                @foreach (var cliente in ViewBag.Aniversariantes)
+                {
+                    @:{ Nome: '@cliente.Nome', Idade: '@cliente.Idade' },
+                }
+                            ];
+
+                    // Formata a mensagem com uma lista de aniversariantes
+                    let messageText = aniversariantes.map(cliente => `${cliente.Nome}, COMPLETANDO ${cliente.Idade} ANOS DE IDADE!`).join('<br><br>');
+
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end', // Configura a posição no canto superior direito
+                        icon: 'info',
+                        title: 'HOJE É ANIVERSÁRIO DE:',
+                        html: `<div style="text-align: left; max-width: 300px; word-wrap: break-word;">${messageText}</div>`,
+                        timer: 10000, // Tempo de exibição do toast em milissegundos
+                        timerProgressBar: true,
+                        showConfirmButton: false, // Remove o botão de fechar
+                        background: '#f8f9fa' // Opcional: ajuste o fundo do toast
+                    });
+                });
+            </script>
+        }
+
+    </div>
+
+    <div class="alert alert-info text-center" role="alert" style="width: 200px; margin: 0 auto;">
+        Total de clientes: @ViewBag.TotalClientes
+    </div>
+
+    
+
+<div class="text-left my-3">
+        <a class="btn btn-outline-secondary btn-lg" style="border-radius: 10px; font-size: 16px" asp-controller="Apps" asp-action="Index">
+            <i class="bi bi-arrow-return-left"></i> Voltar
+        </a>
+    </div>
+</div>
+
+<script>
+    function validarCampo() {
+        var searchString = document.getElementById("searchString").value;
+        var searchStringLimpa = limparCaracteresEspeciais(searchString);
+        document.getElementById("searchString").value = searchStringLimpa;
+        document.forms[0].submit();
+    }
+
+    function limparCampos() {
+        document.getElementById("searchString").value = "";
+    }
+
+    function limparCaracteresEspeciais(str) {
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^\w\s]/gi, "")
+            .toLowerCase()
+            .trim();
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const btnsExcluir = document.querySelectorAll('.btn-excluir');
+
+        btnsExcluir.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const idCliente = btn.getAttribute('data-id');
+                const nome = btn.getAttribute('data-nome');
+
+                Swal.fire({
+                    text: 'Deseja realmente excluir o cliente?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Excluir',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/Clientes/Apagar?idcliente=${idCliente}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({ idcliente: idCliente })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire({
+                                        title: 'Cliente excluído com sucesso!',
+                                        text: 'Atualizando lista...',
+                                        icon: 'success',
+                                        showConfirmButton: false,
+                                        timer: 3000 // Tempo de exibição da mensagem de sucesso
+                                    }).then(() => {
+                                        // Redirecionar após a mensagem de sucesso
+                                        window.location.href = '/Clientes/Clientes';
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Erro!',
+                                        text: data.message,
+                                        icon: 'error',
+                                        confirmButtonText: 'Ok'
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire({
+                                    title: 'Erro!',
+                                    text: 'Ocorreu um erro ao tentar excluir o cliente.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Ok'
+                                });
+                            });
+                    }
+                });
+            });
+        });
+    });
+</script>
+

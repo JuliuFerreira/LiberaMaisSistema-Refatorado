@@ -1,0 +1,422 @@
+﻿@model Cliente
+@{
+    Layout = "LayoutSistema";
+}
+
+<body>
+
+
+    <form style="border: solid 1px black; padding:10px; border-radius: 10px" id="clienteForm" asp-controller="Clientes" asp-action="EditarCliente" method="post" class="row g-3">
+        <h2 style="text-align:center; margin-top: 50px; margin-bottom: 50px">ALTERAR DADOS</h2>
+
+        <input type="hidden" asp-for="IdCliente" />
+
+        <div style="margin-top: 30px; color: black; border-bottom: solid 1px black">
+            <h5 style="padding: 5px; margin-top: 5px; margin-bottom: 5px; font-weight: bold">Dados pessoais</h5>
+        </div>
+        <div class="col-md-2">
+            <label for="cpf" class="form-label">CPF</label>
+            <input type="text" asp-for="Cpf" class="form-control" id="cpf" required maxlength="11" readonly>
+        </div>
+
+        <div class="col-md-5">
+            <label for="nome" class="form-label">Nome</label>
+            <input type="text" asp-for="Nome" class="form-control" id="nome" required maxlength="50">
+            <span id="nomeError" style="color: red; display: none;">Por favor, insira o nome completo (nome e sobrenome).</span>
+        </div>
+
+        <div class="col-md-3">
+            <label for="senhainss" class="form-label">Senha do cliente</label>
+            <input type="text" asp-for="SenhaInss" class="form-control" id="senhainss" maxlength="20">
+        </div>
+
+
+        <div class="col-2">
+            <label for="nascimento" class="form-label">Data de nascimento</label>
+            <input type="date" asp-for="DataNascimento" class="form-control" id="nascimento" required onchange="calcularIdadeAutomatica()">
+        </div>
+
+        <div style="margin-top: 30px; color: black; border-bottom: solid 1px black">
+            <h5 style="padding: 5px; margin-top: 5px; margin-bottom: 5px; font-weight: bold">Endereço</h5>
+        </div>
+        <div class="col-2">
+            <label for="cep" class="form-label">CEP</label>
+            <input type="number" asp-for="Cep" class="form-control" id="cep">
+        </div>
+
+        <div class="col-md-2">
+            <label for="logradouro" class="form-label">Rua:</label>
+            <input type="text" asp-for="Logradouro" class="form-control" id="logradouro">
+        </div>
+
+        <div class="col-1">
+            <label for="nCasa" class="form-label">Nº</label>
+            <input type="text" asp-for="Ncasa" class="form-control" id="ncasa">
+        </div>
+
+        <div class="col-2">
+            <label for="Complemento" class="form-label">Complemento</label>
+            <input type="text" asp-for="Complemento" class="form-control" id="complemento">
+        </div>
+
+        <div class="col-md-2">
+            <label for="bairro" class="form-label">Bairro:</label>
+            <input type="text" asp-for="Bairro" class="form-control" id="bairro">
+        </div>
+
+        <div class="col-md-2">
+            <label for="cidade" class="form-label">Cidade:</label>
+            <input type="text" asp-for="Cidade" class="form-control" id="cidade">
+        </div>
+
+        <div class="col-md-1">
+            <label for="estado" class="form-label">Estado:</label>
+            <input type="text" asp-for="Estado" class="form-control" id="estado">
+        </div>
+
+
+        <div style="margin-top: 30px; color: black; border-bottom: solid 1px black">
+            <h5 style="padding: 5px; margin-top: 5px; margin-bottom: 5px; font-weight: bold">Contato</h5>
+        </div>
+
+        <div class="col-2">
+            <label for="tel" class="form-label">Telefone/WhatsApp</label>
+            <input type="tel" asp-for="Tel1" class="form-control telefone" id="tel" required>
+            <span id="telError" class="text-danger"></span>
+        </div>
+
+        <div class="col-2">
+            <label for="tel2" class="form-label">Telefone/WhatsApp²</label>
+            <input type="tel" asp-for="Tel2" class="form-control telefone" id="tel2">
+        </div>
+
+
+        <div class="col-2">
+            <label for="email" class="form-label">E-mail</label>
+            <input type="email" asp-for="Email" class="form-control" id="email">
+        </div>
+
+        <div class="col-6">
+            <label for="observacoes" class="form-label">Observações</label>
+            <input type="observacoes" asp-for="observacoes" class="form-control" id="observacoes" rows="3">
+        </div>
+
+        
+        @* <div style="margin-top: 30px; background-color: #cccc; border: 1px solid darkorange">
+            <h5 style="padding: 5px; margin-top: 5px; margin-bottom: 5px; margin-left: 10px">Anexar Documentos</h5>
+        </div>
+               
+
+        <div style="border: solid 1px black; margin-top: 30px;"></div> *@
+
+        @*  <div class="col-12">
+        <button type="button" class="btn btn-outline-success" onclick="adicionarInput()">
+        <i class="bi bi-upload"></i>
+        Adicionar documentos +
+        </button>
+        </div>
+
+        <div class="col-4" id="inputsContainer"></div> *@
+
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-outline-success" onclick="return validarForm();">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy2-fill" viewBox="0 0 16 16">
+                    <path d="M12 2h-2v3h2z" />
+                    <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v13A1.5 1.5 0 0 0 1.5 16h13a1.5 1.5 0 0 0 1.5-1.5V2.914a1.5 1.5 0 0 0-.44-1.06L14.147.439A1.5 1.5 0 0 0 13.086 0zM4 6a1 1 0 0 1-1-1V1h10v4a1 1 0 0 1-1 1zM3 9h10a1 1 0 0 1 1 1v5H2v-5a1 1 0 0 1 1-1" />
+                </svg>
+                Gravar
+            </button>
+
+            <a type="button" class="btn btn-outline-danger" asp-controller="Clientes" asp-action="Clientes">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" />
+                </svg>
+                Cancelar
+            </a>
+        </div>
+    </form>
+
+    <script>
+        function validarForm() {
+            var nomeInput = document.getElementById('nome').value;
+
+            // Verifica se o nome contém um espaço, indicando nome e sobrenome
+            if (nomeInput.indexOf(' ') === -1) {
+                document.getElementById('nomeError').style.display = 'block'; // Exibe a mensagem de erro
+                return false; // Impede o envio do formulário
+            } else {
+                document.getElementById('nomeError').style.display = 'none'; // Oculta a mensagem de erro
+                return true; // Permite o envio do formulário
+            }
+        }
+    </script>
+
+    <script>
+        // Seleciona o campo de entrada
+        var inputNome = document.getElementById('nome');
+
+        // Adiciona um ouvinte de evento de entrada para o campo de entrada
+        inputNome.addEventListener('input', function () {
+            // Converte o valor para maiúsculas
+            this.value = this.value.toUpperCase();
+        });
+    </script>
+
+    <script>
+        function verificarCpfExistente() {
+            var cpf = document.getElementById("cpf").value;
+
+            // Fazer uma chamada AJAX para verificar o CPF
+            $.ajax({
+                url: '/Clientes/VerificarCpfExistente',
+                type: 'GET',
+                data: { cpf: cpf },
+                success: function (response) {
+                    if (response === true) {
+                        // O CPF não existe, limpar mensagem de erro
+                        document.getElementById("cpfError").innerText = "";
+                    } else {
+                        // O CPF já existe, exibir mensagem de erro
+                        document.getElementById("cpfError").innerText = "Este CPF já está em uso.";
+                    }
+                }
+            });
+        }
+    </script>
+
+    <script>
+        function validarCPF(cpf) {
+            // Remove todos os caracteres que não são dígitos
+            cpf = cpf.replace(/\D/g, '');
+
+            // Verifica se o CPF tem exatamente 11 dígitos
+            return cpf.length === 11;
+        }
+
+        function validarForm() {
+            var cpfInput = document.getElementById('cpf');
+            var cpf = cpfInput.value;
+
+            // Verifica se o CPF tem exatamente 11 dígitos e nenhum caractere especial
+            if (!validarCPF(cpf)) {
+                document.getElementById('cpfError').innerText = 'O CPF deve conter exatamente 11 dígitos.';
+                return false; // Impede o envio do formulário
+            } else {
+                document.getElementById('cpfError').innerText = ''; // Limpa a mensagem de erro
+                return true; // Permite o envio do formulário
+            }
+        }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var inputTel = document.getElementById('tel');
+            var inputTel2 = document.getElementById('tel2');
+
+            inputTel.addEventListener('input', function () {
+                var value = inputTel.value.replace(/\D/g, '');
+                var formattedValue = '';
+
+                if (value.length === 11) { // Se for um número de celular
+                    formattedValue = '(' + value.substring(0, 2) + ') ' + value.substring(2, 7) + '-' + value.substring(7, 11);
+                } else if (value.length > 2) { // Se for um número de telefone fixo
+                    formattedValue = '(' + value.substring(0, 2) + ') ' + value.substring(2, 6) + '-' + value.substring(6, 10);
+                } else {
+                    formattedValue = value;
+                }
+
+                inputTel.value = formattedValue;
+            });
+
+            inputTel2.addEventListener('input', function () {
+                var value = inputTel2.value.replace(/\D/g, '');
+                var formattedValue = '';
+
+                if (value.length === 11) { // Se for um número de celular
+                    formattedValue = '(' + value.substring(0, 2) + ') ' + value.substring(2, 7) + '-' + value.substring(7, 11);
+                } else if (value.length > 2) { // Se for um número de telefone fixo
+                    formattedValue = '(' + value.substring(0, 2) + ') ' + value.substring(2, 6) + '-' + value.substring(6, 10);
+                } else {
+                    formattedValue = value;
+                }
+
+                inputTel2.value = formattedValue;
+            });
+        });
+    </script>
+
+    <script>
+        document.getElementById("tel").addEventListener("blur", function () {
+            var telefone = this.value;
+            if (!validarTelefone(telefone)) {
+                document.getElementById("telError").innerText = "Por favor, insira um número de telefone válido.";
+            } else {
+                document.getElementById("telError").innerText = "";
+            }
+        });
+
+        function validarTelefone(telefone) {
+            var regex = /^\(?\d{2}\)?[\s-]?\d{5}-?\d{4}$/;
+            return regex.test(telefone);
+        }
+    </script>
+
+    <script>
+        function calcularIdade() {
+            var dataNascimento = new Date(document.getElementById("dataNascimento").value);
+            var hoje = new Date();
+            var idade = hoje.getFullYear() - dataNascimento.getFullYear();
+            var mes = hoje.getMonth() - dataNascimento.getMonth();
+            if (mes < 0 || (mes === 0 && hoje.getDate() < dataNascimento.getDate())) {
+                idade--;
+            }
+            document.getElementById("idade").value = idade + " anos";
+        }
+
+        // Função para calcular idade automaticamente ao alterar a data de nascimento
+        function calcularIdadeAutomatica() {
+            calcularIdade();
+        }
+    </script>
+
+    <script>
+        function buscarEnderecoPorCEP() {
+            var cep = document.getElementById("cep").value;
+            var url = "https://viacep.com.br/ws/" + cep + "/json/";
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.erro) {
+                        document.getElementById("logradouro").value = data.logradouro;
+                        document.getElementById("cidade").value = data.localidade;
+                        document.getElementById("estado").value = data.uf;
+
+                        // Verifica se o serviço do ViaCEP retornou o bairro
+                        if (!data.bairro) {
+                            // Se o serviço do ViaCEP não retornou o bairro, tenta buscar usando o serviço dos Correios
+                            var urlCorreios = "https://apps.correios.com.br/SigepMasterJPA/AtendeClienteService/AtendeCliente?wsdl";
+                            var soapEnvelope = `<?xml version="1.0"?>
+                                                                <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cli="http://cliente.bean.master.sigep.bsb.correios.com.br/">
+                                                                    <soapenv:Header/>
+                                                                    <soapenv:Body>
+                                                                        <cli:consultaCEP>
+                                                                            <cep>${cep}</cep>
+                                                                        </cli:consultaCEP>
+                                                                    </soapenv:Body>
+                                                                </soapenv:Envelope>`;
+
+                            fetch(urlCorreios, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'text/xml'
+                                },
+                                body: soapEnvelope
+                            })
+                                .then(response => response.text())
+                                .then(dataCorreios => {
+                                    // Parse the XML response to get the address information
+                                    var parser = new DOMParser();
+                                    var xmlDoc = parser.parseFromString(dataCorreios, "text/xml");
+                                    var rua = xmlDoc.getElementsByTagName("end")[0].childNodes[0].nodeValue;
+                                    var bairro = xmlDoc.getElementsByTagName("bairro")[0].childNodes[0].nodeValue;
+
+                                    // Preencher os campos
+                                    document.getElementById("logradouro").value = rua;
+                                    document.getElementById("bairro").value = bairro;
+                                })
+                                .catch(error => console.log("Ocorreu um erro ao consultar o serviço dos Correios: ", error));
+                        } else {
+                            // Se o serviço do ViaCEP retornou o bairro, preenche normalmente
+                            document.getElementById("bairro").value = data.bairro;
+                        }
+                    } else {
+                        alert("CEP não encontrado. Por favor, verifique o CEP digitado.");
+                    }
+                })
+                .catch(error => console.log("Ocorreu um erro: ", error));
+        }
+
+        // Adicionando um evento de escuta para detectar quando o usuário terminou de digitar o CEP
+        document.getElementById("cep").addEventListener("change", buscarEnderecoPorCEP);
+    </script>
+
+    <script>
+        function voltar() {
+            window.history.back();
+        }
+    </script>
+    <script>
+        function adicionarInput() {
+            var inputsContainer = document.getElementById('inputsContainer');
+
+            // Cria um novo input de arquivo
+            var novoInput = document.createElement('div');
+            novoInput.className = 'input-group';
+            novoInput.innerHTML = `
+
+                                    <input type="file" class="form-control" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+                                    <button class="btn btn-outline-secondary border-0" type="button" onclick="removerInput(this)"><i class="bi bi-x-circle text-danger"></i></button>
+
+                                `;
+
+            // Adiciona o novo input ao container
+            inputsContainer.appendChild(novoInput);
+        }
+
+        function removerInput(button) {
+            // Remove o input pai do botão
+            button.parentNode.parentNode.removeChild(button.parentNode);
+        }
+    </script>
+
+    @section Scripts {
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $("form#clienteForm").submit(function (event) {
+                    event.preventDefault(); // Impede o envio do formulário padrão
+
+                    var form = $(this);
+                    $.ajax({
+                        type: form.attr('method'),
+                        url: form.attr('action'),
+                        data: form.serialize(),
+                        success: function (response) {
+                            if (response.success) {
+                                // Mostra o diálogo de sucesso com SweetAlert2
+                                Swal.fire({
+                                    title: 'Cliente Editado com sucesso!',
+                                    text: 'Redirecionando...',
+                                    icon: 'success',
+                                    timer: 3000, // 3 segundos
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    // Redireciona para a view Clientes após 3 segundos
+                                    window.location.href = "@Url.Action("Clientes", "Clientes")";
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Erro',
+                                    text: response.message,
+                                    icon: 'error'
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                title: 'Erro',
+                                text: 'Ops, ocorreu um erro. Tente novamente.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
+    }
+
+
+</body>

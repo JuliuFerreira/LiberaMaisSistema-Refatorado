@@ -1,0 +1,361 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.close-alert{
+    position: absolute;
+    right: -5px;
+    top: -5px;
+    border-radius: 30px;
+    width: 30px;
+    height: 31px;    
+    background-color: transparent;
+    
+}
+
+.fechar-alerta {
+    animation: fecharAlerta 1s forwards;
+}
+
+@keyframes fecharAlerta {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        height: 0;
+        padding: 0;
+        margin: 0;
+    }
+
+   
+    /* Estilos para fixar horizontalmente as células <th> e <td> */
+    .fixo-horizontalmente {
+        position: sticky;
+        left: 0;
+        background-color: white;
+    }
+    /* Estilos para os ícones */
+    .icons-fixed {
+        position: fixed;
+        top: 0;
+        right: 10%; /* Posiciona os ícones a 90% da direita da tela */
+        z-index: 1000; /* Garante que os ícones fiquem sobre outros elementos */
+    }
+
+
+
+    .form-container {
+        border: 2px solid black;
+        padding: 50px;
+        margin: 0 15px; /* Ajusta a margem lateral para diminuir a distância */
+    }
+
+    .row {
+        display: flex;
+        justify-content: center;
+        margin-left: -15px; /* Remove margem padrão do Bootstrap */
+        margin-right: -15px; /* Remove margem padrão do Bootstrap */
+    }
+
+    .col-md-6 {
+        flex: 1;
+        margin-right: 10px;
+    }
+
+
+
+}
+.nav-link.active {
+    background-color: #e6f2ff !important; /* Azul claro */
+    color: blue !important; /* Importante para sobrescrever outras regras */
+}
+
+    .nav-link.active.assinado-tab {
+        background-color: #fff5e6 !important; /* Laranja claro */
+        color: darkorange !important;
+    }
+
+    .nav-link.active.pago-tab {
+        background-color: #f0fff0 !important; /* Verde claro */
+        color: forestgreen !important;
+    }
+
+    .nav-link.active.cancelado-tab {
+        background-color: #ffe6e6 !important; /* Vermelho claro */
+        color: red !important;
+    }
+
+.tab-pane {
+    background-color: #ffffff; /* Fundo padrão */
+    padding: 20px;
+}
+
+    .tab-pane.digitado {
+        background-color: #e6f2ff; /* Azul claro */
+    }
+
+    .tab-pane.assinado {
+        background-color: #fff5e6; /* Laranja claro */
+    }
+
+    .tab-pane.pago {
+        background-color: #f0fff0; /* Verde claro */
+    }
+
+    .tab-pane.cancelado {
+        background-color: #ffe6e6; /* Vermelho claro */
+    }
+
+
+.nav-tabs {
+    border-bottom: none; /* Remove a borda inferior das abas */
+}
+
+.tab-content {
+    border: none; /* Remove a borda ao redor do conteúdo das abas */
+}
+
+.custom-accordion-button {
+    background-color: #DEB887;
+    height: 40px; /* Diminui a altura do botão */
+    padding: 5px 10px; /* Ajusta o preenchimento do botão */
+    border: none; /* Remove a borda padrão */
+    transition: background-color 0.3s; /* Adiciona transição suave para a cor */
+}
+
+    .custom-accordion-button:not(.collapsed) {
+        background-color: #F4A460; /* Cor quando expandido */
+    }
+
+    .custom-accordion-button.collapsed {
+        background-color: #DEB887; /* Cor quando não expandido */
+    }
+
+.custom-collapse {
+    margin: 0; /* Remove margem na expansão */
+}
+
+.custom-accordion-body {
+    padding: 10px; /* Ajusta o preenchimento da área da accordion */
+}
+
+.custom-heading {
+    color: black;
+    font-size: 16px; /* Diminui o tamanho do texto */
+    margin: 0; /* Remove a margem padrão */
+}
+
+.custom-back-button {
+    border-radius: 10px;
+    font-size: 16px;
+    height: 40px; /* Diminui a altura do botão de voltar */
+    padding: 5px 20px; /* Ajusta o preenchimento do botão de voltar */
+}
+
+
+.digitado {
+    color: saddlebrown;
+}
+
+.assinado {
+    color: darkblue;
+}
+
+.pago {
+    color: darkgreen;
+}
+
+.cancelado {
+    color: red;
+}
+
+.menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 180px; /* tamanho padrão para TODOS */
+    padding: 8px 12px;
+    border-radius: 8px;
+
+    background-color: #f1f1f1; /* cinza claro */
+    color: #333; /* texto cinza escuro */
+    text-decoration: none;
+
+    transition: 0.2s;
+}
+
+.menu-btn i {
+    color: #666; /* ícone cinza */
+}
+
+.menu-btn:hover {
+    background-color: #dcdcdc; /* cinza médio */
+    color: #000;
+}
+
+body {
+    background-color: #f4f6f9;
+}
+
+.page-title {
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.top-actions {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+.action-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    width: 190px;
+    text-align: center;
+    text-decoration: none;
+    color: #2c3e50;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        color: #0d6efd;
+    }
+
+    .action-card svg {
+        color: #0d6efd;
+        margin-bottom: 10px;
+    }
+
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: left;
+    gap: 20px;
+}
+
+.financa-card {
+    width: 320px;
+    border: none;
+    border-radius: 22px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+    .financa-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+    }
+
+.card-body {
+    padding: 25px;
+}
+
+.financa-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.financa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.delete-icon {
+    font-size: 18px;
+    color: #dc3545;
+    transition: 0.2s;
+}
+
+    .delete-icon:hover {
+        transform: scale(1.2);
+    }
+
+.saldo-box {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border-radius: 18px;
+    padding: 25px;
+    text-align: center;
+    color: white;
+    margin-bottom: 25px;
+}
+
+.saldo-label {
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.9;
+    margin-bottom: 10px;
+}
+
+.saldo-valor {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.btn-financa {
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 10px;
+    transition: all 0.2s ease;
+}
+
+    .btn-financa:hover {
+        transform: scale(1.02);
+    }
+
+.btn-voltar {
+    border-radius: 12px;
+    font-size: 16px;
+    padding: 10px 20px;
+}
+
+@media (max-width: 768px) {
+
+    .top-actions {
+        justify-content: center;
+    }
+
+    .action-card {
+        width: 100%;
+    }
+
+    .financa-card {
+        width: 100%;
+
+    }
+
+}

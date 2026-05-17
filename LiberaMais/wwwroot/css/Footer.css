@@ -1,0 +1,43 @@
+﻿#fixed-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #f8f9fa; /* Cor de fundo para o footer */
+    padding: 1rem 0; /* Ajuste o padding conforme necessário */
+    z-index: 1000; /* Garante que o footer esteja na frente de outros elementos */
+}
+
+/* Garante que o conteúdo do body não fique escondido atrás do footer */
+body {
+    margin: 0;
+    padding-bottom: 60px; /* Espaço para o footer, ajuste conforme a altura do seu footer */
+    box-sizing: border-box;
+}
+
+#aniversariantes-container {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-color: #bee5eb;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+#aniversariantes-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+    #aniversariantes-list li {
+        margin-bottom: 5px;
+    }
+
+.close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    border: none;
+    background: transparent;
+    font-size: 1.5rem;
+    cursor: pointer;
+}

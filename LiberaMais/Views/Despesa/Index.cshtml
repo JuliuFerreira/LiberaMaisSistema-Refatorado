@@ -1,0 +1,152 @@
+﻿@using System.Globalization
+@model IEnumerable<Despesa>
+
+
+@{
+    Layout = "LayoutSistema";
+
+    decimal totalDespesa = Model.Sum(despesa => despesa.ValorDespesa);
+
+}
+
+
+
+<div class="container-fluid" style="border-radius: 10px; border: solid 2px black">
+
+    <h2 style="text-align:center; margin-top: 30px; margin-bottom: 20px">
+        DESPESAS DE @Model?.FirstOrDefault().Financa?.Mesdescription.GetDisplayName() DE @Model?.FirstOrDefault().Financa?.Ano
+    </h2>
+    <h3 style="text-align:center; margin-top: 20px; margin-bottom: 20px">
+        <p>
+            </picture><strong style="color:red"> @totalDespesa.ToString("C2", new CultureInfo(1046))</strong>
+        </p>
+    </h3>
+
+    <form method="get" action="/ListarPromotora" class="search-form">
+        <div class="column" style="text-align: right;">
+            <a class="icon-link" asp-route-idFinanca="@Model?.FirstOrDefault().FinancaId" asp-controller="Despesa" asp-action="CriarDespesa">
+                <div class="icon-container-fluid">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-folder-minus" viewBox="0 0 16 16">
+                        <path d="m.5 3 .04.87a2 2 0 0 0-.342 1.311l.637 7A2 2 0 0 0 2.826 14H9v-1H2.826a1 1 0 0 1-.995-.91l-.637-7A1 1 0 0 1 2.19 4h11.62a1 1 0 0 1 .996 1.09L14.54 8h1.005l.256-2.819A2 2 0 0 0 13.81 3H9.828a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 6.172 1H2.5a2 2 0 0 0-2 2m5.672-1a1 1 0 0 1 .707.293L7.586 3H2.19q-.362.002-.683.12L1.5 2.98a1 1 0 0 1 1-.98z" />
+                        <path d="M11 11.5a.5.5 0 0 1 .5-.5h4a.5.5 0 1 1 0 1h-4a.5.5 0 0 1-.5-.5" />
+                    </svg>
+                    <h4 class="card-text" style="text-align:center; font-size: 16px">Adicionar <br />Despesa</h4>
+                </div>
+            </a>
+        </div>
+    </form>
+
+    <div style="margin-top: 30px">
+        <div class="table-responsive">
+            <table class="table table-hover" id="table-libera" style="width: 100%">
+                <thead style="background-color: #666; color: white">
+                    <tr>
+                        <th>Data</th>
+                        <th>Descrição</th>
+                        <th>Conta</th>
+                        <th style="text-align: start">Valor (R$)</th>
+                        <th class="text-center">Ações</th> <!-- Alterei aqui para class="text-end" -->
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var despesa in Model)
+                    {
+                        <tr style=" background-color: #fff2f2; color: red; font-size: 16px; border:black">
+                            <td>@despesa.DataDespesa.ToString("dd/MM/yyyy")</td>
+                            <td>@despesa.Descricao</td>
+                            <td>@Html.DisplayFor(model => despesa.UsuarioDescription)</td>
+                            <td style="text-align: start">@despesa.ValorDespesa.ToString("C2", new CultureInfo(1046))</td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-center">
+                                    <a role="button" asp-route-id="@despesa.Id" asp-controller="Despesa" asp-action="EditarDespesa">
+                                        <div class="d-flex flex-column align-items-center mr-2">
+                                            <button type="button" class="btn btn-warning">
+                                                <i class="bi bi-pencil-square text-white" style="font-size: 16px;"></i>
+                                            </button>
+                                        </div>
+                                    </a>
+                                    <a role="button">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <button type="button" class="btn btn-danger delete-despesa-button" data-id="@despesa.Id" data-url="@Url.Action("Apagar", "Despesa", new { id = despesa.Id })">
+                                                <i class="bi bi-trash" style="font-size: 16px;"></i>
+                                            </button>
+                                        </div>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-left" style="margin-bottom: 15px">
+        <a class="btn btn-outline-secondary btn-lg" style="border-radius: 10px; font-size:16px" asp-controller="Financa" asp-action="Index">
+            <i class="bi bi-arrow-return-left"></i> Voltar
+        </a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteButtons = document.querySelectorAll('.delete-despesa-button');
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const id = button.getAttribute('data-id');
+                    const url = button.getAttribute('data-url');
+
+                    Swal.fire({
+                        text: `Deseja realmente excluir essa despesa?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Excluir',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(url, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                body: JSON.stringify({ id: id })
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        Swal.fire({
+                                            title: 'Despesa excluida com sucesso!',
+                                            text: 'Atualizando a lista...',
+                                            icon: 'success',
+                                            showConfirmButton: false,
+                                            timer: 2000 // Tempo de exibição da mensagem de sucesso
+                                        }).then(() => {
+                                            // Atualizar a lista de bancos na página
+                                            window.location.reload(); // Recarregar a página para atualizar a lista
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Erro!',
+                                            text: data.message,
+                                            icon: 'error',
+                                            confirmButtonText: 'Ok'
+                                        });
+                                    }
+                                })
+                                .catch(error => {
+                                    Swal.fire({
+                                        title: 'Erro!',
+                                        text: 'Ocorreu um erro ao tentar excluir a despesa.',
+                                        icon: 'error',
+                                        confirmButtonText: 'Ok'
+                                    });
+                                });
+                        }
+                    });
+                });
+            });
+        });
+    </script>

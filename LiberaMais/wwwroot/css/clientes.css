@@ -1,0 +1,180 @@
+﻿.search-form {
+    display: flex;
+    align-items: center; /* Alinha verticalmente os elementos */
+    justify-content: space-between; /* Espaço entre os elementos */
+    margin-top: 20px;
+}
+
+    .search-form input[type="text"],
+    .search-form button {
+        height: 40px; /* Definindo a mesma altura */
+        padding: 5px 10px; /* Adicionando preenchimento interno */
+        box-sizing: border-box; /* Incluindo padding e borda na altura total */
+        font-size: 16px; /* Definindo o tamanho da fonte */
+    }
+
+    .search-form input[type="text"] {
+        flex: 1;
+        margin-right: 5px; /* Espaçamento entre o campo de entrada e o botão de pesquisa */
+    }
+
+    .search-form button {
+        background-color: darkorange; /* Cor de fundo verde */
+        color: #fff; /* Cor do texto branco */
+        border: none; /* Removendo a borda */
+        cursor: pointer; /* Alterando o cursor para apontar */
+    }
+
+.btn.btn-success:hover {
+    background-color: orange; /* Alterando para azul */
+}
+
+    /* Estilo para o botão "Adicionar Cliente" */
+    .search-form .add-client-button {
+        margin-left: 500px; /* Espaçamento entre o botão de pesquisa e o botão "Adicionar Cliente" */
+        margin-right: 100px;
+    }
+
+
+.container {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    width: 1000000px;
+    
+  
+    
+}
+
+.column {
+    margin: 0 10px;
+    padding: 20px;
+    
+}
+
+.icon-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.icon-container {
+    position: relative;
+    display: inline-block;
+    margin-left: 600px;
+    margin-right:100px;
+}
+
+.icon {
+    fill: black; /* Cor inicial do ícone */
+    transition: transform 0.3s ease, fill 0.3s ease; /* Transição da cor do ícone */
+}
+
+.card-text {
+    color: black; /* Cor inicial do texto */
+    transition: color 0.3s ease; /* Transição da cor do texto */
+    margin-top: 10px;
+   
+}
+
+.icon-container:hover .icon {
+    transform: scale(1.1);
+    fill: darkorange; /* Cor de sobreposição do ícone */
+}
+
+.icon-container:hover .card-text {
+    color: darkorange; /* Cor de sobreposição do texto */
+}
+
+.inp1{
+    border-radius: 10px;
+    border: 2px solid;
+    border-color: #cccc;
+    margin-left: 100px;
+   
+}
+
+.remover-opcao {
+    color: red;
+    border: none;
+    font-size: 1rem;
+}
+
+.input-group .btn:hover {
+    opacity: 0.7; /* Define a opacidade do botão quando o mouse está sobre ele */
+}
+.input-group {
+    margin-bottom: 20px;
+}
+.input-group {
+    margin-bottom: 20px;
+    width: calc(33.33% - 20px); /* Define a largura dos inputs para ocupar 1/3 da tela, considerando a margem */
+    float: left; /* Faz com que os inputs fiquem em linha */
+}
+
+.confirmacao-caixa {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.confirmacao-botao {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    .confirmacao-botao:hover {
+        background-color: darkorange;
+    }
+
+
+.icon-container-fluid:hover svg {
+    fill: darkorange;
+    transform: scale(1.1);
+}
+
+.icon-container-fluid:hover h4 {
+    color: darkorange;
+    text-decoration: none;
+}
+
+.icon-container-fluid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+    .icon-container-fluid h4 {
+        margin: 0;
+    }
+
+.icon-link:hover {
+    text-decoration: none;
+}
+
+.swal2-toast-custom {
+    width: 500px !important; /* Ajusta a largura do toast para 500px */
+}
+
+.form-container {
+    border: 2px solid black;
+    padding: 50px;
+    margin: 0 15px; /* Ajusta a margem lateral para diminuir a distância */
+}
+
+.row {
+    display: flex;
+    justify-content: ;
+    margin-left: -15px; /* Remove margem padrão do Bootstrap */
+    margin-right: -15px; /* Remove margem padrão do Bootstrap */
+}
+
+.col-md-6 {
+    flex: 1;
+    margin-right: 10px;
+}

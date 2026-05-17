@@ -1,0 +1,123 @@
+﻿@model Cliente
+
+@{
+    Layout = "LayoutClientes";
+}
+
+
+<form asp-controller="Clientes" asp-action="Documentos" method="post" enctype="multipart/form-data" class="row g-3" style="width: auto; margin: 0 auto; border: solid 2px black; padding: 10px; border-radius:10px">
+    <h1 style="text-align:center; margin-top: 50px; margin-bottom: 50px">Anexar Documentos</h1>
+
+    <input type="hidden" asp-for="IdCliente" />
+
+
+    <div style="margin-top: 30px; background-color: #cccc; border: 1px solid darkorange">
+        <h5 style="padding: 5px; margin-top: 5px; margin-bottom: 5px; margin-left: 10px">Dados do cliente</h5>
+    </div>
+
+    <div class="col-md-2">
+        <label for="cpf" class="form-label">CPF</label>
+        <input type="text" asp-for="Cpf" class="form-control" id="cpf" required maxlength="11" readonly>
+    </div>
+
+    <div class="col-md-5">
+        <label for="nome" class="form-label">Nome</label>
+        <input type="text" asp-for="Nome" class="form-control" id="nome" readonly maxlength="50">
+        <span id="nomeError" style="color: red; display: none;">Por favor, insira o nome completo (nome e sobrenome).</span>
+    </div>
+
+    <div style="display: none" class="col-2">
+        <label for="nascimento" class="form-label">Data de nascimento</label>
+        <input type="date" asp-for="DataNascimento" class="form-control" id="nascimento" required onchange="calcularIdadeAutomatica()">
+    </div>
+
+    <div style="display: none" class="col-md-2">
+        <label for="senhainss" class="form-label">Senha do cliente</label>
+        <input type="text" asp-for="SenhaInss" class="form-control" id="senhainss" maxlength="20">
+    </div>
+
+    <div style="display: none" class="col-1">
+        <label for="cep" class="form-label">CEP</label>
+        <input type="number" asp-for="Cep" class="form-control" id="cep" required>
+    </div>
+
+    <div style="display: none" class="col-md-3">
+        <label for="logradouro" class="form-label">Rua:</label>
+        <input type="text" asp-for="Logradouro" class="form-control" id="logradouro" readonly>
+    </div>
+
+    <div style="display: none" class="col-1">
+        <label for="nCasa" class="form-label">Nº</label>
+        <input type="text" asp-for="Ncasa" class="form-control" id="ncasa" required>
+    </div>
+
+    <div style="display: none" class="col-md-2">
+        <label for="bairro" class="form-label">Bairro:</label>
+        <input type="text" asp-for="Bairro" class="form-control" id="bairro" readonly>
+    </div>
+
+    <div style="display: none" class="col-md-2">
+        <label for="cidade" class="form-label">Cidade:</label>
+        <input type="text" asp-for="Cidade" class="form-control" id="cidade" readonly>
+    </div>
+
+    <div style="display: none" class="col-md-1">
+        <label for="estado" class="form-label">Estado:</label>
+        <input type="text" asp-for="Estado" class="form-control" id="estado" readonly>
+    </div>
+
+    <div style="display: none" class="col-2">
+        <label for="tel" class="form-label">Telefone/WhatsApp</label>
+        <input type="tel" asp-for="Tel1" class="form-control telefone" id="tel" required>
+        <span id="telError" class="text-danger"></span>
+    </div>
+
+    <div style="display: none" class="col-2">
+        <label for="tel2" class="form-label">Telefone/WhatsApp²</label>
+        <input type="tel" asp-for="Tel2" class="form-control telefone" id="tel2">
+    </div>
+
+
+    <div style="display: none" class="col-4">
+        <label for="email" class="form-label">E-mail</label>
+        <input type="email" asp-for="Email" class="form-control" id="email">
+    </div>
+
+    <div style="display: none" class="col-12">
+        <label for="observacoes" class="form-label">Observações</label>
+        <input type="observacoes" asp-for="observacoes" class="form-control" id="observacoes" rows="3">
+    </div>
+
+
+    <div style="margin-top: 30px; background-color: #cccc; border: 1px solid darkorange">
+        <h5 style="padding: 5px; margin-top: 5px; margin-bottom: 5px; margin-left: 10px">Selecione o arquivo</h5>
+    </div>
+
+    @* <div class="col-md-2">
+        <label for="tipoDocumento" class="form-label">Documento</label>
+        <select id="tipoDocumento" asp-for="TipoDocumento" asp-items="@Html.GetEnumSelectList<LiberaMais.Models.Enums.DocumentoEnum>()" class="form-select" required>
+            <option value="">Selecione o documento</option>
+        </select>
+    </div> *@
+
+    <div class="col-md-6">
+        <label for="documento" class="form-label">Documento</label>
+        <input type="file" name="documento" id="documento" accept="image/*" class="form-control">
+    </div>
+    <div class="col-md-6">
+        <button type="submit" class="btn btn-outline-success">
+            <i class="bi bi-upload"></i>
+            Enviar
+        </button>
+    </div>
+
+    <div style="border: solid 1px black; margin-top: 30px;"></div>
+
+
+    <div style="margin-top: 10px; margin-bottom: 10px">
+        <a button style="border-radius: 10px; font-size: 18px; width: 100px" role="button" class="btn btn-outline-secondary" asp-controller="Clientes" asp-action="Clientes">
+            <i class="bi bi-arrow-return-left"></i>
+            Voltar
+        </a>
+    </div>
+</form>

@@ -1,0 +1,97 @@
+﻿html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa; /* Cor de fundo para contraste */
+}
+
+.login-container {
+    border: 1px solid #ced4da; /* Borda ao redor da div */
+    border-radius: 10px; /* Bordas arredondadas */
+    padding: 20px; /* Espaçamento interno */
+    background-color: #fff; /* Fundo branco */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    width: 100%;
+    max-width: 400px; /* Largura máxima */
+    box-sizing: border-box; /* Inclui padding e border na largura total */
+    margin: auto; /* Centraliza horizontalmente */
+}
+
+.login {
+    display: flex;
+    flex-direction: column;
+}
+
+.box-user {
+    margin-bottom: 15px; /* Espaço entre os campos */
+}
+
+    .box-user input {
+        width: 100%; /* Campo de entrada ocupa toda a largura */
+        padding: 10px;
+        margin-top: 5px; /* Espaço entre o label e o input */
+        box-sizing: border-box; /* Inclui padding e border na largura total */
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+    }
+
+    .box-user label {
+        font-size: 14px;
+        margin-bottom: 5px; /* Espaço abaixo do label */
+    }
+
+.logo-container img {
+    display: block;
+    margin: 0 auto 20px; /* Centraliza a imagem e adiciona margem inferior */
+}
+
+.btn-primary {
+    display: block;
+    width: 100%;
+}
+
+p {
+    margin: 0;
+}
+
+    p a {
+        text-decoration: none;
+        color: #007bff;
+    }
+
+.close-alert {
+    position: absolute;
+    right: -5px;
+    top: -5px;
+    border-radius: 30px;
+    width: 30px;
+    height: 31px;
+    background-color: transparent;
+}
+
+.fechar-alerta {
+    animation: fecharAlerta 1s forwards;
+}
+
+@keyframes fecharAlerta {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        height: 0;
+        padding: 0;
+        margin: 0;
+    }
+}
+
+.swal2-toast-custom {
+    width: 500px !important; /* Ajusta a largura do toast para 500px */
+
+}

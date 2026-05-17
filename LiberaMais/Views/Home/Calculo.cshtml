@@ -1,0 +1,60 @@
+﻿    <div class="container">
+            <div class="row">
+        <div class="mt-4">
+            <h5>
+                Aqui você pode simular seu empréstimo do jeito que você quer.
+            </h5>
+            <br />
+            <p>
+                Preencha o formulário abaixo, escolhendo entre valor do empréstimo ou valor da parcela e o prazo que deseja:
+            </p>
+
+        </div>
+    </div>
+ <br />
+ <form class="row g-3">
+  <div class="col-md-3">
+    <label for="inputName" class="form-label">Nome</label>
+    <input type="text" class="form-control" id="inputName">
+  </div>
+    <div class="col-md-3">
+    <label for="inputCpf" class="form-label">CPF</label>
+    <input type="cpf" class="form-control" id="inputCpf">
+  </div>
+   <div class="col-md-3">
+    <label for="inputBen" class="form-label">Número do Benefício</label>
+    <input type="text" class="form-control" id="inputBen">
+  </div>
+  <div class="col-md-3">
+    <label for="inputFone" class="form-label">Tel / WhatsApp</label>
+    <input type="text" class="form-control" name="telefone" id="telefone" placeholder="(XX) XXXXX-XXXX">
+  </div>
+ 
+  <div class="col-md-3">
+        <label for="imputEmprestimo" class="form-label">Escolha por Valor ou parcela</label>
+        <select class="form-select" id="Emprestimo">
+            <option value="opcao1">Parcela</option>
+            <option value="opcao2">Valor</option>
+        </select>
+    </div>
+  <div class="col-md-2">
+    <label for="inputValor" class="form-label">Valor</label>
+    <input type="number" class="form-control" id="valor">
+  </div>
+  <div class="col-md-1">
+        <label for="inputPrazo" class="form-label">Prazo</label>
+        <select class="form-select" id="prazo">
+            <option value="opcao1">84X</option>
+            <option value="opcao2">72X</option>
+            <option value="opcao3">60X</option>
+        </select>
+    </div>
+  <div class="mb-3">
+  <label for="areaTexto" class="form-label">Mensagem</label>
+  <textarea class="form-control" id="exampleFormControlTextarea1" rows="5"></textarea>
+   </div>
+  <div class="col-12">
+            <button type="submit" class="btn btn-outline-warning">Enviar</button>
+  </div>
+</form>
+</div>

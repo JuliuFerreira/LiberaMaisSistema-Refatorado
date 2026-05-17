@@ -1,0 +1,382 @@
+﻿* {
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+body {
+    display:contents;
+    align-content:center;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    
+}
+
+
+.login {
+    margin:auto;
+    margin-top:200px;
+    background: white;
+    border-radius: 10px;
+    width: 400px;
+    padding: 40px;
+    border: 2px solid black;
+}
+
+.login.logo-container {
+    text-align: center; /* Centraliza horizontalmente */
+    display: flex;
+}
+
+
+.login .box-user {
+    position: relative;
+}
+
+.login .box-user input {
+    width: 100%;
+    padding: 10px 0;
+    outline: none;
+    border: 0;
+    background: transparent;
+    border-bottom: 1px solid black;
+    color: black;
+    font-size: 16px;
+    margin-bottom: 30px;
+    }
+
+.login .box-user label{
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 10px 0;
+    color: black;
+    font-size: 16px;
+    pointer-events: none;
+    transition: .5s;
+
+}
+/* Efeito ao clicar no label  */
+.login .box-user input:focus~label,
+.login .box-user input:valid~label
+{
+    top: -20px;
+    left: 0;
+    color: darkorange;
+    font-size: 12px;
+}
+
+
+.btn{
+
+    position: center;
+    display: inline block;
+    background-color:darkorange;
+    color:white;
+    text-decoration: none;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    font-weight: 600;
+    margin-top: 3px;
+    transition: .5s;
+    overflow: hidden;
+
+}
+/* Efeito ao passar o mouse no botão */
+.btn:hover{
+
+    background-color: darkorange;
+    border-radius: 5px;
+    color: #172031;
+
+}
+.login .box-user label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 10px 0;
+    color: black;
+    font-size: 16px;
+    pointer-events: none;
+    transition: .5s;
+}
+/* Efeito ao clicar no label  */
+.login .box-user input:focus ~ label,
+.login .box-user input:valid ~ label {
+    top: -20px;
+    left: 0;
+    color: darkorange;
+    font-size: 12px;
+}
+
+
+    /* Efeito ao passar o mouse no botão */
+    .btn:hover {
+        background-color: darkorange;
+        border-radius: 5px;
+        color: #172031;
+    }
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+}
+
+
+.action-buttons {
+    text-align: left;
+    margin-top: -40px;
+    
+}
+
+.C-user {
+    text-align: right;
+    margin-top: -20px;
+    font-size: 12px;
+    color: darkorange;
+}
+
+.forget {
+    text-align: right;
+    margin-top: 5px;
+    font-size: 12px;}
+
+.custom-modal {
+    background-color: #ccc; /* Cinza */
+    color: #333; /* Cor do texto */
+}
+
+.card {
+    flex: 1 1 200px; /* Flexibilidade mínima de 200px */
+    margin: 10px;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.card-text {
+    flex-grow: 1;
+}
+
+.btn-outline-success {
+    margin-right: 10px;
+}
+
+.modal-content {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+body {
+    background-color: #f4f6f9;
+}
+
+.page-title {
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.top-actions {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+.action-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    width: 190px;
+    text-align: center;
+    text-decoration: none;
+    color: #2c3e50;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        color: #0d6efd;
+    }
+
+    .action-card svg {
+        color: #0d6efd;
+        margin-bottom: 10px;
+    }
+
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.financa-card {
+    width: 320px;
+    border: none;
+    border-radius: 22px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+    .financa-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+    }
+
+.card-body {
+    padding: 25px;
+}
+
+.financa-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.financa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.delete-icon {
+    font-size: 18px;
+    color: #dc3545;
+    transition: 0.2s;
+}
+
+    .delete-icon:hover {
+        transform: scale(1.2);
+    }
+
+.saldo-box {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border-radius: 18px;
+    padding: 25px;
+    text-align: center;
+    color: white;
+    margin-bottom: 25px;
+}
+
+.saldo-label {
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.9;
+    margin-bottom: 10px;
+}
+
+.saldo-valor {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.btn-financa {
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 10px;
+    transition: all 0.2s ease;
+}
+
+    .btn-financa:hover {
+        transform: scale(1.02);
+    }
+
+.btn-voltar {
+    border-radius: 12px;
+    font-size: 16px;
+    padding: 10px 20px;
+}
+
+@@media (max-width: 768px) {
+
+    .top-actions {
+        justify-content: center;
+    }
+
+    .action-card {
+        width: 100%;
+    }
+
+    .financa-card {
+        width: 100%;
+    }
+
+    <style >
+
+
+    .promotora-card {
+        transition: 0.2s ease-in-out;
+    }
+
+    .promotora-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .icon-box {
+        width: 45px;
+        height: 45px;
+        background: #eef4ff;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    .info-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #6c757d;
+        text-transform: uppercase;
+    }
+
+    .info-text {
+        font-size: 14px;
+        font-weight: 500;
+        color: #212529;
+    }
+
+    </style>
+}
+

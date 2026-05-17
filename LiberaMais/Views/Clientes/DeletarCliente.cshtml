@@ -1,0 +1,24 @@
+﻿@model Cliente
+@{
+    Layout = null; // Não utiliza layout
+}
+
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title" id="modalExcluirClienteLabel">Confirmação de Exclusão</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+    </div>
+
+    <div class="modal-body">
+        <p>DESEJA MESMO EXCLUIR O CLIENTE <strong style="color: red">@Model.Nome</strong> ?</p>
+    </div>
+
+    <div class="modal-footer">
+        <a role="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" asp-controller="Clientes" asp-action="Clientes">
+            <i class="bi bi-x-circle"></i> Cancelar
+        </a>
+        <a role="button" class="btn btn-outline-danger" asp-controller="Clientes" asp-action="Apagar" asp-route-idCliente="@Model.IdCliente">
+            <i class="bi bi-trash"></i> Excluir
+        </a>
+    </div>
+</div>

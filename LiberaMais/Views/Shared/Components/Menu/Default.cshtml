@@ -1,0 +1,175 @@
+﻿@model UsuarioModel
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-end">
+
+        <div class="dropdown">
+
+            <button class="btn user-menu dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+
+                <div class="d-flex align-items-center gap-2">
+
+                    <div class="user-icon">
+
+                        <i class="bi bi-person-circle"></i>
+
+                    </div>
+
+                    <div class="text-start">
+
+                        <div class="user-label">
+                            Bem-vindo,
+                        </div>
+
+                        <div class="user-name">
+                            @Model.Nome
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end custom-dropdown shadow border-0">
+
+                <li>
+
+                    <a class="dropdown-item custom-item"
+                       asp-controller="AlterarSenha"
+                       asp-action="Index">
+
+                        <i class="bi bi-arrow-repeat"></i>
+
+                        Alterar senha
+
+                    </a>
+
+                </li>
+
+                @*<li>
+
+                    <a class="dropdown-item custom-item"
+                       asp-controller="Setup"
+                       asp-action="Index">
+
+                        <i class="bi bi-gear-fill"></i>
+
+                        Configurações
+
+                    </a>
+
+                </li>*@
+
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+
+                <li>
+
+                    <a class="dropdown-item custom-item logout"
+                       asp-controller="Login"
+                       asp-action="Sair">
+
+                        <i class="bi bi-box-arrow-right"></i>
+
+                        Sair
+
+                    </a>
+
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+    /* BOTÃO USUÁRIO */
+
+    .user-menu {
+        background: rgba(255,255,255,0.08);
+        border: none;
+        border-radius: 14px;
+        padding: 10px 16px;
+        color: white;
+        transition: 0.3s;
+        backdrop-filter: blur(8px);
+    }
+
+        .user-menu:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        .user-menu:focus {
+            box-shadow: none;
+        }
+
+    /* ÍCONE */
+
+    .user-icon {
+        font-size: 35px;
+        color: #60a5fa;
+        display: flex;
+        align-items: center;
+    }
+
+    /* TEXTO */
+
+    .user-label {
+        color: dimgrey;
+        font-size: 11px;
+        line-height: 12px;
+    }
+
+    .user-name {
+        font-weight: 600;
+        font-size: 14px;
+        color: dimgrey;
+        line-height: 16px;
+    }
+
+    /* DROPDOWN */
+
+    .custom-dropdown {
+        border-radius: 16px;
+        padding: 10px;
+        min-width: 230px;
+        margin-top: 10px;
+        background-color: white;
+    }
+
+    /* ITENS */
+
+    .custom-item {
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-weight: 500;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #374151;
+    }
+
+        .custom-item:hover {
+            background-color: #f3f4f6;
+            color: #2563eb;
+        }
+
+    /* LOGOUT */
+
+    .logout:hover {
+        background-color: #fee2e2;
+        color: #dc2626;
+    }
+
+</style>

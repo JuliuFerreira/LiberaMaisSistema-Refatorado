@@ -1,0 +1,180 @@
+﻿@model IEnumerable<PromotoraBanco>
+
+@{
+    Layout = "LayoutSistema";
+}
+
+<div>
+
+    <div class="card shadow-sm mt-5 rounded-4">
+
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Lista de Login</h4>
+        </div>
+
+            @* <a asp-action="Criar"
+               class="btn btn-success mb-3">
+                Adicionar Login
+            </a> *@
+
+            <table class="table table-striped table-bordered">
+
+                <thead class="table-light">
+
+                    <tr>
+                        <th>Promotora</th>
+                        <th>Banco</th>
+                        <th>Login</th>
+                        <th>Senha</th>
+                        <th>Link do sistema</th>
+                        @* <th></th>
+                        <th></th> *@
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var pb in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                @pb.Promotora.Nome
+                            </td>
+                            <td>
+                                @pb.Banco.Nome
+                            </td>
+                            <td>
+                                @pb.Login
+                            </td>
+
+                            <td>
+                                @pb.Senha
+                            </td>
+                            <td>
+                                @pb.Banco.Url
+                            </td>
+
+
+                            @* <td>
+                                <a asp-action="Editar"
+                                   asp-route-id="@pb.Id"
+                                   class="btn btn-warning btn-sm">
+                                    Editar
+                                </a>
+                            </td>
+
+                            <td>
+                                <button class="btn btn-danger btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalExcluir_@pb.Id">
+
+                                    Excluir
+
+                                </button>
+                            </td>
+ *@
+                        </tr>
+
+                        <!-- MODAL -->
+                        <div class="modal fade"
+                             id="modalExcluir_@pb.Id"
+                             tabindex="-1"
+                             aria-hidden="true">
+
+                            <div class="modal-dialog modal-dialog-centered">
+
+                                <div class="modal-content rounded-4 border-0 shadow">
+
+                                    <div class="modal-header bg-danger text-white">
+
+                                        <h5 class="modal-title">
+
+                                            Excluir Login
+
+                                        </h5>
+
+                                        <button type="button"
+                                                class="btn-close btn-close-white"
+                                                data-bs-dismiss="modal">
+                                        </button>
+
+                                    </div>
+
+                                    <div class="modal-body text-center p-4">
+
+                                        <h5 class="text-danger mb-3">
+                                            Atenção!
+                                        </h5>
+
+                                        <p class="fs-5">
+
+                                            Deseja realmente excluir o login 
+
+                                            <strong class="text-primary">
+                                                @pb.Login
+                                            </strong>?
+
+                                        </p>
+
+                                    </div>
+
+                                    <div class="modal-footer border-0">
+
+                                        <button type="button"
+                                                class="btn btn-secondary"
+                                                data-bs-dismiss="modal">
+
+                                            Cancelar
+
+                                        </button>
+
+                                        <form asp-action="Apagar" method="post">
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@pb.Id" />
+
+                                            <button type="submit"
+                                                    class="btn btn-danger">
+
+                                                Excluir
+
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    <div class="text-left my-3">
+        <a class="btn btn-outline-secondary btn-lg" style="border-radius: 10px; font-size: 16px" asp-controller="Setup" asp-action="Index">
+            <i class="bi bi-arrow-return-left"></i> Voltar
+        </a>
+    </div>
+    </div>
+
+
+
+
+<script>
+    setTimeout(function () {
+
+        $("#alertaSucesso").fadeOut("slow");
+        $("#alertaErro").fadeOut("slow");
+
+    }, 3000);
+</script>

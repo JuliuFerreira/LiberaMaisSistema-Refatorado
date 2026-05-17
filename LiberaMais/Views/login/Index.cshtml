@@ -1,0 +1,120 @@
+﻿@using System.Security.Claims
+@model LoginModel
+@{
+    Layout = "_LayoutLogin.cshtml";
+}
+
+<body>
+    <div class="login-container">
+
+        <form id="loginForm" asp-controller="Login" asp-action="Entrar" method="post" class="login">
+            <!-- Container para o alerta -->
+            <div id="alert-container" class="alert-container"></div>
+
+            <div class="logo-container">
+                <img src="~/img/Logom.png" alt="Logo">
+            </div>
+
+            <div class="box-user">
+                <label for="login">Login</label>
+                <input asp-for="Login" type="text" id="login">
+                @Html.ValidationMessageFor(x => x.Login)
+            </div>
+            <div class="box-user">
+                <label for="senha">Senha</label>
+                <input asp-for="Senha" type="password" id="senha">
+                @Html.ValidationMessageFor(x => x.Senha)
+            </div>
+
+            <p style="font-size: 12px; text-align: end; margin-top: -5px; margin-bottom: 20px">
+                <a asp-action="RedefinirSenha" asp-controller="Login">Esqueci minha senha</a>
+            </p>
+
+            <button style="border-radius: 10px; margin-bottom: 20px" type="submit" class="btn btn-outline-secondary">Entrar</button>
+        </form>
+    </div>
+
+    <script>
+        // Função para fechar o alerta após 5 segundos
+        setTimeout(function () {
+            var alerta = document.getElementById('alerta');
+            alerta.classList.add('fechar-alerta');
+            setTimeout(function () {
+                alerta.remove();
+            }, 1000); // Tempo de duração da animação
+        }, 5000); // 5000 milissegundos = 5 segundos
+    </script>
+</body>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("form#loginForm").submit(function (event) {
+                event.preventDefault(); // Impede o envio do formulário padrão
+
+                var form = $(this);
+                $.ajax({
+                    type: form.attr('method'),
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            // Mostra o diálogo de sucesso com SweetAlert2
+                            Swal.fire({
+                                title: 'Login efetuado com sucesso!',
+                                text: 'Bem vindo ao sistema Libera Mais!',
+                                icon: 'success',
+                                timer: 3000, // 3 segundos
+                                showConfirmButton: false,
+                                position: 'top-center', // Alerta aparece na parte superior central
+                                toast: true, // Exibe como um toast (pequeno, não modal)
+                                customClass: {
+                                    container: 'swal2-toast-custom' // Aplica a classe customizada ao toast
+                                }
+                            }).then(() => {
+                                // Redireciona para a view Clientes após 3 segundos
+                                window.location.href = "@Url.Action("Index", "Apps")";
+                            });
+                        } else {
+                            // Mostra o diálogo de erro com SweetAlert2
+                            Swal.fire({
+                                title: 'Erro',
+                                text: response.message,
+                                icon: 'error',
+                                timer: 3000, // 3 segundos
+                                showConfirmButton: false,
+                                position: 'top-center', // Alerta aparece na parte superior central
+                                toast: true, // Exibe como um toast (pequeno, não modal)
+                                customClass: {
+                                    container: 'swal2-toast-custom' // Aplica a classe customizada ao toast
+                                }
+                            }).then(() => {
+                                // Redireciona para a view Login após 3 segundos
+                                window.location.href = "@Url.Action("Venda", "Venda")";
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            title: 'Erro',
+                            text: 'Ops, ocorreu um erro. Tente novamente.',
+                            icon: 'error',
+                            timer: 3000, // 3 segundos
+                            showConfirmButton: false,
+                            position: 'top-center', // Alerta aparece na parte superior central
+                            toast: true, // Exibe como um toast (pequeno, não modal)
+                            customClass: {
+                                container: 'swal2-toast-custom' // Aplica a classe customizada ao toast
+                            }
+                        }).then(() => {
+                            // Redireciona para a view Login após 3 segundos
+                            window.location.href = "@Url.Action("Venda", "Venda")";
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

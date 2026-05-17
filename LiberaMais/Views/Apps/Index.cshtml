@@ -1,0 +1,236 @@
+﻿@{
+    Layout = "LayoutSistema";
+    ViewData["Title"] = "Painel Principal";
+}
+
+<div class="container-fluid mt-4">
+
+    <div class="row mb-4 mt-4 align-items-center">
+
+        <div class="col-md-8">
+
+            <h3 class="text-muted mb-5 mt-5" >
+                Bem-vindo ao sistema LiberaMais
+            </h3>
+
+        </div>
+
+        <div class="col-md-4 text-end">
+
+            <span class="badge bg-primary fs-6 p-2 shadow-sm">
+                Sistema Online
+            </span>
+
+        </div>
+
+    </div>
+
+    <div class="row g-4">
+
+        <!-- CLIENTES -->
+        <div class="col-md-3">
+
+            <a asp-controller="Clientes"
+               asp-action="Clientes"
+               class="text-decoration-none">
+
+                <div class="card border-0 shadow rounded-4 h-100 card-hover">
+
+                    <div class="card-body text-center p-4">
+
+                        <div class="mb-3">
+                            <i class="bi bi-people-fill display-4 text-primary"></i>
+                        </div>
+
+                        <h4 class="fw-bold text-dark">
+                            Clientes
+                        </h4>
+
+                        <p class="text-muted mb-0">
+                            Cadastro e gerenciamento de clientes
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+        <!-- VENDAS -->
+        <div class="col-md-3">
+
+            <a asp-controller="Venda"
+               asp-action="Venda"
+               class="text-decoration-none">
+
+                <div class="card border-0 shadow rounded-4 h-100 card-hover">
+
+                    <div class="card-body text-center p-4">
+
+                        <div class="mb-3">
+                            <i class="bi bi-currency-dollar display-4 text-success"></i>
+                        </div>
+
+                        <h4 class="fw-bold text-dark">
+                            Vendas
+                        </h4>
+
+                        <p class="text-muted mb-0">
+                            Controle completo de vendas
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+        <!-- PROMOTORAS -->
+        <div class="col-md-3">
+
+            <a asp-controller="Promotora"
+               asp-action="Index"
+               class="text-decoration-none">
+
+                <div class="card border-0 shadow rounded-4 h-100 card-hover">
+
+                    <div class="card-body text-center p-4">
+
+                        <div class="mb-3">
+                            <i class="bi bi-building display-4 text-warning"></i>
+                        </div>
+
+                        <h4 class="fw-bold text-dark">
+                            Promotoras e Logins
+                        </h4>
+
+                        <p class="text-muted mb-0">
+                            Gerencie promotoras e acessos
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+               
+        <!-- FINANCEIRO -->
+        <div class="col-md-3">
+
+            <a asp-controller="Financa"
+               asp-action="Index"
+               class="text-decoration-none">
+
+                <div class="card border-0 shadow rounded-4 h-100 card-hover">
+
+                    <div class="card-body text-center p-4">
+
+                        <div class="mb-3">
+                            <i class="bi bi-wallet2 display-4 text-info"></i>
+                        </div>
+
+                        <h4 class="fw-bold text-dark">
+                            Financeiro
+                        </h4>
+
+                        <p class="text-muted mb-0">
+                            Receitas, despesas e controle financeiro
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+        <!-- LINKS UTEIS -->
+        <div class="col-md-3">
+
+            <a asp-controller=""
+               asp-action=""
+               class="text-decoration-none">
+
+                <div class="card border-0 shadow rounded-4 h-100 card-hover">
+
+                    <div class="card-body text-center p-4">
+
+                        <div class="mb-3">
+                            <i class="bi bi-link-45deg display-4 text-secondary"></i>
+                        </div>
+
+                        <h4 class="fw-bold text-dark">
+                            Links Úteis
+                        </h4>
+
+                        <p class="text-muted mb-0">
+                            Acesso rápido a sistemas e ferramentas
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+        <!-- CONFIGURAÇÕES -->
+        <div class="col-md-3">
+
+            <a asp-controller="Setup"
+               asp-action="Index"
+               class="text-decoration-none">
+
+                <div class="card border-0 shadow rounded-4 h-100 card-hover">
+
+                    <div class="card-body text-center p-4">
+
+                        <div class="mb-3">
+                            <i class="bi bi-gear-fill display-4 text-dark"></i>
+                        </div>
+
+                        <h4 class="fw-bold text-dark">
+                            Configurações
+                        </h4>
+
+                        <p class="text-muted mb-0">
+                            Usuários, bancos e configurações do sistema
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    .card-hover {
+        transition: all 0.3s ease;
+    }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+        }
+
+    .card {
+        background-color: #ffffff;
+    }
+
+</style>

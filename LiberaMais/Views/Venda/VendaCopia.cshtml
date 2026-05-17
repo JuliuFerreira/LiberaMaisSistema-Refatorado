@@ -1,0 +1,202 @@
+﻿@using LiberaMais.Models.Enums
+@using System.Globalization
+@model IEnumerable<Venda>
+@{
+    Layout = "LayoutSistema";
+    decimal totalComissoes = Model.Sum(venda => venda.ValorComissao ?? 0);
+}
+
+
+
+<div class="container-fluid">
+    <h2 style="text-align:center; margin-top: 50px; margin-bottom: 20px">Vendas</h2>
+
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8 col-lg-6">
+            <form method="get" asp-controller="Venda" asp-action="Venda" class="my-4">
+                <div class="form-row">
+                    <div class="col-12 mb-2">
+                        <div id="searchField">
+                            <label for="searchString" class="sr-only">Buscar</label>
+                            <div class="input-group">
+                                <input class="form-control" type="search" placeholder="Buscar" aria-label="Buscar" name="searchString" id="searchString" value="@ViewBag.SearchString">
+                                <div class="input-group-append ml-2">
+                                    <button class="btn btn-outline-success mr-1" type="button" onclick="validarCampo()">
+                                        <i class="bi bi-search"></i>
+                                        Buscar
+                                    </button>
+                                    <button class="btn btn-outline-danger" type="button" onclick="limparCampos()">
+                                        <i class="bi bi-x-circle"></i>
+                                        Limpar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="dateFields" style="display: none;">
+                            <div class="input-group mt-2">
+                                <input class="form-control" type="date" placeholder="Data Início" aria-label="Data Início" name="startDate" id="startDatePicker" value="@ViewBag.StartDate">
+                                <input class="form-control ml-2" type="date" placeholder="Data Fim" aria-label="Data Fim" name="endDate" id="endDatePicker" value="@ViewBag.EndDate">
+                                <div class="input-group-append ml-2">
+                                    <button class="btn btn-outline-success mr-1" type="button" onclick="validarCampo()">
+                                        <i class="bi bi-search"></i>
+                                        Buscar
+                                    </button>
+                                    <button class="btn btn-outline-danger" type="button" onclick="limparCampos()">
+                                        <i class="bi bi-x-circle"></i>
+                                        Limpar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row mt-2">
+                    <div class="col-12">
+                        <div class="form-check form-check-inline mr-2">
+                            <input class="form-check-input" type="radio" name="campo" id="campoTodos" value="" onchange="changeCampoType()" checked>
+                            <label class="form-check-label" for="campoTodos">Todos</label>
+                        </div>
+                        <div class="form-check form-check-inline mr-2">
+                            <input class="form-check-input" type="radio" name="campo" id="campoData" value="Data" onchange="changeCampoType()">
+                            <label class="form-check-label" for="campoData">Data</label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+        
+    <div class="container-fluid">
+        <ul class="nav nav-tabs" id="vendaTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active digitado-tab" style="color: blue; border: none" id="digitado-tab" data-toggle="tab" href="#digitado" role="tab" aria-controls="digitado" aria-selected="true">Digitado</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link assinado-tab" style="color: darkorange; border: none" id="assinado-tab" data-toggle="tab" href="#assinado" role="tab" aria-controls="assinado" aria-selected="false">Assinado</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link pago-tab" style="color: forestgreen; border: none" id="pago-tab" data-toggle="tab" href="#pago" role="tab" aria-controls="pago" aria-selected="false">Pago</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link cancelado-tab" style="color: red; border: none" id="cancelado-tab" data-toggle="tab" href="#cancelado" role="tab" aria-controls="cancelado" aria-selected="false">Cancelado</a>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="vendaTabsContent">
+            <div class="tab-pane fade show active digitado" id="digitado" role="tabpanel" aria-labelledby="digitado-tab">
+                @await Html.PartialAsync("_ListaVendas", Model.Where(v => (int)v.Status == (int)StatusEnum.DIGITADO).ToList())
+            </div>
+            <div class="tab-pane fade assinado" id="assinado" role="tabpanel" aria-labelledby="assinado-tab">
+                @await Html.PartialAsync("_ListaVendas", Model.Where(v => (int)v.Status == (int)StatusEnum.ASSINADO).ToList())
+            </div>
+            <div class="tab-pane fade pago" id="pago" role="tabpanel" aria-labelledby="pago-tab">
+                @await Html.PartialAsync("_ListaVendas", Model.Where(v => (int)v.Status == (int)StatusEnum.PAGO).ToList())
+                @* <tfoot>
+                    <tr>
+                        <td colspan="7" class="text-right font-weight-bold">Total de Comissões:</td>
+                        <td>@Model.Sum(v => v.ValorComissao ?? 0).ToString("C2", new CultureInfo(1046))</td>
+                    </tr>
+                </tfoot> *@
+
+            </div>
+            <div class="tab-pane fade cancelado" id="cancelado" role="tabpanel" aria-labelledby="cancelado-tab">
+                @await Html.PartialAsync("_ListaVendas", Model.Where(v => (int)v.Status == (int)StatusEnum.CANCELADO).ToList())
+            </div>
+        </div>
+
+        <hr style="border: 1px solid #ccc; margin: 20px 0;">
+
+        <div class="text-left my-3">
+            <a class="btn btn-outline-secondary btn-lg" style="border-radius: 10px; font-size: 16px" asp-controller="Apps" asp-action="Index">
+                <i class="bi bi-arrow-return-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+    
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('.nav-link').on('click', function () {
+            // Remove a classe active de todas as abas
+            $('.nav-link').removeClass('active');
+            // Adiciona a classe active apenas na aba clicada
+            $(this).addClass('active');
+
+            // Remove a classe active de todos os tab-panes
+            $('.tab-pane').removeClass('show active');
+            // Adiciona a classe active apenas no tab-pane correspondente à aba clicada
+            var tabId = $(this).attr('href');
+            $(tabId).addClass('show active');
+        });
+    });
+</script>
+
+
+<script>
+    function changeCampoType() {
+        var campo = document.querySelector('input[name="campo"]:checked').value;
+        var searchField = document.getElementById("searchField");
+        var dateFields = document.getElementById("dateFields");
+
+        switch (campo) {
+            case "Data":
+                searchField.style.display = "none";
+                dateFields.style.display = "flex";
+                break;
+            default:
+                searchField.style.display = "flex";
+                dateFields.style.display = "none";
+                break;
+        }
+    }
+
+    function validarCampo() {
+        var campoSelecionado = document.querySelector('input[name="campo"]:checked').value;
+        var searchString = document.getElementById("searchString").value;
+
+        // Verifica se o campo selecionado é "Data"
+        if (campoSelecionado === "Data") {
+            var startDate = document.getElementById("startDatePicker").value;
+            var endDate = document.getElementById("endDatePicker").value;
+
+            // Se ambas as datas estiverem em branco, define seus valores como null
+            if (startDate === "" && endDate === "") {
+                document.getElementById("startDatePicker").value = null;
+                document.getElementById("endDatePicker").value = null;
+            } else {
+                // Verifica se ambas as datas estão preenchidas
+                if (startDate === "" || endDate === "") {
+                    alert("Por favor, selecione ambas as datas para pesquisar por intervalo.");
+                    return;
+                }
+            }
+        }
+
+        // Submete o formulário se passar pela validação
+        document.forms[0].submit();
+    }
+
+    function removerAcentos(str) {
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    // Exemplo de uso da função removerAcentos
+    let textoComAcentos = "São José dos Campos";
+    let textoSemAcentos = removerAcentos(textoComAcentos);
+
+    console.log(textoSemAcentos); // Saõ Jose dos Campos (sem acentos)
+
+
+    function limparCampos() {
+        document.getElementById("searchString").value = "";
+        document.getElementById("startDatePicker").value = "";
+        document.getElementById("endDatePicker").value = "";
+        document.getElementById("campoTodos").checked = true;
+        changeCampoType();
+    }
+
+    // Executa a função ao carregar a página para verificar o valor inicial do select
+    changeCampoType();
+</script>

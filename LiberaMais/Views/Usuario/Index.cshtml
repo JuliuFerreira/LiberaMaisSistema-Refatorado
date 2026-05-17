@@ -1,0 +1,155 @@
+﻿@model IEnumerable<UsuarioModel>
+@{
+    Layout = "LayoutSistema";
+}
+
+
+
+<div class="container-fluid">
+    <h2 style="text-align:center; margin-top: 50px; margin-bottom: 50px">CONTROLE DE USUÁRIOS</h2>
+
+    <form method="get" action="/ListarUsuarios" class="search-form">
+        <div class="column" style="text-align: right;">
+            <a class="icon-link" asp-area="" asp-controller="Usuario" asp-action="Criar">
+                <div class="icon-container-fluid">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-person-lock" viewBox="0 0 16 16">
+                        <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m0 5.996V14H3s-1 0-1-1 1-4 6-4q.845.002 1.544.107a4.5 4.5 0 0 0-.803.918A11 11 0 0 0 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664zM9 13a1 1 0 0 1 1-1v-1a2 2 0 1 1 4 0v1a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1zm3-3a1 1 0 0 0-1 1v1h2v-1a1 1 0 0 0-1-1" />
+                    </svg>
+                    <h4 class="card-text" style="text-align:center; font-size: 16px">Adicionar <br />usuário</h4>
+                </div>
+            </a>
+        </div>
+    </form>
+
+    <br />
+
+    <div class="container-fluid">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="table-libera" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Login</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Perfil</th>
+                        <th scope="col">Total de Vendas</th>
+                        <th scope="col">Data de cadastro</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var user in Model)
+                        {
+                            <tr style="font-size: 16px">
+                                <th scope="row">@user.Id</th>
+                                <td>@user.Nome</td>
+                                <td>@user.Login</td>
+                                <td>@user.Email</td>
+                                <td>@(user.Perfil == LiberaMais.Models.Enums.PerfilEnum.Admin ? "Administrador" : "Padrão")</td>
+                                <td>
+                                    <a href="javascript:" class="btn btn-success btn-sm btn-total-vendas">
+                                        @(user.Vendas != null && user.Vendas.Any() ? user.Vendas.Count() : 0)
+                                    </a>
+                                </td>
+                                <td>@user.DataCadastro</td>
+                                <td>
+                                    <div class="d-flex justify-content-end">
+                                        <a role="button" asp-route-id="@user.Id" asp-controller="Usuario" asp-action="Editar">
+                                            <div class="d-flex flex-column align-items-center mr-2">
+                                                <button type="button" class="btn btn-warning">
+                                                    <i class="bi bi-pencil-square text-white" style="font-size: 16px;"></i>
+                                                </button>
+                                            </div>
+                                        </a>
+                                        <a href="#" role="button" class="btn-delete-usuario" data-id="@user.Id" data-login="@user.Login" data-url="@Url.Action("Apagar", "Usuario", new { id = user.Id })">
+                                            <button type="button" class="btn btn-danger">
+                                                <i class="bi bi-trash text-white" style="font-size: 16px;"></i>
+                                            </button>
+                                        </a>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-left my-3">
+            <a class="btn btn-outline-secondary btn-lg" style="border-radius: 10px; font-size: 16px" asp-controller="Setup" asp-action="Index">
+                <i class="bi bi-arrow-return-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+<div id="deleteModalPlaceholder"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteButtons = document.querySelectorAll('.btn-delete-usuario');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault(); // Evita o comportamento padrão do link
+                const id = button.getAttribute('data-id');
+                const login = button.getAttribute('data-login');
+                const url = button.getAttribute('data-url');
+
+                Swal.fire({
+                    text: `Deseja realmente excluir esse usuário?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Excluir',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({ id: id })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Usuário excluído com sucesso!',
+                                    text: 'Atualizando lista...',
+                                    icon: 'success',
+                                    showConfirmButton: false,
+                                    timer: 3000 // Tempo de exibição da mensagem de sucesso
+                                }).then(() => {
+                                    // Recarregar a página para atualizar a lista
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Erro!',
+                                    text: data.message,
+                                    icon: 'error',
+                                    confirmButtonText: 'Ok'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                title: 'Erro!',
+                                text: 'Ocorreu um erro ao tentar excluir o usuário.',
+                                icon: 'error',
+                                confirmButtonText: 'Ok'
+                            });
+                        });
+                    }
+                });
+            });
+        });
+    });
+</script>

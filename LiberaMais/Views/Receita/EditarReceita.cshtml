@@ -1,0 +1,138 @@
+﻿@model Receita
+
+
+@{
+    Layout = "LayoutSistema";
+}
+
+
+<form style="border: solid 1px black; padding:10px; border-radius: 10px" id="receitaForm" asp-controller="Receita" asp-action="EditarReceita" method="post" class="row g-3">
+    <input type="hidden" asp-for="FinancaId" />
+
+    <h2 style="text-align:center; margin-top: 50px; margin-bottom: 50px">ALTERAR RECEITA</h2>
+
+    <div class="form-group col-md-2">
+        <label for="data">Data da Receita</label>
+        <input type="date" asp-for="DataReceita" class="form-control" id="data" required>
+    </div>
+
+    <div class="form-group col-md-2">
+        <label for="descricao">Descrição</label>
+        <input type="text" asp-for="Descricao" class="form-control" id="descricao" required>
+    </div>
+
+    <div class="form-group col-md-3">
+        <label for="usuario" class="form-label">Conta</label>
+        <select id="usuario" asp-for="Usuario" asp-items="@Html.GetEnumSelectList<LiberaMais.Models.Enums.UsuarioEnum>()" class="form-select" required>
+            <option value="">Selecione uma opção</option>
+        </select>
+    </div>
+
+    <div class="form-group col-md-3">
+        <label for="promotora" class="form-label">Promotora</label>
+        <select id="operacao" asp-for="Promotora" asp-items="@Html.GetEnumSelectList<LiberaMais.Models.Enums.PromotoraEnum>()" class="form-select" required>
+        </select>
+    </div>
+
+    <div class="form-group col-md-2">
+        <label for="valor" class="form-label">Valor (R$)</label>
+        <input type="number" asp-for="ValorRecebido" step="0.01" min="0" placeholder="0.00" class="form-control" id="valor" required />
+    </div>
+
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-outline-success">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy2-fill" viewBox="0 0 16 16">
+                <path d="M12 2h-2v3h2z" />
+                <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v13A1.5 1.5 0 0 0 1.5 16h13a1.5 1.5 0 0 0 1.5-1.5V2.914a1.5 1.5 0 0 0-.44-1.06L14.147.439A1.5 1.5 0 0 0 13.086 0zM4 6a1 1 0 0 1-1-1V1h10v4a1 1 0 0 1-1 1zM3 9h10a1 1 0 0 1 1 1v5H2v-5a1 1 0 0 1 1-1" />
+            </svg>
+            Gravar
+        </button>
+
+        <a type="button" class="btn btn-outline-danger" asp-controller="Receita" asp-action="Index" asp-route-idFinanca="@Model.FinancaId">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" />
+            </svg>
+            Cancelar
+        </a>
+    </div>
+</form>
+
+<script>
+    // Obter a data atual
+    var today = new Date();
+
+    // Formatar a data como "YYYY-MM-DD"
+    var formattedDate = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
+
+    // Definir o valor do campo de data como a data formatada
+    document.getElementById('data').value = formattedDate;
+</script>
+
+<script>
+    // Selecionar o campo de entrada
+    var inputDescricao = document.getElementById('descricao');
+
+    // Adicionar um ouvinte de evento de entrada para o campo de entrada
+    inputDescricao.addEventListener('input', function () {
+        // Converter o texto para maiúsculas e definir como valor do campo de entrada
+        this.value = this.value.toUpperCase();
+    });
+</script>
+
+<script>
+    // Selecionar o campo de entrada
+    var inputValor = document.getElementById('valor');
+
+    // Adicionar um ouvinte de evento de foco para o campo de entrada
+    inputValor.addEventListener('focus', function () {
+        // Verificar se o valor atual é '0', se for, limpar o campo
+        if (this.value === '0') {
+            this.value = '';
+        }
+    });
+</script>
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("form#receitaForm").submit(function (event) {
+                event.preventDefault(); // Impede o envio do formulário padrão
+
+                var form = $(this);
+                $.ajax({
+                    type: form.attr('method'),
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Receita editada com sucesso!',
+                                text: 'Redirecionando...',
+                                icon: 'success',
+                                timer: 3000, // 3 segundos
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.href = "@Url.Action("Index", "Receita", new { idFinanca = Model.FinancaId })";
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Erro',
+                                text: response.message,
+                                icon: 'error'
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            title: 'Erro',
+                            text: 'Ops, ocorreu um erro. Tente novamente.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

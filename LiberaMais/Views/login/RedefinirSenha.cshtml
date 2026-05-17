@@ -1,0 +1,100 @@
+﻿@using System.Security.Claims
+@model RedefinirSenha
+@{
+    Layout = "_LayoutLogin.cshtml";
+}
+
+<body>
+
+    <div class="login-container">
+        <form id="redefinirSenhaForm" asp-controller="Login" asp-action="LinkParaRedefinirSenha" method="post" class="login">
+            <div class="logo-container">
+                <img src="~/img/Logom.png" alt="Logo">
+            </div>
+
+            <div class="box-user">
+                <label for="login">Login</label>
+                <input asp-for="Login" type="text" id="login">
+                @Html.ValidationMessageFor(x => x.Login)
+            </div>
+            <div class="box-user">
+                <label for="email">Email</label>
+                <input asp-for="Email" type="text" id="email">
+                @Html.ValidationMessageFor(x => x.Email)
+            </div>
+
+            <button style="border-radius: 10px; margin-bottom: 5px" type="submit" class="btn btn-outline-secondary">Redefinir senha</button>
+
+            <div style="margin-top: 10px; margin-bottom: 10px">
+                <a style="border-radius: 10px; margin-bottom: 20px" role="button" class="btn btn-outline-info d-block" button onclick="history.back()">
+                    Voltar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    @section Scripts {
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $("form#redefinirSenhaForm").submit(function (event) {
+                    event.preventDefault(); // Impede o envio do formulário padrão
+
+                    var form = $(this);
+                    $.ajax({
+                        type: form.attr('method'),
+                        url: form.attr('action'),
+                        data: form.serialize(),
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: 'Sucesso!',
+                                    text: response.message,
+                                    icon: 'success',
+                                    timer: 3000, // 3 segundos
+                                    showConfirmButton: false,
+                                    position: 'top-center', // Alerta aparece na parte superior central
+                                    toast: true, // Exibe como um toast (pequeno, não modal)
+                                    customClass: {
+                                        container: 'swal2-toast-custom' // Aplica a classe customizada ao toast
+                                    }
+                                }).then(() => {
+                                    // Redireciona para a view Login após 3 segundos
+                                    window.location.href = "@Url.Action("Index", "Login")";
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Erro',
+                                    text: response.message,
+                                    icon: 'error',
+                                    timer: 3000, // 3 segundos
+                                    showConfirmButton: false,
+                                    position: 'top-center', // Alerta aparece na parte superior central
+                                    toast: true, // Exibe como um toast (pequeno, não modal)
+                                    customClass: {
+                                        container: 'swal2-toast-custom' // Aplica a classe customizada ao toast
+                                    }
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                title: 'Erro',
+                                text: 'Ops, ocorreu um erro. Tente novamente.',
+                                icon: 'error',
+                                timer: 3000, // 3 segundos
+                                showConfirmButton: false,
+                                position: 'top-center', // Alerta aparece na parte superior central
+                                toast: true, // Exibe como um toast (pequeno, não modal)
+                                customClass: {
+                                    container: 'swal2-toast-custom' // Aplica a classe customizada ao toast
+                                }
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
+    }
+</body>

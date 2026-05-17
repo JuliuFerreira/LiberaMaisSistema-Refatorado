@@ -1,0 +1,106 @@
+﻿@model PromotoraBanco
+
+@{
+    Layout = "LayoutSistema";
+}
+
+<div class="container mt-6">
+
+    <div class="card shadow border-0 rounded-4 col-10">
+
+        <div class="card-header text-white rounded-top-4"
+             style="background-color:orange;">
+
+            <h3 class="text-center mb-0">
+                Editar   login
+            </h3>
+
+        </div>
+
+        <div class="card-body p-4">
+
+            <form asp-controller="PromotoraBanco"
+                  asp-action="Editar"
+                  method="post">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="PromotoraId" />
+                <input type="hidden" asp-for="BancoId" />
+
+
+                <div class="row g-3">
+
+                    <div class="col-md-3">
+
+
+                        <label class="form-label">
+                            Promotora
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               value="@ViewBag.NomePromotora"
+                               disabled />
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Banco
+                        </label>
+
+                        <select asp-for="BancoId"
+                                class="form-select" disabled>
+
+                            <option value="">
+                                Selecione
+                            </option>
+
+                            @foreach (var banco in ViewBag.Banco)
+                            {
+                                <option value="@banco.Id">
+                                    @banco.Nome
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="login" class="form-label">Usuário</label>
+                        <input type="text" asp-for="Login" class="form-control" id="usuario">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="login" class="form-label">Senha</label>
+                        <input type="text" asp-for="Senha" class="form-control" id="senha">
+                    </div>
+
+                    <div class="col-12 mt-4">
+
+                        <button type="submit"
+                                class="btn btn-success">
+
+                            Salvar
+
+                        </button>
+
+                        <a asp-controller="PromotoraBanco"
+                           asp-action="Index"
+                           asp-route-promotoraId="@ViewBag.PromotoraId"
+                           class="btn btn-secondary">
+                            Cancelar
+
+                        </a>
+
+                    </div>
+                </div>
+
+
+            </form>
+        </div>
+    </div>
+
+
+</div>
