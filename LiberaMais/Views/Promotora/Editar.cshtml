@@ -51,10 +51,40 @@
                   asp-controller="Promotora"
                   asp-action="Editar"
                   method="post">
-
+                <input type="hidden" asp-for="UsuarioId" />
                 <input type="hidden" asp-for="Id" />
 
                 <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-bold">
+                            Usuário
+                        </label>
+                        
+                        <select asp-for="UsuarioId"
+                                class="form-select">
+                            
+
+                            <option value=""> 
+                                Selecione
+                            </option>
+
+                            @foreach (var user in ViewBag.Usuarios)
+                            {
+                                <option value="@user.Id">
+                                    @user.Nome
+                                </option>
+                            }
+
+                        </select>
+
+                        <span asp-validation-for="UsuarioId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
 
                     <div class="col-md-3">
 

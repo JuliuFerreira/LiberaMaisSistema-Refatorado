@@ -23,6 +23,12 @@ namespace LiberaMais.Models
 
         public List<PromotoraBanco>? PromotoraBancos { get; set; }
 
+        public int UsuarioId { get; set; }
+
+        public UsuarioModel? Usuario { get; set; }
+
+
+
 
     }
 }

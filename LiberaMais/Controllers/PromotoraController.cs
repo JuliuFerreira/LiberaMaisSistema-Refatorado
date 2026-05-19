@@ -27,17 +27,48 @@ namespace LiberaMais.Controllers
 
         public IActionResult Index()
         {
+            var usuarioLogado =
+                _sessao.BuscarSessaoDoUsuario();
 
-            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+            ViewBag.IsAdmin =
+                usuarioLogado.Perfil == PerfilEnum.Admin;
 
-            List<Promotora> promotora = _promotorasRepositorio.ListarPromotora();
+            List<Promotora> promotora;
+
+            if (usuarioLogado.Perfil == PerfilEnum.Admin)
+            {
+                promotora =
+                    _promotorasRepositorio.ListarPromotora();
+            }
+            else
+            {
+                promotora =
+                    _promotorasRepositorio
+                        .ListarPorUsuario(usuarioLogado.Id);
+            }
+
             return View(promotora);
         }
         public IActionResult Criar()
         {
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+
             ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+
+            if (usuarioLogado.Perfil == PerfilEnum.Admin)
+            {
+                ViewBag.Usuarios =
+                    _usuarioRepositorio.ListarTodosUsuarios();
+            }
+            else
+            {
+                ViewBag.Usuarios = new List<UsuarioModel>
+                {
+                    usuarioLogado
+
+                };
+
+            }
 
             return View();
         }
@@ -47,10 +78,25 @@ namespace LiberaMais.Controllers
         public IActionResult Criar(Promotora promotora)
         {
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
 
+
+            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+                        
             try
             {
+                if (usuarioLogado.Perfil == PerfilEnum.Admin)
+                {
+                    ViewBag.Usuarios = _usuarioRepositorio.ListarTodosUsuarios();
+                }
+                else
+                {
+                    ViewBag.Usuarios = new List<UsuarioModel>
+                {
+                    usuarioLogado
+
+                };
+
+                }
 
                 if (ModelState.IsValid)
                 {
@@ -60,16 +106,31 @@ namespace LiberaMais.Controllers
                 }
                 else
                 {
-                    TempData["MensagemErro"] = "Promotora não adicionada";
+                    TempData["MensagemErro"] = "Promotora não adicionada.";
                     return View(promotora);
                 }
+                                
+                                
             }
             catch (Exception)
             {
-                TempData["MensagemErro"] = "Não foi possivel adicionar a promotora!";
+                if (usuarioLogado.Perfil == PerfilEnum.Admin)
+                {
+                    ViewBag.Usuarios = _usuarioRepositorio.ListarTodosUsuarios();
+                }
+                else
+                {
+                    TempData["MensagemErro"] = "Não foi possivel adicionar a promotora!";
+                    ViewBag.Usuarios = new List<UsuarioModel>
+                {
+                    usuarioLogado
+
+                };
+
+                }                
+
                 return View(promotora);
             }
-
         }
 
         public IActionResult Editar(int id)
@@ -78,7 +139,19 @@ namespace LiberaMais.Controllers
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
 
-            return View(edit);
+            if(usuarioLogado.Perfil == PerfilEnum.Admin)
+            {
+                ViewBag.Usuarios = _usuarioRepositorio.ListarTodosUsuarios();
+            }
+            else
+            {
+                ViewBag.Usuarios = new List<UsuarioModel>
+                {
+                    usuarioLogado
+                };
+            }
+
+                return View(edit);
         }
 
 
@@ -90,6 +163,19 @@ namespace LiberaMais.Controllers
 
             try
             {
+                if(usuarioLogado.Perfil == PerfilEnum.Admin)
+                {
+                    ViewBag.Usuarios = _usuarioRepositorio.ListarTodosUsuarios();
+                }
+
+                else
+                {
+                    ViewBag.Usuarios = new List<UsuarioModel>
+                    {
+                        usuarioLogado
+                    };
+                }
+
                 if (ModelState.IsValid)
                 {
                     _promotorasRepositorio.Atualizar(promotora);
@@ -99,6 +185,18 @@ namespace LiberaMais.Controllers
                 else
                 {
                     TempData["MensagemErro"] = "Promotora não editada.";
+                    if (usuarioLogado.Perfil == PerfilEnum.Admin)
+                    {
+                        ViewBag.Usuarios = _usuarioRepositorio.ListarTodosUsuarios();
+                    }
+
+                    else
+                    {
+                        ViewBag.Usuarios = new List<UsuarioModel>
+                    {
+                        usuarioLogado
+                    };
+                    }
                     return View(promotora);
                 }
 
@@ -119,10 +217,10 @@ namespace LiberaMais.Controllers
         [HttpPost]
         public IActionResult Apagar(int id)
         {
-                       
+
 
             try
-            {                
+            {
                 var login = _promotoraBancoRepositorio.ListarPorPromotora(id);
 
                 if (login.Any())

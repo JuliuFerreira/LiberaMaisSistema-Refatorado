@@ -9,7 +9,7 @@
 
         <div class="col-md-8">
 
-            <h3 class="text-muted mb-5 mt-5" >
+            <h3 class="text-muted mb-5 mt-5">
                 Bem-vindo ao sistema LiberaMais
             </h3>
 
@@ -119,39 +119,39 @@
             </a>
 
         </div>
-               
-        <!-- FINANCEIRO -->
-        <div class="col-md-3">
 
-            <a asp-controller="Financa"
-               asp-action="Index"
-               class="text-decoration-none">
+        @if (ViewBag.IsAdmin)
+        {
+            <div class="col-md-3">
 
-                <div class="card border-0 shadow rounded-4 h-100 card-hover">
+                <a asp-controller="Financa"
+                   asp-action="Index"
+                   class="text-decoration-none">
 
-                    <div class="card-body text-center p-4">
+                    <div class="card border-0 shadow rounded-4 h-100 card-hover">
 
-                        <div class="mb-3">
-                            <i class="bi bi-wallet2 display-4 text-info"></i>
+                        <div class="card-body text-center p-4">
+
+                            <div class="mb-3">
+                                <i class="bi bi-wallet2 display-4 text-info"></i>
+                            </div>
+
+                            <h4 class="fw-bold text-dark">
+                                Financeiro
+                            </h4>
+
+                            <p class="text-muted mb-0">
+                                Receitas, despesas e controle financeiro
+                            </p>
+
                         </div>
-
-                        <h4 class="fw-bold text-dark">
-                            Financeiro
-                        </h4>
-
-                        <p class="text-muted mb-0">
-                            Receitas, despesas e controle financeiro
-                        </p>
 
                     </div>
 
-                </div>
+                </a>
 
-            </a>
-
-        </div>
-
-        <!-- LINKS UTEIS -->
+            </div>
+        }
         <div class="col-md-3">
 
             <a asp-controller=""
@@ -182,7 +182,8 @@
 
         </div>
 
-        <!-- CONFIGURAÇÕES -->
+        @if (ViewBag.IsAdmin)
+        {
         <div class="col-md-3">
 
             <a asp-controller="Setup"
@@ -212,6 +213,8 @@
             </a>
 
         </div>
+        }
+
 
     </div>
 

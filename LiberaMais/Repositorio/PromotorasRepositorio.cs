@@ -1,5 +1,6 @@
 ﻿using LiberaMais.Data;
 using LiberaMais.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LiberaMais.Repositorio
 {
@@ -7,23 +8,29 @@ namespace LiberaMais.Repositorio
     {
         private readonly BancoContext _bancoContext;
 
-        public PromotorasRepositorio (BancoContext bancoContext)
+        public PromotorasRepositorio(BancoContext bancoContext)
         {
             _bancoContext = bancoContext;
         }
 
         public Promotora BuscarPromotoraPorId(int id)
         {
-            var result = _bancoContext.Promotoras.FirstOrDefault(x => x.Id == id);
+            var result = _bancoContext.Promotoras
+                .Include(x => x.Usuario)
+                .FirstOrDefault(x => x.Id == id);
 
             return result;
         }
 
         public List<Promotora> ListarPromotora()
         {
-            return _bancoContext.Promotoras.ToList();
+            return _bancoContext.Promotoras
+                .Include(x => x.Usuario)
+                .ToList();
 
         }
+
+        
 
         public Promotora Adicionar(Promotora promotora)
         {
@@ -50,10 +57,17 @@ namespace LiberaMais.Repositorio
         public bool VerificarPromotoraExistente(string nome)
         {
             var verificarPromotora = _bancoContext.Promotoras.FirstOrDefault(j => j.Nome == nome);
-            
-            return verificarPromotora != null;
-        }      
 
-        
+            return verificarPromotora != null;
+        }
+
+        public List<Promotora> ListarPorUsuario(int usuarioId)
+        {
+            return _bancoContext.Promotoras
+                .Include(x => x.Usuario)
+                .Where(x => x.UsuarioId == usuarioId)
+                .ToList();
+        }
+
     }
 }

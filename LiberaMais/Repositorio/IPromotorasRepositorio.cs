@@ -9,6 +9,8 @@ namespace LiberaMais.Repositorio
 
         List<Promotora> ListarPromotora();
 
+        List<Promotora> ListarPorUsuario(int usuarioId);
+
         Promotora Adicionar(Promotora promotora);
 
         Promotora Atualizar(Promotora promotora);
