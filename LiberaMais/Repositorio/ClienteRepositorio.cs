@@ -18,27 +18,25 @@ namespace LiberaMais.Repositorio
             _bancoContext = bancoContext;
         }
 
-        public Cliente BuscarClientePorId(long idcliente)
+        public Cliente BuscarClientePorId(int id)
         {
 
-            var result = _bancoContext.Clientes.FirstOrDefault(x => x.IdCliente == idcliente);
+            return _bancoContext.Clientes
+           .Include(c => c.Endereco)
+           .Include(c => c.Usuario)
+           .FirstOrDefault(c => c.Id == id);
 
-
-            return result;
-
-        }
-
-        public List<Cliente> ListarClientes(int usuarioId)
-        {
-            return _bancoContext.Clientes.Where(x => x.UsuarioId == usuarioId).ToList();
         }
 
         public List<Cliente> ListarTodosClientes()
         {
-            return _bancoContext.Clientes.ToList();
+            return _bancoContext.Clientes
+            .Include(c => c.Endereco)
+            .Include (c => c.Usuario)
+            .ToList();
         }
 
-        public Cliente Adicionar(Cliente cliente)
+        public Cliente Adicionar(Cliente cliente)  /*BancoContext bancoContext*/
         {
             _bancoContext.Clientes.Add(cliente);
             _bancoContext.SaveChanges();
@@ -47,38 +45,42 @@ namespace LiberaMais.Repositorio
 
         public Cliente Atualizar(Cliente cliente)
         {
-            if (cliente == null)
-            {
-                throw new ArgumentNullException(nameof(cliente), "O cliente não pode ser nulo.");
-            }
 
             _bancoContext.Clientes.Update(cliente);
             _bancoContext.SaveChanges();
-
             return cliente;
         }
 
 
-        public bool Apagar(int idcliente)
+        public bool Apagar(int id)
         {
-            Cliente cliente = BuscarClientePorId(idcliente);
 
-            if (cliente == null) throw new System.Exception("Erro ao deletar o cliente!");
-
+            Cliente cliente = BuscarClientePorId(id);
+            if(cliente == null)
+            {
+                return false;
+            }
             _bancoContext.Clientes.Remove(cliente);
             _bancoContext.SaveChanges();
-
             return true;
         }
 
-        public bool VerificarCpfExistente(string cpf)
+        public List<Cliente> BuscarClientesPorUsuarioId(int usuarioId)
         {
-            // Faça uma consulta para buscar um cliente com o CPF fornecido
-            var cliente = _bancoContext.Clientes.FirstOrDefault(x => x.Cpf == cpf);
-
-            // Se o cliente não for nulo, significa que o CPF já existe no banco de dados
-            return cliente != null;
+            return _bancoContext.Clientes
+                .Include(c => c.Usuario)
+                .Where(c => c.UsuarioId == usuarioId) 
+                .ToList();
         }
+
+        //public bool VerificarCpfExistente(string cpf)
+        //{
+        //    // Faça uma consulta para buscar um cliente com o CPF fornecido
+        //    var cliente = _bancoContext.Clientes.FirstOrDefault(x => x.Cpf == cpf);
+
+        //    // Se o cliente não for nulo, significa que o CPF já existe no banco de dados
+        //    return cliente != null;
+        //}
 
 
 

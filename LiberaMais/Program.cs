@@ -1,12 +1,13 @@
 using LiberaMais.Data;
 using LiberaMais.Helper;
 using LiberaMais.Repositorio;
+using LiberaMais.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 
 namespace LiberaMais
@@ -29,6 +30,7 @@ namespace LiberaMais
             builder.Services.AddControllersWithViews();
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddTransient<IClienteRepositorio, ClienteRepositorio>();
+            builder.Services.AddTransient<IEnderecoRepositorio, EnderecoRepositorio>();
             builder.Services.AddTransient<IVendaRepositorio, VendaRepositorio>();
             builder.Services.AddTransient<IPromotorasRepositorio, PromotorasRepositorio>();
             builder.Services.AddTransient<IBancosRepositorio, BancosRepositorio>();
@@ -39,6 +41,9 @@ namespace LiberaMais
             builder.Services.AddTransient<IPromotoraBancoRepositorio, PromotoraBancoRepositorio>();
             builder.Services.AddTransient<ISessao, Sessao>();
             builder.Services.AddTransient<IEmail, Email>();
+            builder.Services.AddTransient<IUtilRepositorio, UtilRepositorio>();
+            builder.Services.AddTransient<IOrgaoRepositorio, OrgaoRepositorio>();
+            builder.Services.AddScoped<PermissaoService>(); // Ao criar o Sevice, tem que registrar no Program.
 
             builder.Services.AddSession(options =>
             {

@@ -1,0 +1,142 @@
+﻿@model Util
+
+@{
+    Layout = "LayoutSistema";
+}
+
+<div class="container mt-6">
+
+    <div class="card shadow border-0 rounded-4 col-10">
+
+        @if (TempData["MensagemSucesso"] != null)
+        {
+            <div id="alertaSucesso"
+                 class="alert alert-success mt-3">
+
+                @TempData["MensagemSucesso"]
+
+            </div>
+        }
+
+        @if (TempData["MensagemErro"] != null)
+        {
+            <div id="alertaErro"
+                 class="alert alert-danger mt-3">
+
+                @TempData["MensagemErro"]
+
+            </div>
+        }
+
+        <div class="card-header text-white rounded-top-4"
+             style="background-color: orange;">
+
+            <h3 class="text-center mb-0">
+                Editar Links
+            </h3>
+                        
+
+        </div>
+
+        <div class="card-body p-4">
+
+            <form id="promotoraForm"
+                  asp-controller="Util"
+                  asp-action="Editar"
+                  method="post">
+                  <input type="hidden" asp-for="Id" />
+
+                <div class="row g-6">
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Nome"
+                               class="form-label fw-bold">
+                            Nome
+                        </label>
+
+                        <input asp-for="Nome"
+                               class="form-control"
+                               maxlength="100"
+                               />
+
+                        <span asp-validation-for="Nome"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                    
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Url"
+                               class="form-label fw-bold">
+                            URL
+                        </label>
+
+                        <input asp-for="Url"
+                               class="form-control"
+                               maxlength="255"
+                               placeholder="https://site.com.br" />
+
+                        <span asp-validation-for="Url"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Descricao"
+                               class="form-label fw-bold">
+                            Descrição
+                        </label>
+
+                        <input asp-for="Descricao"
+                               class="form-control"
+                               maxlength="100"
+                               />
+                                                    
+
+                    </div>
+
+
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="d-flex justify-content-end gap-2">
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary">
+
+                        Voltar
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        Salvar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    setTimeout(function () {
+
+        $("#alertaSucesso").fadeOut("slow");
+        $("#alertaErro").fadeOut("slow");
+
+    }, 3000);
+</script>

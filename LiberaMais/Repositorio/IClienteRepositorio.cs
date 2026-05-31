@@ -1,23 +1,25 @@
 ﻿using LiberaMais.Controllers;
+using LiberaMais.Data;
 using LiberaMais.Models;
 
 namespace LiberaMais.Repositorio
 {
     public interface IClienteRepositorio
     {
-        List<Cliente> ListarClientes(int usuarioId);
 
-        Cliente Adicionar(Cliente cliente);
+        Cliente Adicionar(Cliente cliente); /*BancoContext bancoContext*/
 
-        Cliente BuscarClientePorId(long idcliente);
+        Cliente BuscarClientePorId(int id);
 
         Cliente Atualizar(Cliente cliente);
 
-        bool Apagar(int idcliente);
+        bool Apagar(int id);
 
-        bool VerificarCpfExistente(string cpf);
+       // bool VerificarCpfExistente(string cpf);
 
         List<Cliente> ListarTodosClientes();
+
+        List<Cliente> BuscarClientesPorUsuarioId(int usuarioId);
 
     }
 }

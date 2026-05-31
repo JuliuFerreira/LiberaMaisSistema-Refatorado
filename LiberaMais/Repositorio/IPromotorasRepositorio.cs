@@ -13,7 +13,7 @@ namespace LiberaMais.Repositorio
 
         Promotora Adicionar(Promotora promotora);
 
-        Promotora Atualizar(Promotora promotora);
+        Promotora Atualizar(Promotora promotoraDb);
 
         bool Apagar(int id);
 

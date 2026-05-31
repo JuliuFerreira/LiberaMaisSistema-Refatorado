@@ -36,11 +36,11 @@ namespace LiberaMais.Repositorio
 
         }
 
-        public PromotoraBanco Atualizar(PromotoraBanco promotoraBanco)
+        public PromotoraBanco Atualizar(PromotoraBanco promotoraBancoDb)
         {
-            _bancoContext.PromotoraBancos.Update(promotoraBanco);
+            _bancoContext.PromotoraBancos.Update(promotoraBancoDb);
             _bancoContext.SaveChanges();
-            return promotoraBanco;
+            return promotoraBancoDb;
         }
 
         public PromotoraBanco BuscarPorId(int id)

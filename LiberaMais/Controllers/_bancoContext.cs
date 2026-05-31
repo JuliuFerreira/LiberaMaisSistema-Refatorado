@@ -15,7 +15,10 @@ namespace LiberaMais.Controllers
         public static object Receitas { get; internal set; }
 
         public static object Despesas { get; internal set; }
+
         public static object Financas { get; internal set; }
+
+        public static object Utils { get; internal set; }
     }
     
 }

@@ -2,7 +2,7 @@
 
 @{
     Layout = "LayoutSistema";
-    ViewData["Title"] = "Cadastrar Cliente";    
+    ViewData["Title"] = "Editar Cliente";
 }
 
 <div class="row justify-content-center">
@@ -23,7 +23,11 @@
         </div>
     }
 
-    <form asp-action="Criar" method="post">
+    <form asp-action="Editar" method="post">
+       
+        <input type="hidden" asp-for="Cliente.Id" />
+        <input type="hidden" asp-for="Endereco.Id" />
+        <input type="hidden" asp-for="Endereco.ClienteId" />
 
         <div class="card shadow-sm mb-4">
 
@@ -34,36 +38,29 @@
             <div class="card-body">
 
                 <div class="row">
+
                     <div class="row">
-                        <div class="col-md-2">
+                        @if (ViewBag.IsAdmin)
+                        {
+                            <div class="col-md-4 mb-3">
 
-                            <label class="form-label fw-bold">
-                                Usuário
-                            </label>
+                                <label>Usuário</label>
 
-                            <select asp-for="Cliente.UsuarioId"
-                                    class="form-select">
+                                <select asp-for="Cliente.UsuarioId"
+                                        class="form-select"
+                                        asp-items='@(new SelectList(ViewBag.Usuarios, "Id", "Nome"))'>
 
-                                <option value="">
-                                    Selecione
-                                </option>
+                                    <option value="">Selecione</option>
 
-                                @foreach (var user in ViewBag.Usuarios)
-                                {
-                                    <option value="@user.Id">
-                                        @user.Nome
-                                    </option>
-                                }
+                                </select>
 
-                            </select>
+                                <span asp-validation-for="Cliente.UsuarioId"
+                                      class="text-danger"></span>
 
-                            <span asp-validation-for="Cliente.UsuarioId"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
+                            </div>
+                        }
                     </div>
-                                       
+
                     <div class="col-md-6 mb-3">
                         <label>Nome</label>
 
@@ -78,7 +75,7 @@
                         <label>CPF</label>
 
                         <input asp-for="Cliente.Cpf"
-                               class="form-control" />
+                               class="form-control" readonly/>
 
                         <span asp-validation-for="Cliente.Cpf"
                               class="text-danger"></span>
@@ -103,10 +100,7 @@
 
                         <input asp-for="Cliente.DataNascimento"
                                type="date"
-                               class="form-control" />
-
-                        <span asp-validation-for="Cliente.DataNascimento"
-                              class="text-danger"></span>
+                               class="form-control" readonly />
                     </div>
 
                     <div class="col-md-4 mb-3">
@@ -114,8 +108,6 @@
 
                         <input asp-for="Cliente.Email"
                                class="form-control" />
-                        <span asp-validation-for="Cliente.Email"
-                              class="text-danger"></span>
                     </div>
 
                 </div>
@@ -146,8 +138,6 @@
 
                         <input asp-for="Endereco.Cep"
                                class="form-control" />
-                        <span asp-validation-for="Endereco.Cep"
-                              class="text-danger"></span>
                     </div>
 
                     <div class="col-md-6 mb-3">
@@ -155,8 +145,6 @@
 
                         <input asp-for="Endereco.Rua"
                                class="form-control" />
-                        <span asp-validation-for="Endereco.Rua"
-                              class="text-danger"></span>
                     </div>
 
                     <div class="col-md-3 mb-3">
@@ -164,8 +152,6 @@
 
                         <input asp-for="Endereco.Numero"
                                class="form-control" />
-                        <span asp-validation-for="Endereco.Numero"
-                              class="text-danger"></span>
                     </div>
 
                 </div>
@@ -177,8 +163,6 @@
 
                         <input asp-for="Endereco.Bairro"
                                class="form-control" />
-                        <span asp-validation-for="Endereco.Bairro"
-                              class="text-danger"></span>
                     </div>
 
                     <div class="col-md-4 mb-3">
@@ -186,8 +170,6 @@
 
                         <input asp-for="Endereco.Cidade"
                                class="form-control" />
-                        <span asp-validation-for="Endereco.Cidade"
-                              class="text-danger"></span>
                     </div>
 
                     <div class="col-md-2 mb-3">
@@ -195,8 +177,6 @@
 
                         <input asp-for="Endereco.Estado"
                                class="form-control" />
-                        <span asp-validation-for="Endereco.Estado"
-                              class="text-danger"></span>
                     </div>
 
                 </div>
@@ -227,4 +207,4 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}   
+}

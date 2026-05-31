@@ -10,7 +10,7 @@ namespace LiberaMais.Repositorio
 
         PromotoraBanco Adicionar(PromotoraBanco promotoraBanco);
 
-        PromotoraBanco Atualizar(PromotoraBanco promotoraBanco);
+        PromotoraBanco Atualizar(PromotoraBanco promotoraBancoDb);
 
         bool Apagar(int id);
 

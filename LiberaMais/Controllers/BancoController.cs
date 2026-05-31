@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LiberaMais.Controllers
 {
 
-    [PaginaParaUsuarioLogado]
+    [PaginaRestritaSomenteAdmin]
     public class BancoController : Controller
     {
         private readonly IBancosRepositorio _bancosRepositorio;
@@ -25,8 +25,6 @@ namespace LiberaMais.Controllers
 
         public IActionResult Index()
         {
-            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
             List<Banco> bancos = _bancosRepositorio.ListarBancos();
             return View(bancos);
         }
@@ -34,9 +32,6 @@ namespace LiberaMais.Controllers
 
         public IActionResult Criar()
         {
-            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
-
 
             return View();
         }
@@ -45,9 +40,6 @@ namespace LiberaMais.Controllers
         [HttpPost]
         public IActionResult Criar(Banco bancos)
         {
-            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
-
             try
             {
                 if (ModelState.IsValid)
@@ -73,9 +65,6 @@ namespace LiberaMais.Controllers
 
         public IActionResult Editar(int id)
         {
-            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
-
             var banco = _bancosRepositorio.BuscarBancoPorId(id);
 
             if (banco == null)
@@ -90,9 +79,6 @@ namespace LiberaMais.Controllers
         [HttpPost]
         public IActionResult Editar(Banco bancos)
         {
-            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
-
             try
             {
                 if (!ModelState.IsValid)

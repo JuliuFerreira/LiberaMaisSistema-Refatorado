@@ -12,7 +12,7 @@
 
     <div class="card shadow-sm mt-5 rounded-4">
 
-              
+
 
 
 
@@ -50,8 +50,7 @@
                     <tr>
                         <th>Nome</th>
                         <th>Url</th>
-                        <th></th>
-                        <th></th>
+                        <th class="text-center">Ações</th>
                     </tr>
 
                 </thead>
@@ -75,14 +74,13 @@
                                 </a>
                             </td>
 
-                            <td>
+                            <td class="text-center">
                                 <a asp-action="Editar"
                                    asp-route-id="@ban.Id"
                                    class="btn btn-warning btn-sm">
                                     Editar
                                 </a>
-                            </td>
-                            <td>
+
                                 <button class="btn btn-danger btn-sm"
                                         data-bs-toggle="modal"
                                         data-bs-target="#modalExcluir_@ban.Id">
@@ -91,6 +89,7 @@
 
                                 </button>
                             </td>
+
                         </tr>
 
                         <!-- MODAL -->

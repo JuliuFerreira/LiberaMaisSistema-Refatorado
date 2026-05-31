@@ -1,0 +1,212 @@
+﻿@using LiberaMais.Models.Enums
+
+@model IEnumerable<Util>
+
+@{
+    Layout = "LayoutSistema";
+
+    // var isAdmin = ViewBag.IsAdmin as bool? ?? false;
+}
+
+<div class="container-fluid mt-4">
+
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso"
+             class="alert alert-success mt-3">
+
+            @TempData["MensagemSucesso"]
+
+        </div>
+    }
+
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro"
+             class="alert alert-danger mt-3">
+
+            @TempData["MensagemErro"]
+
+        </div>
+    }
+    <div class="card shadow-sm mt-5 rounded-4">
+
+
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Links úteis</h4>
+        </div>
+
+        <div class="table-responsive">
+
+            <div class="mb-3 mt-3">
+                <a asp-action="Criar"
+                   class="btn btn-success mb-3">
+                    Adicionar links
+                </a>
+            </div>
+
+            <table class="table table-striped table-bordered">
+
+                <thead class="table-dark">
+
+                    <tr>
+                        <th>Nome</th>
+                        <th>Url</th>
+                        <th>Descrição</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var util in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @util.Nome
+                                </td>
+                                <td>
+                                    <a href="https://@util.Url"
+                                       target="_blank"
+                                       class="text-decoration-none">
+
+                                        @util.Url
+
+                                    </a>
+                                </td>
+
+                                <td>
+                                    @util.Descricao
+                                </td>
+
+                                <td class="text-center">
+                                    <a asp-action="Editar"
+                                       asp-route-id="@util.Id"
+                                       class="btn btn-warning btn-sm">
+                                        Editar
+                                    </a>
+                                    <button class="btn btn-danger btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalExcluir_@util.Id">
+
+                                        Excluir
+
+                                    </button>
+
+                                </td>
+
+                            </tr>
+
+                            <!-- MODAL -->
+                            <div class="modal fade"
+                                 id="modalExcluir_@util.Id"
+                                 tabindex="-1"
+                                 aria-hidden="true">
+
+                                <div class="modal-dialog modal-dialog-centered">
+
+                                    <div class="modal-content rounded-4 border-0 shadow">
+
+                                        <div class="modal-header bg-danger text-white">
+
+                                            <h5 class="modal-title">
+
+                                                Excluir Link
+
+                                            </h5>
+
+                                            <button type="button"
+                                                    class="btn-close btn-close-white"
+                                                    data-bs-dismiss="modal">
+                                            </button>
+
+                                        </div>
+
+                                        <div class="modal-body text-center p-4">
+
+                                            <h5 class="text-danger mb-3">
+                                                Atenção!
+                                            </h5>
+
+                                            <p class="fs-5">
+
+                                                Deseja realmente excluir esse link?
+
+                                                <strong class="text-primary">
+                                                    @util.Nome
+                                                </strong>?
+
+                                            </p>
+
+                                        </div>
+
+                                        <div class="modal-footer border-0">
+
+                                            <button type="button"
+                                                    class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">
+
+                                                Cancelar
+
+                                            </button>
+
+                                            <form asp-action="Apagar" method="post">
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@util.Id" />
+
+                                                <button type="submit"
+                                                        class="btn btn-danger">
+
+                                                    Excluir
+
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                Nenhum cliente encontrado.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+    <div class="text-left my-3">
+        <a class="btn btn-outline-secondary btn-lg" style="border-radius: 10px; font-size: 16px" asp-controller="Apps" asp-action="Index">
+            <i class="bi bi-arrow-return-left"></i> Voltar
+        </a>
+    </div>
+</div>
+
+
+
+
+<script>
+    setTimeout(function () {
+
+        $("#alertaSucesso").fadeOut("slow");
+        $("#alertaErro").fadeOut("slow");
+
+    }, 3000);
+</script>

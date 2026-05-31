@@ -7,12 +7,18 @@ namespace LiberaMais.Data
 {
     public class BancoContext : DbContext
     {
+        public BancoContext()
+        {
+        }
+
         public BancoContext(DbContextOptions<BancoContext> options) : base(options)
         {
         }
         public DbSet<Cliente> Clientes { get; set; }
 
         public DbSet<Venda> Vendas { get; set; }
+
+        public DbSet<Endereco> Enderecos { get; set; }
 
         public DbSet<Promotora> Promotoras { get; set; }
 
@@ -28,13 +34,18 @@ namespace LiberaMais.Data
 
         public DbSet<PromotoraBanco> PromotoraBancos { get; set; }
 
+        public DbSet<Util> utils { get; set; }
+
+        public DbSet<Orgao> orgaos { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new VendaMap());
 
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Cliente>().HasKey(j => j.IdCliente);
+            modelBuilder.Entity<Cliente>().HasKey(c => c.Id);
             modelBuilder.Entity<Cliente>().ToTable("Cliente");
+            modelBuilder.Entity<Endereco>().HasKey(e => e.Id);
+            modelBuilder.Entity<Endereco>().ToTable("Endereco");
             //modelBuilder.Entity<Venda>().HasKey(j => j.Id);
             modelBuilder.Entity<Venda>().ToTable("Venda");
             modelBuilder.Entity<Promotora>().HasKey(j => j.Id);
@@ -50,6 +61,11 @@ namespace LiberaMais.Data
             modelBuilder.Entity<UsuarioModel>().ToTable("Usuarios");
             modelBuilder.Entity<PromotoraBanco>().HasKey(j => j.Id);
             modelBuilder.Entity<PromotoraBanco>().ToTable("PromotoraBanco");
+            modelBuilder.Entity<Util>().HasKey(u => u.Id);
+            modelBuilder.Entity<Util>().ToTable("Util");
+            modelBuilder.Entity<Orgao>().HasKey(o => o.Id);
+            modelBuilder.Entity<Orgao>().ToTable("Orgao");
+
 
             // Configura relacionamento:
             // PromotoraBanco possui uma Promotora

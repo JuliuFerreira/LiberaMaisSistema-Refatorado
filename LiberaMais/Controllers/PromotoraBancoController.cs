@@ -3,6 +3,8 @@ using LiberaMais.Helper;
 using LiberaMais.Models;
 using LiberaMais.Models.Enums;
 using LiberaMais.Repositorio;
+using LiberaMais.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LiberaMais.Controllers
@@ -15,33 +17,48 @@ namespace LiberaMais.Controllers
         private readonly IBancosRepositorio _bancosRepositorio;
         private readonly ISessao _sessao;
         private readonly IUsuarioRepositorio _usuarioRepositorio;
+        private readonly PermissaoService _permissaoService;
         public PromotoraBancoController(IPromotoraBancoRepositorio promotoraBancoRepositorio,
                  IPromotorasRepositorio promotorasRepositorio,
-                 IBancosRepositorio bancosRepositorio, ISessao sessao, IUsuarioRepositorio usuarioRepositorio)
+                 IBancosRepositorio bancosRepositorio,
+                 ISessao sessao,
+                 IUsuarioRepositorio usuarioRepositorio,
+                 PermissaoService permissaoService)
         {
             _promotoraBancoRepositorio = promotoraBancoRepositorio;
             _promotorasRepositorio = promotorasRepositorio;
             _bancosRepositorio = bancosRepositorio;
             _sessao = sessao;
             _usuarioRepositorio = usuarioRepositorio;
+            _permissaoService = permissaoService;
         }
 
 
-           public IActionResult ListarTodosLogins()
-         {
-           var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-           ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
-        
+        public IActionResult ListarTodosLogins()
+        {
+            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+
             List<PromotoraBanco> promotoraBancos = _promotoraBancoRepositorio.ListarPromotoraBanco();
             return View(promotoraBancos);
 
         }
 
+        //[Authorize(Roles ="Admin")]
         public IActionResult Index(int promotoraId)
         {
-            var logins = _promotoraBancoRepositorio.ListarPorPromotora(promotoraId);
-            var promotora = _promotorasRepositorio.BuscarPromotoraPorId(promotoraId);
+            var usuarioLogado = _sessao.BuscarSessaoDoUsuario(); // Busca a sessão do usuário
 
+            var promotora = _promotorasRepositorio.BuscarPromotoraPorId(promotoraId); // Busca o Id da promotora
+
+            if (!_permissaoService.UsuarioTemAcessoPromotora(usuarioLogado, promotora)) // Serviço que válida se o usuário tem acesso ou não a promotora, depenmdendo do seu perfil,
+            {
+                TempData["MensagemErro"] =
+                    "Você não possui acesso.";
+
+                return RedirectToAction("Index", "Promotora");
+            }
+            var logins = _promotoraBancoRepositorio.ListarPorPromotora(promotoraId); // Busca os Logins por promotora
             ViewBag.PromotoraNome = promotora.Nome;
             ViewBag.PromotoraId = promotoraId;
 
@@ -51,11 +68,20 @@ namespace LiberaMais.Controllers
         public IActionResult Criar(int promotoraId)
         {
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
-
-            ViewBag.Banco = _bancosRepositorio.ListarBancos();
 
             var promotora = _promotorasRepositorio.BuscarPromotoraPorId(promotoraId);
+
+            if(!_permissaoService.UsuarioTemAcessoPromotora(usuarioLogado, promotora))
+            {
+                TempData["MensagemErro"] =
+                   "Você não possui acesso.";
+
+                return RedirectToAction("Index", "PromotoraBanco");
+            }
+
+            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+            ViewBag.Banco = _bancosRepositorio.ListarBancos();
+
             ViewBag.PromotoraId = promotoraId;
             ViewBag.NomePromotora = promotora.Nome;
 
@@ -69,10 +95,21 @@ namespace LiberaMais.Controllers
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
 
+            var promotora = _promotorasRepositorio.BuscarPromotoraPorId(promotoraBanco.PromotoraId);
+
+            if (!_permissaoService.UsuarioTemAcessoPromotora(usuarioLogado, promotora))
+            {
+                TempData["MensagemErro"] =
+                   "Você não possui acesso.";
+
+                return RedirectToAction("Index", "Promotora");
+            }
+
             if (!ModelState.IsValid)
             {
                 TempData["MensagemErro"] = "Não foi possivel salvar o login.";
-                ViewBag.Promotora = _promotorasRepositorio.ListarPromotora();
+                ViewBag.promotoraId = promotoraBanco.PromotoraId;
+                ViewBag.promotoranome = promotora.Nome;
                 ViewBag.Banco = _bancosRepositorio.ListarBancos();
                 return View(promotoraBanco);
             }
@@ -88,9 +125,18 @@ namespace LiberaMais.Controllers
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
 
+            var promotoraBanco = _promotoraBancoRepositorio.BuscarPorId(id);
+
+            if (!_permissaoService.UsuarioTemAcessoPromotoraBanco(usuarioLogado, promotoraBanco))
+            {
+                TempData["MensagemErro"] =
+                    "Você não possui acesso.";
+
+                return RedirectToAction("Index", "PromotoraBanco");
+            }
+
             ViewBag.Banco = _bancosRepositorio.ListarBancos();
 
-            var promotoraBanco = _promotoraBancoRepositorio.BuscarPorId(id);
 
             if (promotoraBanco == null)
             {
@@ -110,24 +156,47 @@ namespace LiberaMais.Controllers
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
 
+            var promotoraBancoDb = _promotoraBancoRepositorio.BuscarPorId(promotoraBanco.Id);
+
+            if (!_permissaoService.UsuarioTemAcessoPromotoraBanco(usuarioLogado, promotoraBancoDb))
+            {
+                TempData["MensagemErro"] = "Você não possui acesso";
+
+                return RedirectToAction("Index", "PromotoraBanco");
+            }
 
             if (!ModelState.IsValid)
             {
                 TempData["MensagemErro"] = "Não foi possivel alterar o login";
                 ViewBag.Banco = _bancosRepositorio.ListarBancos();
-                ViewBag.NomePromotora = _promotorasRepositorio.BuscarPromotoraPorId(promotoraBanco.PromotoraId).Nome;
+                ViewBag.NomePromotora = _promotorasRepositorio.BuscarPromotoraPorId(promotoraBancoDb.PromotoraId).Nome;
                 return View(promotoraBanco);
             }
 
-            _promotoraBancoRepositorio.Atualizar(promotoraBanco);
+            promotoraBancoDb.Login = promotoraBanco.Login;
+            promotoraBancoDb.Senha = promotoraBanco.Senha;
+            promotoraBancoDb.BancoId = promotoraBanco.BancoId;
+
+            _promotoraBancoRepositorio.Atualizar(promotoraBancoDb);
             TempData["MensagemSucesso"] = "Login atualizado com sucesso!";
-            return RedirectToAction("Index",new { promotoraId = promotoraBanco.PromotoraId });
+            return RedirectToAction("Index", new { promotoraId = promotoraBancoDb.PromotoraId });
 
         }
 
         public IActionResult Excluir(int id)
         {
+            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+
+
             var promotoraBanco = _promotoraBancoRepositorio.BuscarPorId(id);
+
+            if(!_permissaoService.UsuarioTemAcessoPromotoraBanco(usuarioLogado, promotoraBanco))
+            {
+                TempData["MensagemErro"] = "Você não possui acesso";
+
+                return RedirectToAction("Index", "PromotoraBanco");
+            }
 
             if (promotoraBanco == null)
             {
@@ -141,9 +210,21 @@ namespace LiberaMais.Controllers
         [HttpPost]
         public IActionResult Apagar(int id)
         {
+
+            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+
             try
             {
                 var promotoraBanco = _promotoraBancoRepositorio.BuscarPorId(id);
+
+                if(!_permissaoService.UsuarioTemAcessoPromotoraBanco(usuarioLogado, promotoraBanco))
+                {
+                    TempData["MensagemErro"] = "Você não possui acesso";
+
+                    return RedirectToAction("Index", "PromotoraBanco");
+
+                }
 
                 if (promotoraBanco == null)
                 {

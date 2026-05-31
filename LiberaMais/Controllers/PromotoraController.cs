@@ -3,6 +3,7 @@ using LiberaMais.Helper;
 using LiberaMais.Models;
 using LiberaMais.Models.Enums;
 using LiberaMais.Repositorio;
+using LiberaMais.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Numerics;
 
@@ -16,24 +17,26 @@ namespace LiberaMais.Controllers
         private readonly IPromotoraBancoRepositorio _promotoraBancoRepositorio;
         private readonly IUsuarioRepositorio _usuarioRepositorio;
         private readonly ISessao _sessao;
+        private readonly PermissaoService _permissaoService;
 
-        public PromotoraController(IPromotorasRepositorio promotorasRepositorio, ISessao sessao, IUsuarioRepositorio usuarioRepositorio, IPromotoraBancoRepositorio promotoraBancoRepositorio)
+        public PromotoraController(IPromotorasRepositorio promotorasRepositorio, ISessao sessao, IUsuarioRepositorio usuarioRepositorio, IPromotoraBancoRepositorio promotoraBancoRepositorio, PermissaoService permissaoService)
         {
             _promotorasRepositorio = promotorasRepositorio;
             _sessao = sessao;
             _usuarioRepositorio = usuarioRepositorio;
             _promotoraBancoRepositorio = promotoraBancoRepositorio;
+            _permissaoService = permissaoService;
         }
 
         public IActionResult Index()
         {
-            var usuarioLogado =
-                _sessao.BuscarSessaoDoUsuario();
+            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
 
-            ViewBag.IsAdmin =
-                usuarioLogado.Perfil == PerfilEnum.Admin;
+            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+
 
             List<Promotora> promotora;
+
 
             if (usuarioLogado.Perfil == PerfilEnum.Admin)
             {
@@ -78,12 +81,11 @@ namespace LiberaMais.Controllers
         public IActionResult Criar(Promotora promotora)
         {
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-
-
             ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
-                        
+
             try
             {
+
                 if (usuarioLogado.Perfil == PerfilEnum.Admin)
                 {
                     ViewBag.Usuarios = _usuarioRepositorio.ListarTodosUsuarios();
@@ -109,8 +111,8 @@ namespace LiberaMais.Controllers
                     TempData["MensagemErro"] = "Promotora não adicionada.";
                     return View(promotora);
                 }
-                                
-                                
+
+
             }
             catch (Exception)
             {
@@ -127,7 +129,7 @@ namespace LiberaMais.Controllers
 
                 };
 
-                }                
+                }
 
                 return View(promotora);
             }
@@ -135,13 +137,23 @@ namespace LiberaMais.Controllers
 
         public IActionResult Editar(int id)
         {
-            var edit = _promotorasRepositorio.BuscarPromotoraPorId(id);
+
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+            var promotora = _promotorasRepositorio.BuscarPromotoraPorId(id);
 
-            if(usuarioLogado.Perfil == PerfilEnum.Admin)
+
+            if (!_permissaoService.UsuarioTemAcessoPromotora(usuarioLogado, promotora))
             {
-                ViewBag.Usuarios = _usuarioRepositorio.ListarTodosUsuarios();
+                TempData["mensagemErro"] = "Você não tem autorização";
+
+                return RedirectToAction("Index", "Promotora");
+            }
+
+            if (usuarioLogado.Perfil == PerfilEnum.Admin)
+            {
+             
+               ViewBag.Usuarios = _usuarioRepositorio.ListarTodosUsuarios();
             }
             else
             {
@@ -151,7 +163,7 @@ namespace LiberaMais.Controllers
                 };
             }
 
-                return View(edit);
+            return View(promotora);
         }
 
 
@@ -160,10 +172,18 @@ namespace LiberaMais.Controllers
         {
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+            var promotoraDb = _promotorasRepositorio.BuscarPromotoraPorId(promotora.Id);
 
             try
             {
-                if(usuarioLogado.Perfil == PerfilEnum.Admin)
+                if (!_permissaoService.UsuarioTemAcessoPromotora(usuarioLogado, promotoraDb))
+                {
+                    TempData["mensagemErro"] = "Você não tem permissão";
+
+                    return RedirectToAction("Index", "Promotora");
+                }
+
+                if (usuarioLogado.Perfil == PerfilEnum.Admin)
                 {
                     ViewBag.Usuarios = _usuarioRepositorio.ListarTodosUsuarios();
                 }
@@ -178,7 +198,16 @@ namespace LiberaMais.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    _promotorasRepositorio.Atualizar(promotora);
+                    promotoraDb.Senha = promotora.Senha;
+                    promotoraDb.Url = promotora.Url;
+
+                    if (usuarioLogado.Perfil == PerfilEnum.Admin)
+                    {
+                        promotoraDb.UsuarioId = promotora.UsuarioId;
+                    }
+
+                    _promotorasRepositorio.Atualizar(promotoraDb);
+
                     TempData["MensagemSucesso"] = "Promotora editada com sucesso!";
                     return RedirectToAction("Index");
                 }
@@ -209,24 +238,39 @@ namespace LiberaMais.Controllers
         }
         public IActionResult Deletar(int id)
         {
-            var del = _promotorasRepositorio.BuscarPromotoraPorId(id);
+            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            var promotora = _promotorasRepositorio.BuscarPromotoraPorId(id);
 
-            return View(del);
+            if (!_permissaoService.UsuarioTemAcessoPromotora(usuarioLogado, promotora))
+            {
+                TempData["mensagemErro"] = "Você não tem permissão";
+
+                return RedirectToAction("Index", "Promotora");
+            }
+
+            return View(promotora);
         }
 
         [HttpPost]
         public IActionResult Apagar(int id)
         {
-
+            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            var promotora = _promotorasRepositorio.BuscarPromotoraPorId(id);
 
             try
             {
                 var login = _promotoraBancoRepositorio.ListarPorPromotora(id);
 
+                if (!_permissaoService.UsuarioTemAcessoPromotora(usuarioLogado, promotora))
+                {
+                    TempData["mensagemErro"] = "Você não tem permissão";
+
+                    return RedirectToAction("Index", "Promotora");
+                }
+
                 if (login.Any())
                 {
-                    TempData["MensagemErro"] =
-                "Não é possível excluir essa promotora, pois existem bancos cadastrados.";
+                    TempData["MensagemErro"] = "Não é possível excluir essa promotora, pois existem bancos cadastrados.";
 
                     return RedirectToAction("Index");
                 }

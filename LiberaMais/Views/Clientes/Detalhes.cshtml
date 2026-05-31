@@ -1,0 +1,127 @@
+﻿@model ClienteEnderecoViewModel
+
+@{
+    Layout = "LayoutSistema";
+    ViewData["Title"] = "Detalhes do Cliente";
+}
+
+<div class="container-fluid mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Detalhes do Cliente</h2>
+
+    </div>
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header bg-primary text-white">
+            Dados do Cliente
+        </div>
+
+        <div class="card-body">
+
+            <div class="row mb-3">
+
+                <div class="col-md-6">
+                    <strong>Nome:</strong><br />
+                    @Model.Cliente.Nome
+                </div>
+
+                <div class="col-md-3">
+                    <strong>CPF:</strong><br />
+                    @Model.Cliente.Cpf
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Telefone:</strong><br />
+                    @Model.Cliente.Fone
+                </div>
+
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-md-4">
+                    <strong>Data Nascimento:</strong><br />
+                    @Model.Cliente.DataNascimento.ToString?("dd/MM/yyyy")
+                </div>
+
+                <div class="col-md-4">
+                    <strong>Email:</strong><br />
+                    @Model.Cliente.Email
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-12">
+                    <strong>Observações:</strong><br />
+                    @Model.Cliente.Observacoes
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header bg-secondary text-white">
+            Endereço
+        </div>
+
+        <div class="card-body">
+
+            <div class="row mb-3">
+
+                <div class="col-md-3">
+                    <strong>CEP:</strong><br />
+                    @Model.Endereco?.Cep
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Rua:</strong><br />
+                    @Model.Endereco?.Rua
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Número:</strong><br />
+                    @Model.Endereco?.Numero
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-4">
+                    <strong>Bairro:</strong><br />
+                    @Model.Endereco?.Bairro
+                </div>
+
+                <div class="col-md-4">
+                    <strong>Cidade:</strong><br />
+                    @Model.Endereco?.Cidade
+                </div>
+
+                <div class="col-md-2">
+                    <strong>Estado:</strong><br />
+                    @Model.Endereco?.Estado
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Voltar
+        </a>
+    </div>
+
+
+</div>

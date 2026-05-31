@@ -29,13 +29,13 @@ namespace LiberaMais.Models
         [Required(ErrorMessage = "Selecione o perfil do usuário")]
         public PerfilEnum? Perfil { get; set; }
 
-        public DateTime DataCadastro { get; set; }
+        public DateTime DataCadastro { get; set; } = DateTime.Now;
 
-        public DateTime? DataAtualizacao { get; set; }
+        public DateTime? DataAtualizacao { get; set; } = DateTime.Now;
 
         public virtual List<Venda>? Vendas { get; set; }
 
-        public virtual List<Cliente>? Clientes { get; set; }
+
 
 
         public bool SenhaValida(string senha)

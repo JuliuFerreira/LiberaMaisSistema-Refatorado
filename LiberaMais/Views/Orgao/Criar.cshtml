@@ -1,0 +1,97 @@
+﻿@model Orgao
+
+@{
+    Layout = "LayoutSistema";
+}
+
+<div class="row justify-content-center">    
+
+    <div class="card shadow border-0 rounded-4 col-10 mt-5">
+
+        @if (TempData["mensagemSucesso"] != null)
+        {
+            <div id="alertaSucesso" class="alert alert-success">
+                @TempData["mensagemSucesso"]
+            </div>
+        }
+
+        @if (TempData["mensagemErro"] != null)
+        {
+            <div id="alertaErro" class="alert alert-danger">
+                @TempData["mensagemErro"]
+            </div>
+        }
+
+        <div class="card-header text-white rounded-top-4"
+             style="background-color:green;">
+
+            <h3 class="text-center mb-0">
+                Cadastrar orgão
+            </h3>
+
+        </div>
+
+        <div class="card-body p-4">
+
+            <form id="promotoraForm"
+                  asp-controller="Orgao"
+                  asp-action="Criar"
+                  method="post">
+
+                <div class="row g-6">
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Nome"
+                               class="form-label fw-bold">
+                            Nome
+                        </label>
+
+                        <input asp-for="Nome"
+                               class="form-control"
+                               maxlength="100"
+                               placeholder="Nome do orgão" />
+
+                        <span asp-validation-for="Nome"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="d-flex justify-content-end gap-2">
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary">
+
+                        Voltar
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        Salvar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    setTimeout(function () {
+
+        $("#alertaSucesso").fadeOut("slow");
+        $("#alertaErro").fadeOut("slow");
+
+    }, 3000);
+</script>

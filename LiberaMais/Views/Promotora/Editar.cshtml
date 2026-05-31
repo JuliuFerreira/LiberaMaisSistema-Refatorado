@@ -51,38 +51,30 @@
                   asp-controller="Promotora"
                   asp-action="Editar"
                   method="post">
-                <input type="hidden" asp-for="UsuarioId" />
                 <input type="hidden" asp-for="Id" />
 
                 <div class="row g-3">
 
-                    <div class="col-md-6">
+                    <div class="row">
+                        @if (ViewBag.IsAdmin)
+                        {
+                            <div class="col-md-4 mb-3">
 
-                        <label class="form-label fw-bold">
-                            Usuário
-                        </label>
-                        
-                        <select asp-for="UsuarioId"
-                                class="form-select">
-                            
+                                <label>Usuário</label>
 
-                            <option value=""> 
-                                Selecione
-                            </option>
+                                <select asp-for="UsuarioId"
+                                        class="form-select"
+                                        asp-items='@(new SelectList(ViewBag.Usuarios, "Id", "Nome"))'>
 
-                            @foreach (var user in ViewBag.Usuarios)
-                            {
-                                <option value="@user.Id">
-                                    @user.Nome
-                                </option>
-                            }
+                                    <option value="">Selecione</option>
 
-                        </select>
+                                </select>
 
-                        <span asp-validation-for="UsuarioId"
-                              class="text-danger">
-                        </span>
+                                <span asp-validation-for="UsuarioId"
+                                      class="text-danger"></span>
 
+                            </div>
+                        }
                     </div>
 
 
