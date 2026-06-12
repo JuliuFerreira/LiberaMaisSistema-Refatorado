@@ -44,6 +44,8 @@ namespace LiberaMais.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    bancos.Nome = System.Globalization.CultureInfo.CurrentCulture.TextInfo
+                        .ToTitleCase(bancos.Nome.ToLower());
                     _bancosRepositorio.Adicionar(bancos);
                     TempData["MensagemSucesso"] = "Banco cadastrado com sucesso!";
                     return RedirectToAction("Index");
@@ -87,6 +89,8 @@ namespace LiberaMais.Controllers
                     return View(bancos);
                 }
 
+                bancos.Nome = System.Globalization.CultureInfo.CurrentCulture.TextInfo
+                        .ToTitleCase(bancos.Nome.ToLower());
                 _bancosRepositorio.Atualizar(bancos);
                 TempData["MensagemSucesso"] = "Alteração realizada com sucesso!";
                 return RedirectToAction("Index");

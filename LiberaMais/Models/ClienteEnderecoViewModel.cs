@@ -1,4 +1,7 @@
-﻿namespace LiberaMais.Models
+﻿
+
+namespace LiberaMais.Models
+
 {
     public class ClienteEnderecoViewModel
     {

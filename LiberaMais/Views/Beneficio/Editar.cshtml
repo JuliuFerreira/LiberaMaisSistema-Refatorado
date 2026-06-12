@@ -1,0 +1,159 @@
+﻿@model Beneficio
+
+@{
+    Layout = "LayoutSistema";
+}
+
+<div class="row justify-content-center">
+
+    <div class="card shadow border-0 rounded-4 col-10 mt-5">
+
+        <div class="card-header text-white rounded-top-4"
+             style="background-color:orange">
+
+            <h3 class="text-center mb-0">
+                Editar Beneficio
+            </h3>
+
+        </div>
+
+        @if (TempData["mensagemSucesso"] != null)
+        {
+            <div id="alertaSucesso" class="alert alert-success">
+                @TempData["mensagemSucesso"]
+            </div>
+        }
+
+        @if (TempData["mensagemErro"] != null)
+        {
+            <div id="alertaErro" class="alert alert-danger">
+                @TempData["mensagemErro"]
+            </div>
+        }
+
+
+
+        <div class="card-body p-4">
+
+            <form id="promotoraForm"
+                  asp-controller="Beneficio"
+                  asp-action="Editar"
+                  method="post">
+                <input type="hidden" asp asp-for="Id" />
+                <input type="hidden" asp asp-for="OrgaoId" />
+
+
+                <div class="row g-6">
+
+                    @*                     <div class="col-md-3">
+
+                        <label class="form-label">
+                            Orgão
+                        </label>
+
+                        <select asp-for="OrgaoId"
+                                class="form-select">
+
+                            <option value="">
+                                Selecione
+                            </option>
+
+                            @foreach (var ben in ViewBag.orgao)
+                            {
+                                <option value="@ben.Id">
+                                    @ben.Nome
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+ *@
+                    <div class="col-md-3">
+
+                        <label asp-for="OrgaoId"
+                               class="form-label fw-bold">
+                            Orgão
+                        </label>
+
+                        <input asp-for="Orgaos.Nome"
+                               class="form-control"
+                               maxlength="15"
+                               readonly />
+
+                        <span asp-validation-for="OrgaoId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <label asp-for="Codigo"
+                               class="form-label fw-bold">
+                            Código
+                        </label>
+
+                        <input asp-for="Codigo"
+                               class="form-control"
+                               maxlength="15"
+                               placeholder="Código do benefício" />
+
+                        <span asp-validation-for="Codigo"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Descricao"
+                               class="form-label fw-bold">
+                            Descrição
+                        </label>
+
+                        <input asp-for="Descricao"
+                               class="form-control"
+                               maxlength="60"
+                               placeholder="Descrição do benefício" />
+
+                        <span asp-validation-for="Descricao"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+                <hr class="my-4" />
+                <div class="d-flex justify-content-end gap-2">
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary">
+
+                        Voltar
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        Salvar
+
+                    </button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    setTimeout(function () {
+
+        $("#alertaSucesso").fadeOut("slow");
+        $("#alertaErro").fadeOut("slow");
+
+    }, 3000);
+</script>

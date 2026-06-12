@@ -53,6 +53,19 @@ namespace LiberaMais.Controllers
         }
 
 
+        //public IActionResult Detalhes(int id)
+        //{
+        //    var cliente = _clienteRepositorio.BuscarDadosCompletos(id);
+
+        //    if(cliente == null)
+        //    {
+        //        TempData["MensagemErro"] = "Cliente não encontrado.";
+        //        return RedirectToAction("Index");
+        //    }
+
+        //    return View(cliente);
+        //}
+
         public IActionResult Criar()
         {
             var usuarioLogado =
@@ -63,8 +76,7 @@ namespace LiberaMais.Controllers
 
             if (usuarioLogado.Perfil == PerfilEnum.Admin)
             {
-                ViewBag.Usuarios =
-                    _usuarioRepositorio.ListarTodosUsuarios();
+                ViewBag.Usuarios = _usuarioRepositorio.ListarTodosUsuarios();
             }
 
             else
@@ -110,7 +122,6 @@ namespace LiberaMais.Controllers
                     usuarioLogado
                         };
                 }
-
                 if (!ModelState.IsValid)
                 {
                     TempData["MensagemErro"] = "Não foi possível adicionar o cliente";
@@ -124,34 +135,35 @@ namespace LiberaMais.Controllers
                     model.Cliente.UsuarioId = usuarioLogado.Id;
                 }
 
+                var clienteExistente = _clienteRepositorio.BuscarPorCpf(model.Cliente.Cpf);
+
+                if(clienteExistente != null)
+                {
+                    TempData["MensagemErro"] = "Já existe um cliente cadastrado com este CPF.";
+                    return View(model);
+                }
+
                 _clienteRepositorio.Adicionar(model.Cliente);
 
                 model.Endereco.ClienteId = model.Cliente.Id;
 
+
+                model.Cliente.Nome = System.Globalization.CultureInfo.CurrentCulture.TextInfo
+                .ToTitleCase(model.Cliente.Nome.ToLower());
                 _enderecoRepositorio.Adicionar(model.Endereco);
 
-                TempData["MensagemSucesso"] =
-                    "Cliente adicionado com sucesso";
+                TempData["MensagemSucesso"] = "Cliente adicionado com sucesso";
 
                 return RedirectToAction("Index");
             }
 
             catch (Exception)
             {
-                TempData["MensagemErro"] =
-                    "Não foi possível adicionar o cliente";
+                TempData["MensagemErro"] = "Não foi possível adicionar o cliente";
 
                 return View(model);
             }
         }
-
-        //catch (Exception ex)
-
-        //{
-        //    _bancoContext.Database.RollbackTransaction(); // Caso por algum motivo de erro nos dados do endereço, ele volta ao estado inicial.
-        //    throw;
-
-        //}
 
 
         public IActionResult Detalhes(int id)
@@ -191,7 +203,7 @@ namespace LiberaMais.Controllers
                 TempData["MensagemErro"] = "Você não tem acesso";
                 return RedirectToAction("Index");
             }
-            
+
             if (usuarioLogado.Perfil == PerfilEnum.Admin)
             {
                 ViewBag.Usuarios = _usuarioRepositorio.ListarTodosUsuarios();
@@ -296,18 +308,19 @@ namespace LiberaMais.Controllers
                     model.Endereco.Estado;
                 clienteDb.UsuarioId = model.Cliente.UsuarioId;
 
+                clienteDb.Nome = System.Globalization.CultureInfo.CurrentCulture.TextInfo
+                    .ToTitleCase(clienteDb.Nome.ToLower());
+
                 _clienteRepositorio.Atualizar(clienteDb);
 
-                TempData["MensagemSucesso"] =
-                    "Cliente atualizado com sucesso";
+                TempData["MensagemSucesso"] = "Cliente atualizado com sucesso";
 
-                return RedirectToAction("Index");
+                return RedirectToAction("Detalhes", new { id = clienteDb.Id });
             }
 
             catch (Exception)
             {
-                TempData["MensagemErro"] =
-                    "Não foi possível atualizar o cliente";
+                TempData["MensagemErro"] = "Não foi possível atualizar o cliente";
 
                 return View(model);
             }
@@ -316,16 +329,16 @@ namespace LiberaMais.Controllers
 
         public IActionResult Deletar(int id)
         {
-            var usuarioLogado =_sessao.BuscarSessaoDoUsuario();
+            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             var cliente = _clienteRepositorio.BuscarClientePorId(id);
 
-            if( cliente == null)
+            if (cliente == null)
             {
                 TempData["MensagemErro"] = "Cliente não localizado.";
                 return RedirectToAction("Index");
             }
 
-            if(!_permissaoService.UsuarioTemAcessoCliente(usuarioLogado, cliente))
+            if (!_permissaoService.UsuarioTemAcessoCliente(usuarioLogado, cliente))
             {
                 TempData["MensagemErro"] = "Você não tem permissão";
 
@@ -346,13 +359,13 @@ namespace LiberaMais.Controllers
             try
             {
 
-                if( cliente == null)
+                if (cliente == null)
                 {
                     TempData["MensagemErro"] = "Cliente não encontrado";
                     return RedirectToAction("Index");
                 }
 
-                if(!_permissaoService.UsuarioTemAcessoCliente(usuarioLogado, cliente))
+                if (!_permissaoService.UsuarioTemAcessoCliente(usuarioLogado, cliente))
                 {
                     TempData["MensagemErro"] = "Você não tem permissão";
 

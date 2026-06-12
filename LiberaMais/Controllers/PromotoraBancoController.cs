@@ -59,12 +59,13 @@ namespace LiberaMais.Controllers
                 return RedirectToAction("Index", "Promotora");
             }
             var logins = _promotoraBancoRepositorio.ListarPorPromotora(promotoraId); // Busca os Logins por promotora
-            ViewBag.PromotoraNome = promotora.Nome;
             ViewBag.PromotoraId = promotoraId;
+            ViewBag.NomePromotora = promotora.Nome;
 
             return View(logins);
         }
 
+        [PaginaRestritaSomenteAdmin]
         public IActionResult Criar(int promotoraId)
         {
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
@@ -89,6 +90,7 @@ namespace LiberaMais.Controllers
 
         }
 
+        [PaginaRestritaSomenteAdmin]
         [HttpPost]
         public IActionResult Criar(PromotoraBanco promotoraBanco)
         {
@@ -109,7 +111,7 @@ namespace LiberaMais.Controllers
             {
                 TempData["MensagemErro"] = "Não foi possivel salvar o login.";
                 ViewBag.promotoraId = promotoraBanco.PromotoraId;
-                ViewBag.promotoranome = promotora.Nome;
+                ViewBag.NomePromotora = promotora.Nome;
                 ViewBag.Banco = _bancosRepositorio.ListarBancos();
                 return View(promotoraBanco);
             }
@@ -120,6 +122,7 @@ namespace LiberaMais.Controllers
 
         }
 
+        [PaginaRestritaSomenteAdmin]
         public IActionResult Editar(int id)
         {
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
@@ -150,6 +153,7 @@ namespace LiberaMais.Controllers
             return View(promotoraBanco);
         }
 
+        [PaginaRestritaSomenteAdmin]
         [HttpPost]
         public IActionResult Editar(PromotoraBanco promotoraBanco)
         {
@@ -169,6 +173,7 @@ namespace LiberaMais.Controllers
             {
                 TempData["MensagemErro"] = "Não foi possivel alterar o login";
                 ViewBag.Banco = _bancosRepositorio.ListarBancos();
+                ViewBag.PromotoraId = promotoraBancoDb.PromotoraId;
                 ViewBag.NomePromotora = _promotorasRepositorio.BuscarPromotoraPorId(promotoraBancoDb.PromotoraId).Nome;
                 return View(promotoraBanco);
             }
@@ -183,6 +188,7 @@ namespace LiberaMais.Controllers
 
         }
 
+        [PaginaRestritaSomenteAdmin]
         public IActionResult Excluir(int id)
         {
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
@@ -207,6 +213,7 @@ namespace LiberaMais.Controllers
             return View(promotoraBanco);
         }
 
+        [PaginaRestritaSomenteAdmin]
         [HttpPost]
         public IActionResult Apagar(int id)
         {

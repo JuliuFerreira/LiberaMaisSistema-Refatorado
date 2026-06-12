@@ -13,7 +13,11 @@ namespace LiberaMais.Repositorio
 
         Cliente Atualizar(Cliente cliente);
 
+        Cliente BuscarCompleto(int id);
+
         bool Apagar(int id);
+
+        public Cliente BuscarPorCpf(string cpf);
 
        // bool VerificarCpfExistente(string cpf);
 

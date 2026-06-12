@@ -1,6 +1,7 @@
 ﻿using AspNetCoreGeneratedDocument;
 using LiberaMais.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using System.ComponentModel.DataAnnotations;
@@ -38,6 +39,8 @@ namespace LiberaMais.Models
 
         public UsuarioModel? Usuario { get; set; }
 
+        [ValidateNever]
+        public virtual List<ClienteBeneficio> ClienteBeneficios { get; set; }
         //public string ValidarCpf (string Cpf)
         //{
         //    if (string.IsNullOrWhiteSpace(Cpf))

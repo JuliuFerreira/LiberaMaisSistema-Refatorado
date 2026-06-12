@@ -7,21 +7,33 @@
 
 <div class="row justify-content-center">
 
-    <h2 class="mt-5">Cadastrar Cliente</h2>
+    <div class="justify-content-center align-items-center mb-4 mt-4 mt-5">
 
-    @if (TempData["mensagemSucesso"] != null)
+        <div class="card-header text-white rounded-top-4"
+             style="background-color:orange;">
+
+            <h3 class="text-center mb-0">
+                Editar Cliente
+            </h3>
+
+        </div>
+
+    </div>
+
+    @if (TempData["MensagemSucesso"] != null)
     {
-        <div class="alert alert-success">
-            @TempData["mensagemSucesso"]
+        <div id="alertaSucesso" class="alert alert-success">
+            @TempData["MensagemSucesso"]
         </div>
     }
 
-    @if (TempData["mensagemErro"] != null)
+    @if (TempData["MensagemErro"] != null)
     {
-        <div class="alert alert-danger">
-            @TempData["mensagemErro"]
+        <div id="alertaErro" class="alert alert-danger">
+            @TempData["MensagemErro"]
         </div>
     }
+
 
     <form asp-action="Editar" method="post">
        
@@ -31,13 +43,14 @@
 
         <div class="card shadow-sm mb-4">
 
-            <div class="card-header bg-primary text-white">
+            <div class="card-header bg-info text-white">
                 Dados do Cliente
             </div>
 
             <div class="card-body">
 
                 <div class="row">
+                                    
 
                     <div class="row">
                         @if (ViewBag.IsAdmin)
@@ -48,12 +61,8 @@
 
                                 <select asp-for="Cliente.UsuarioId"
                                         class="form-select"
-                                        asp-items='@(new SelectList(ViewBag.Usuarios, "Id", "Nome"))'>
-
-                                    <option value="">Selecione</option>
-
+                                        asp-items='@(new SelectList(ViewBag.Usuarios, "Id", "Nome", Model.Cliente.UsuarioId))'>
                                 </select>
-
                                 <span asp-validation-for="Cliente.UsuarioId"
                                       class="text-danger"></span>
 
@@ -85,7 +94,8 @@
                         <label>Telefone</label>
 
                         <input asp-for="Cliente.Fone"
-                               class="form-control" />
+                               class="form-control"
+                               id="telefone" />
 
                         <span asp-validation-for="Cliente.Fone"
                               class="text-danger"></span>
@@ -137,14 +147,16 @@
                         <label>CEP</label>
 
                         <input asp-for="Endereco.Cep"
-                               class="form-control" />
+                               class="form-control"
+                               id="cep"/>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label>Rua</label>
 
                         <input asp-for="Endereco.Rua"
-                               class="form-control" />
+                               class="form-control"
+                               id="rua"/>
                     </div>
 
                     <div class="col-md-3 mb-3">
@@ -162,21 +174,24 @@
                         <label>Bairro</label>
 
                         <input asp-for="Endereco.Bairro"
-                               class="form-control" />
+                               class="form-control"
+                               id="bairro"/>
                     </div>
 
                     <div class="col-md-4 mb-3">
                         <label>Cidade</label>
 
                         <input asp-for="Endereco.Cidade"
-                               class="form-control" />
+                               class="form-control"
+                               id="cidade"/>
                     </div>
 
                     <div class="col-md-2 mb-3">
                         <label>Estado</label>
 
                         <input asp-for="Endereco.Estado"
-                               class="form-control" />
+                               class="form-control"
+                               id="estado"/>
                     </div>
 
                 </div>
@@ -185,15 +200,19 @@
 
         </div>
 
-        <div class="d-flex gap-2">
+        <hr class="my-4" />
+
+        <div class="d-flex justify-content-end gap-2">
 
             <button type="submit"
                     class="btn btn-success">
                 Salvar
             </button>
 
-            <a asp-action="Index"
+            <a asp-action="Detalhes"
+               asp-route-id="@Model.Cliente.Id"
                class="btn btn-secondary">
+                <i class="bi bi-arrow-return-left"></i>
                 Voltar
             </a>
 
@@ -208,3 +227,15 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
+<script>
+
+    setTimeout(function () {
+
+        $("#alertaSucesso").fadeOut("slow");
+        $("#alertaErro").fadeOut("slow");
+
+    }, 3000);
+
+</script>
+

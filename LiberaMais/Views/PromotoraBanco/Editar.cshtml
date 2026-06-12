@@ -4,9 +4,9 @@
     Layout = "LayoutSistema";
 }
 
-<div class="container mt-6">
+<div class="row justify-content-center">
 
-    <div class="card shadow border-0 rounded-4 col-10">
+    <div class="card shadow border-0 rounded-4 col-10 mt-5">
 
         <div class="card-header text-white rounded-top-4"
              style="background-color:orange;">
@@ -16,6 +16,21 @@
             </h3>
 
         </div>
+
+        @if (TempData["MensagemSucesso"] != null)
+        {
+            <div id="alertaSucesso" class="alert alert-success">
+                @TempData["MensagemSucesso"]
+            </div>
+        }
+
+        @if (TempData["MensagemErro"] != null)
+        {
+            <div id="alertaErro" class="alert alert-danger">
+                @TempData["MensagemErro"]
+            </div>
+        }
+
 
         <div class="card-body p-4">
 
@@ -64,20 +79,32 @@
                             }
 
                         </select>
+                        <span asp-validation-for="BancoId"
+                              class="text-danger">
+                        </span>
+
 
                     </div>
 
                     <div class="col-md-3">
                         <label for="login" class="form-label">Usuário</label>
                         <input type="text" asp-for="Login" class="form-control" id="usuario">
+                        <span asp-validation-for="Login"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
                     <div class="col-md-3">
                         <label for="login" class="form-label">Senha</label>
                         <input type="text" asp-for="Senha" class="form-control" id="senha">
+                        <span asp-validation-for="Senha"
+                              class="text-danger">
+                        </span>
+
                     </div>
 
-                    <div class="col-12 mt-4">
+                    <div class="d-flex justify-content-end gap-2">
 
                         <button type="submit"
                                 class="btn btn-success">

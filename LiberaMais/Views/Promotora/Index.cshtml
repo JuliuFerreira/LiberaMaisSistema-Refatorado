@@ -22,29 +22,34 @@
 
         </div>
 
+        @if (TempData["MensagemSucesso"] != null)
+        {
+            <div id="alertaSucesso" class="alert alert-success">
+                @TempData["MensagemSucesso"]
+            </div>
+        }
+
+        @if (TempData["MensagemErro"] != null)
+        {
+            <div id="alertaErro" class="alert alert-danger">
+                @TempData["MensagemErro"]
+            </div>
+        }
+
     </div>
 
-    @if (TempData["MensagemSucesso"] != null)
+    
+
+    @if (isAdmin)
     {
-        <div id="alertaSucesso" class="alert alert-success">
-            @TempData["MensagemSucesso"]
-        </div>
+        <a asp-action="Criar"
+           class="btn btn-success rounded-4 shadow-sm px-4 mb-3 ">
+
+            <i class="bi bi-plus-circle-fill"></i>
+            Nova Promotora
+
+        </a>
     }
-
-    @if (TempData["MensagemErro"] != null)
-    {
-        <div id="alertaErro" class="alert alert-danger">
-            @TempData["MensagemErro"]
-        </div>
-    }
-
-    <a asp-action="Criar"
-       class="btn btn-success rounded-4 shadow-sm px-4 mb-3 ">
-
-        <i class="bi bi-plus-circle-fill"></i>
-        Nova Promotora
-
-    </a>
 
     <div class="row g-3">
 
@@ -130,7 +135,7 @@
                             </div>
 
                         </div>
-
+                        
                         <div class="d-grid gap-2">
 
                             <a asp-controller="PromotoraBanco"
@@ -142,26 +147,29 @@
                                 Logins
 
                             </a>
+                            @if (isAdmin)
+                            {
+                                <div class="d-flex gap-2">
 
-                            <div class="d-flex gap-2">
+                                    <a asp-action="Editar"
+                                       asp-route-id="@pro.Id"
+                                       class="btn btn-outline-warning btn-sm w-100 rounded-3">
 
-                                <a asp-action="Editar"
-                                   asp-route-id="@pro.Id"
-                                   class="btn btn-outline-warning btn-sm w-100 rounded-3">
+                                        <i class="bi bi-pencil-square"></i>
 
-                                    <i class="bi bi-pencil-square"></i>
+                                    </a>
 
-                                </a>
+                                    <button class="btn btn-outline-danger btn-sm w-100 rounded-3"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalExcluir_@pro.Id">
 
-                                <button class="btn btn-outline-danger btn-sm w-100 rounded-3"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modalExcluir_@pro.Id">
+                                        <i class="bi bi-trash"></i>
 
-                                    <i class="bi bi-trash"></i>
+                                    </button>
 
-                                </button>
-
-                            </div>
+                                </div>
+                            }
+                            
 
                         </div>
 
@@ -244,7 +252,7 @@
 
     </div>
 
-    <div class="mt-4">
+    <div class="mt-3">
 
         <a class="btn btn-outline-secondary rounded-4 px-4"
            asp-controller="Apps"

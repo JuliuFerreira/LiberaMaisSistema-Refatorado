@@ -52,6 +52,8 @@ namespace LiberaMais.Controllers
 
             return View(promotora);
         }
+
+        [PaginaRestritaSomenteAdmin]
         public IActionResult Criar()
         {
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
@@ -76,7 +78,7 @@ namespace LiberaMais.Controllers
             return View();
         }
 
-
+        [PaginaRestritaSomenteAdmin]
         [HttpPost]
         public IActionResult Criar(Promotora promotora)
         {
@@ -135,6 +137,7 @@ namespace LiberaMais.Controllers
             }
         }
 
+        [PaginaRestritaSomenteAdmin]
         public IActionResult Editar(int id)
         {
 
@@ -166,7 +169,7 @@ namespace LiberaMais.Controllers
             return View(promotora);
         }
 
-
+        [PaginaRestritaSomenteAdmin]
         [HttpPost]
         public IActionResult Editar(Promotora promotora)
         {
@@ -198,6 +201,8 @@ namespace LiberaMais.Controllers
 
                 if (ModelState.IsValid)
                 {
+                    promotoraDb.Nome = promotora.Nome;
+                    promotoraDb.Login = promotora.Login;
                     promotoraDb.Senha = promotora.Senha;
                     promotoraDb.Url = promotora.Url;
 
@@ -236,6 +241,8 @@ namespace LiberaMais.Controllers
                 return View(promotora);
             }
         }
+
+        [PaginaRestritaSomenteAdmin]
         public IActionResult Deletar(int id)
         {
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
@@ -251,6 +258,8 @@ namespace LiberaMais.Controllers
             return View(promotora);
         }
 
+
+        [PaginaRestritaSomenteAdmin]
         [HttpPost]
         public IActionResult Apagar(int id)
         {

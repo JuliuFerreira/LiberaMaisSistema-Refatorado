@@ -20,12 +20,17 @@ namespace LiberaMais.Repositorio
 
         public Cliente BuscarClientePorId(int id)
         {
-
             return _bancoContext.Clientes
-           .Include(c => c.Endereco)
-           .Include(c => c.Usuario)
-           .FirstOrDefault(c => c.Id == id);
 
+                .Include(c => c.Endereco)
+
+                .Include(c => c.ClienteBeneficios)
+
+                    .ThenInclude(cb => cb.Beneficio)
+
+                        .ThenInclude(b => b.Orgaos)
+
+                .FirstOrDefault(c => c.Id == id);
         }
 
         public List<Cliente> ListarTodosClientes()
@@ -71,6 +76,22 @@ namespace LiberaMais.Repositorio
                 .Include(c => c.Usuario)
                 .Where(c => c.UsuarioId == usuarioId) 
                 .ToList();
+        }
+
+        public Cliente BuscarCompleto(int id)
+        {
+         return _bancoContext.Clientes
+        .Include(c => c.Endereco)
+        .Include(c => c.ClienteBeneficios)
+            .ThenInclude(cb => cb.Beneficio)
+                .ThenInclude(b => b.Orgaos)
+        .FirstOrDefault(c => c.Id == id);
+        }
+
+        public Cliente BuscarPorCpf(string cpf)
+        {
+            return _bancoContext.Clientes
+                 .FirstOrDefault(c => c.Cpf == cpf);
         }
 
         //public bool VerificarCpfExistente(string cpf)

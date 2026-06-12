@@ -4,29 +4,10 @@
     Layout = "LayoutSistema";
 }
 
-<div class="container mt-6">
+<div class="row justify-content-center">
 
-    <div class="card shadow border-0 rounded-4 col-10">
 
-        @if (TempData["MensagemSucesso"] != null)
-        {
-            <div id="alertaSucesso"
-                 class="alert alert-success mt-3">
-
-                @TempData["MensagemSucesso"]
-
-            </div>
-        }
-
-        @if (TempData["MensagemErro"] != null)
-        {
-            <div id="alertaErro"
-                 class="alert alert-danger mt-3">
-
-                @TempData["MensagemErro"]
-
-            </div>
-        }
+    <div class="card shadow border-0 rounded-4 col-10 mt-5">
 
         <div class="card-header text-white rounded-top-4"
              style="background-color: orange;">
@@ -38,6 +19,21 @@
 
         </div>
 
+        @if (TempData["MensagemSucesso"] != null)
+        {
+            <div id="alertaSucesso" class="alert alert-success">
+                @TempData["MensagemSucesso"]
+            </div>
+        }
+
+        @if (TempData["MensagemErro"] != null)
+        {
+            <div id="alertaErro" class="alert alert-danger">
+                @TempData["MensagemErro"]
+            </div>
+        }
+
+
         <div class="card-body p-4">
 
             <form id="promotoraForm"
@@ -48,7 +44,7 @@
 
                 <div class="row g-6">
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
 
                         <label asp-for="Nome"
                                class="form-label fw-bold">
@@ -68,7 +64,7 @@
 
                     
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
 
                         <label asp-for="Url"
                                class="form-label fw-bold">
@@ -86,7 +82,7 @@
 
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
 
                         <label asp-for="Descricao"
                                class="form-label fw-bold">

@@ -1,4 +1,4 @@
-﻿@model ClienteEnderecoViewModel
+﻿    @model ClienteEnderecoViewModel
 
 @{
     Layout = "LayoutSistema";
@@ -7,29 +7,42 @@
 
 <div class="row justify-content-center">
 
-    <h2 class="mt-5">Cadastrar Cliente</h2>
-
-    @if (TempData["mensagemSucesso"] != null)
+    @if (TempData["MensagemSucesso"] != null)
     {
-        <div class="alert alert-success">
-            @TempData["mensagemSucesso"]
+        <div id="alertaSucesso" class="alert alert-success">
+            @TempData["MensagemSucesso"]
         </div>
     }
 
-    @if (TempData["mensagemErro"] != null)
+    @if (TempData["MensagemErro"] != null)
     {
-        <div class="alert alert-danger">
-            @TempData["mensagemErro"]
+        <div id="alertaErro" class="alert alert-danger">
+            @TempData["MensagemErro"]
         </div>
     }
+
+    <div class="justify-content-center align-items-center mb-4 mt-4 mt-5">
+
+        <div class="card-header text-white rounded-top-4"
+             style="background-color:green;">
+
+            <h3 class="text-center mb-0">
+                Cadastrar Cliente
+            </h3>
+
+        </div>
+
+    </div>
+       
 
     <form asp-action="Criar" method="post">
 
         <div class="card shadow-sm mb-4">
-
-            <div class="card-header bg-primary text-white">
+                        
+            <div class="card-header bg-success text-white">
                 Dados do Cliente
             </div>
+
 
             <div class="card-body">
 
@@ -68,7 +81,9 @@
                         <label>Nome</label>
 
                         <input asp-for="Cliente.Nome"
-                               class="form-control" />
+                               class="form-control"
+                               maxlength="200"
+                               placeholder="Nome do cliente" />
 
                         <span asp-validation-for="Cliente.Nome"
                               class="text-danger"></span>
@@ -78,17 +93,24 @@
                         <label>CPF</label>
 
                         <input asp-for="Cliente.Cpf"
-                               class="form-control" />
+                               class="form-control"
+                               minlength="14"
+                               maxlength="14"
+                               placeholder="CPF do clietne"
+                               id="cpf" />
 
                         <span asp-validation-for="Cliente.Cpf"
                               class="text-danger"></span>
                     </div>
-
                     <div class="col-md-3 mb-3">
                         <label>Telefone</label>
 
                         <input asp-for="Cliente.Fone"
-                               class="form-control" />
+                               class="form-control"
+                               maxlength="20"
+                               placeholder="Insira o telefone/WhatsApp"
+                               id="telefone"
+                               />
 
                         <span asp-validation-for="Cliente.Fone"
                               class="text-danger"></span>
@@ -113,7 +135,8 @@
                         <label>Email</label>
 
                         <input asp-for="Cliente.Email"
-                               class="form-control" />
+                               class="form-control"
+                               placeholder="Digite um Email" />
                         <span asp-validation-for="Cliente.Email"
                               class="text-danger"></span>
                     </div>
@@ -145,7 +168,9 @@
                         <label>CEP</label>
 
                         <input asp-for="Endereco.Cep"
-                               class="form-control" />
+                               class="form-control"
+                               id="cep" 
+                               placeholder="Digite o CEP do cliente" />
                         <span asp-validation-for="Endereco.Cep"
                               class="text-danger"></span>
                     </div>
@@ -154,7 +179,9 @@
                         <label>Rua</label>
 
                         <input asp-for="Endereco.Rua"
-                               class="form-control" />
+                               class="form-control"
+                               placeholder="Digite a Rua"
+                               id="rua"/>
                         <span asp-validation-for="Endereco.Rua"
                               class="text-danger"></span>
                     </div>
@@ -163,7 +190,9 @@
                         <label>Número</label>
 
                         <input asp-for="Endereco.Numero"
-                               class="form-control" />
+                               class="form-control"
+                               placeholder="Digite o número da casa"
+                               id="numero"/>
                         <span asp-validation-for="Endereco.Numero"
                               class="text-danger"></span>
                     </div>
@@ -176,7 +205,9 @@
                         <label>Bairro</label>
 
                         <input asp-for="Endereco.Bairro"
-                               class="form-control" />
+                               class="form-control"
+                               placeholder="Digite o Bairro"
+                               id="bairro"/>
                         <span asp-validation-for="Endereco.Bairro"
                               class="text-danger"></span>
                     </div>
@@ -185,7 +216,9 @@
                         <label>Cidade</label>
 
                         <input asp-for="Endereco.Cidade"
-                               class="form-control" />
+                               class="form-control"
+                               placeholder="Digite a Cidade"
+                               id="cidade"/>
                         <span asp-validation-for="Endereco.Cidade"
                               class="text-danger"></span>
                     </div>
@@ -194,7 +227,10 @@
                         <label>Estado</label>
 
                         <input asp-for="Endereco.Estado"
-                               class="form-control" />
+                               class="form-control"
+                               maxlength="2"
+                               placeholder="Digite o Estado (Apenas singla)"
+                               id="estado"/>
                         <span asp-validation-for="Endereco.Estado"
                               class="text-danger"></span>
                     </div>
@@ -205,7 +241,9 @@
 
         </div>
 
-        <div class="d-flex gap-2">
+        <hr class="my-4" />
+
+        <div class="d-flex justify-content-end gap-2">
 
             <button type="submit"
                     class="btn btn-success">
@@ -227,4 +265,18 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}   
+    
+}
+
+
+<script>
+
+    setTimeout(function () {
+
+        $("#alertaSucesso").fadeOut("slow");
+    $("#alertaErro").fadeOut("slow");
+
+    }, 3000);
+
+</script>
+

@@ -1,0 +1,204 @@
+﻿@model ClienteBeneficio
+
+@{
+    Layout = "LayoutSistema";
+    ViewData["Title"] = "Cadastrar Benefício do Cliente";
+}
+
+
+
+<div class="row justify-content-center">
+
+
+    <div class="card shadow border-0 rounded-4 col-10 mt-5">
+
+        <div class="card-header bg-success text-white">
+
+            <h4 class="mb-0">
+                Cadastrar Benefício do Cliente
+            </h4>
+
+        </div>
+
+        @if (TempData["MensagemSucesso"] != null)
+        {
+            <div id="alertaSucesso" class="alert alert-success">
+                @TempData["MensagemSucesso"]
+            </div>
+        }
+
+        @if (TempData["MensagemErro"] != null)
+        {
+            <div id="alertaErro" class="alert alert-danger">
+                @TempData["MensagemErro"]
+            </div>
+        }
+
+
+        <div class="card-body">
+
+            <form asp-action="Criar" method="post">
+                <input asp-for="ClienteId" type="hidden" />
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                                                
+                        <div class="alert alert-info">
+                            Cliente:
+                            <strong>@ViewBag.ClienteSelecionado.Nome</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2 mb-3">
+
+                        <label class="form-label">
+                            Órgão
+                        </label>
+
+                        <select id="OrgaoId"
+                                class="form-select">
+
+                            <option value="">
+                                Selecione
+                            </option>
+
+                            @foreach (var orgao in ViewBag.orgao)
+                            {
+                                <option value="@orgao.Id">
+                                    @orgao.Nome
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label">
+                            Benefício
+                        </label>
+
+                        <select asp-for="BeneficioId"
+                                id="BeneficioId"
+                                class="form-select">
+
+                            <option value="">
+                                Selecione um órgão primeiro
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">
+                            Número do Benefício (NB)
+                        </label>
+
+                        <input asp-for="NumeroBeneficio"
+                               class="form-control"
+                               placeholder="Insira o número do beneficio"/>
+
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+
+                        <label class="form-label">
+                            Senha do Órgão
+                        </label>
+
+                        <input asp-for="SenhaOrgao"
+                               class="form-control"
+                               placeholder="Insira a senha de acesso ao orgão" />
+
+                    </div>
+
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="d-flex justify-content-end gap-2">
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        Salvar
+
+                    </button>
+
+                        <button type="button"
+                                class="btn btn-secondary"
+                                onclick="history.back()">
+
+                            <i class="bi bi-arrow-return-left"></i>
+                            Voltar
+
+                        </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script>
+
+        $("#OrgaoId").change(function () {
+
+            var orgaoId = $(this).val();
+
+            $("#BeneficioId").empty();
+
+            $("#BeneficioId").append(
+                '<option value="">Carregando...</option>'
+            );
+
+            $.get('/ClienteBeneficio/BuscarBeneficiosPorOrgao',
+                { orgaoId: orgaoId },
+
+                function (dados) {
+
+                    $("#BeneficioId").empty();
+
+                    $("#BeneficioId").append(
+                        '<option value="">Selecione</option>'
+                    );
+
+                    $.each(dados, function (i, beneficio) {
+
+                        $("#BeneficioId").append(
+                            `<option value="${beneficio.id}">
+                                ${beneficio.codigo} - ${beneficio.descricao}
+                            </option>`
+                        );
+
+                    });
+
+                });
+
+        });
+
+    </script>
+
+}
+
+<script>
+    setTimeout(function () {
+
+        $("#alertaSucesso").fadeOut("slow");
+        $("#alertaErro").fadeOut("slow");
+
+    }, 3000);
+</script>

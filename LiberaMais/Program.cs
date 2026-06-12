@@ -43,6 +43,8 @@ namespace LiberaMais
             builder.Services.AddTransient<IEmail, Email>();
             builder.Services.AddTransient<IUtilRepositorio, UtilRepositorio>();
             builder.Services.AddTransient<IOrgaoRepositorio, OrgaoRepositorio>();
+            builder.Services.AddTransient<IBeneficioRepositorio, BeneficioRepositorio>();
+            builder.Services.AddTransient<IClienteBeneficioRepositorio, ClienteBeneficioRepositorio>();
             builder.Services.AddScoped<PermissaoService>(); // Ao criar o Sevice, tem que registrar no Program.
 
             builder.Services.AddSession(options =>

@@ -2,18 +2,18 @@
 
 @{
     Layout = "LayoutSistema";
+    var isAdmin = ViewBag.IsAdmin as bool? ?? false;    
 }
 
-<div class="card shadow-sm mt-5 rounded-4">    
+<div class="container-fluid mt-4">
 
-    <div class="card-header bg-primary text-white">
-        <h4 class="mb-0">
-            Logins cadastrados em
-            <span class="text-primary">
-                @ViewBag.promotoraNome
-            </span>
-        </h4>
+    <div class="card shadow-sm mt-5 rounded-4">
 
+        <div class="card-header bg-primary text-white">
+            <h3 class="text-center mb-0">
+                Logins cadastrados <h style="color:lightgreen">@ViewBag.NomePromotora</h>
+            </h3>
+        </div>   
     </div>
 
     @if (TempData["MensagemSucesso"] != null)
@@ -30,8 +30,6 @@
         </div>
     }
 
-
-
     <div class="table-responsive">
 
         <div class="mt-3 mb-3">
@@ -45,7 +43,6 @@
             </a>
         </div>
 
-        
 
         <table class="table table-striped table-bordered">
 
@@ -107,11 +104,6 @@
                                 </button>
 
                             </td>
-
-                            
-                                
-                            
-
                         </tr>
                         <!-- MODAL -->
                         <div class="modal fade"
@@ -195,7 +187,7 @@
                 {
                     <tr>
 
-                        <td colspan="4" class="text-center text-muted">
+                        <td colspan="5" class="text-center text-muted">
                             Nenhum login encontrado para esta promotora.
                         </td>
 
@@ -207,25 +199,20 @@
         </table>
 
     </div>
-</div>
+    <div>
 
+        <a class="btn btn-outline-secondary rounded-4 px-4"
+           asp-controller="Promotora"
+           asp-action="Index">
 
+            <i class="bi bi-arrow-return-left"></i>
+            Voltar
 
-<div class="mt-4">
+        </a>
 
-    <a class="btn btn-outline-secondary"
-       asp-controller="Promotora"
-       asp-action="Index">
-
-        <i class="bi bi-arrow-return-left"></i>
-        Voltar
-
-    </a>
+    </div>
 
 </div>
-
-
-
 
 
 <script>

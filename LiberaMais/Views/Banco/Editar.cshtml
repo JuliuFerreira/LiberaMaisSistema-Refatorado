@@ -4,37 +4,9 @@
 
 }
 
-<div class="container mt-6">
+<div class="row justify-content-center">
 
-    @if (TempData["MensagemErro"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-
-            @TempData["MensagemErro"]
-
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert">
-            </button>
-
-        </div>
-    }
-
-    @if (TempData["MensagemSucesso"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-
-            @TempData["MensagemSucesso"]
-
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert">
-            </button>
-
-        </div>
-    }
-
-    <div class="card shadow border-0 rounded-4 col-10">
+    <div class="card shadow border-0 rounded-4 col-10 mt-5">
 
         <div class="card-header text-white rounded-top-4"
              style="background-color:orange;">
@@ -44,6 +16,21 @@
             </h3>
 
         </div>
+
+        @if (TempData["MensagemSucesso"] != null)
+        {
+            <div id="alertaSucesso" class="alert alert-success">
+                @TempData["MensagemSucesso"]
+            </div>
+        }
+
+        @if (TempData["MensagemErro"] != null)
+        {
+            <div id="alertaErro" class="alert alert-danger">
+                @TempData["MensagemErro"]
+            </div>
+        }
+
 
         <div class="card-body p-4">
 
@@ -96,7 +83,7 @@
 
                 <hr class="my-4" />
 
-                <div class="d-flex justify-content-end gap-5">
+                <div class="d-flex justify-content-end gap-2">
 
                     <a asp-action="Index"
                        class="btn btn-secondary">
@@ -121,3 +108,14 @@
     </div>
 
 </div>
+
+<script>
+
+    setTimeout(function () {
+
+        $("#alertaSucesso").fadeOut("slow");
+        $("#alertaErro").fadeOut("slow");
+
+    }, 3000);
+
+</script>

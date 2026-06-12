@@ -7,57 +7,110 @@
 
 <div class="container-fluid mt-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Detalhes do Cliente</h2>
+
+    <div class="justify-content-center align-items-center mb-4 mt-4 mt-5">
+
+        <div class="card-header text-white rounded-top-4"
+             style="background-color:dodgerblue;">
+
+            <h3 class="text-center mb-0">
+                Detalhes do cliente
+            </h3>
+
+        </div>
 
     </div>
 
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso" class="alert alert-success">
+            @TempData["MensagemSucesso"]
+        </div>
+    }
+
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro" class="alert alert-danger">
+            @TempData["MensagemErro"]
+        </div>
+    }
+
+    <!-- DADOS DO CLIENTE -->
+
     <div class="card shadow-sm mb-4">
 
-        <div class="card-header bg-primary text-white">
-            Dados do Cliente
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+
+            <span>
+                <i class="bi bi-person"></i>
+                Dados do Cliente
+            </span>
+
+            <div>
+
+                <a asp-action="Editar"
+                   asp-route-id="@Model.Cliente.Id"
+                   class="btn btn-warning btn-sm">
+
+                    <i class="bi bi-pencil"></i>
+                    Editar
+
+                </a>
+
+            </div>
+
         </div>
 
         <div class="card-body">
 
-            <div class="row mb-3">
+            <div class="row">
 
-                <div class="col-md-6">
-                    <strong>Nome:</strong><br />
-                    @Model.Cliente.Nome
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3 bg-light">
+                        <small class="text-muted">Nome</small>
+                        <div class="fw-bold">@Model.Cliente.Nome</div>
+                    </div>
                 </div>
 
-                <div class="col-md-3">
-                    <strong>CPF:</strong><br />
-                    @Model.Cliente.Cpf
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3 bg-light">
+                        <small class="text-muted">CPF</small>
+                        <div class="fw-bold">@Model.Cliente.Cpf</div>
+                    </div>
                 </div>
 
-                <div class="col-md-3">
-                    <strong>Telefone:</strong><br />
-                    @Model.Cliente.Fone
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3 bg-light">
+                        <small class="text-muted">Telefone</small>
+                        <div class="fw-bold">@Model.Cliente.Fone</div>
+                    </div>
                 </div>
 
-            </div>
-
-            <div class="row mb-3">
-
-                <div class="col-md-4">
-                    <strong>Data Nascimento:</strong><br />
-                    @Model.Cliente.DataNascimento.ToString?("dd/MM/yyyy")
-                </div>
-
-                <div class="col-md-4">
-                    <strong>Email:</strong><br />
-                    @Model.Cliente.Email
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3 bg-light">
+                        <small class="text-muted">Nascimento</small>
+                        <div class="fw-bold">
+                            @Model.Cliente.DataNascimento?.ToString("dd/MM/yyyy")
+                        </div>
+                    </div>
                 </div>
 
             </div>
 
             <div class="row">
 
-                <div class="col-md-12">
-                    <strong>Observações:</strong><br />
-                    @Model.Cliente.Observacoes
+                <div class="col-md-4 mb-3">
+                    <div class="border rounded p-3 bg-light">
+                        <small class="text-muted">E-mail</small>
+                        <div class="fw-bold">@Model.Cliente.Email</div>
+                    </div>
+                </div>
+
+                <div class="col-md-8 mb-3">
+                    <div class="border rounded p-3 bg-light">
+                        <small class="text-muted">Observações</small>
+                        <div class="fw-bold">@Model.Cliente.Observacoes</div>
+                    </div>
                 </div>
 
             </div>
@@ -65,49 +118,66 @@
         </div>
 
     </div>
+
+    <!-- ENDEREÇO -->
 
     <div class="card shadow-sm mb-4">
 
         <div class="card-header bg-secondary text-white">
+
+            <i class="bi bi-geo-alt"></i>
             Endereço
+
         </div>
 
         <div class="card-body">
 
-            <div class="row mb-3">
+            <div class="row">
 
-                <div class="col-md-3">
-                    <strong>CEP:</strong><br />
-                    @Model.Endereco?.Cep
+                <div class="col-md-2 mb-3">
+                    <div class="border rounded p-3 bg-light">
+                        <small class="text-muted">CEP</small>
+                        <div class="fw-bold">@Model.Endereco?.Cep</div>
+                    </div>
                 </div>
 
-                <div class="col-md-6">
-                    <strong>Rua:</strong><br />
-                    @Model.Endereco?.Rua
+                <div class="col-md-5 mb-3">
+                    <div class="border rounded p-3 bg-light">
+                        <small class="text-muted">Rua</small>
+                        <div class="fw-bold">@Model.Endereco?.Rua</div>
+                    </div>
                 </div>
 
-                <div class="col-md-3">
-                    <strong>Número:</strong><br />
-                    @Model.Endereco?.Numero
+                <div class="col-md-2 mb-3">
+                    <div class="border rounded p-3 bg-light">
+                        <small class="text-muted">Número</small>
+                        <div class="fw-bold">@Model.Endereco?.Numero</div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3 bg-light">
+                        <small class="text-muted">Bairro</small>
+                        <div class="fw-bold">@Model.Endereco?.Bairro</div>
+                    </div>
                 </div>
 
             </div>
 
             <div class="row">
 
-                <div class="col-md-4">
-                    <strong>Bairro:</strong><br />
-                    @Model.Endereco?.Bairro
+                <div class="col-md-4 mb-3">
+                    <div class="border rounded p-3 bg-light">
+                        <small class="text-muted">Cidade</small>
+                        <div class="fw-bold">@Model.Endereco?.Cidade</div>
+                    </div>
                 </div>
 
-                <div class="col-md-4">
-                    <strong>Cidade:</strong><br />
-                    @Model.Endereco?.Cidade
-                </div>
-
-                <div class="col-md-2">
-                    <strong>Estado:</strong><br />
-                    @Model.Endereco?.Estado
+                <div class="col-md-2 mb-3">
+                    <div class="border rounded p-3 bg-light">
+                        <small class="text-muted">Estado</small>
+                        <div class="fw-bold">@Model.Endereco?.Estado</div>
+                    </div>
                 </div>
 
             </div>
@@ -115,13 +185,224 @@
         </div>
 
     </div>
-    <div>
 
-        <a asp-action="Index"
-           class="btn btn-secondary">
-            Voltar
-        </a>
+    <!-- BENEFÍCIOS -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+
+            <span>
+                <i class="bi bi-credit-card"></i>
+                Benefícios do Cliente
+            </span>
+
+            <a asp-controller="ClienteBeneficio"
+               asp-action="Criar"
+               asp-route-clienteId="@Model.Cliente.Id"
+               class="btn btn-light btn-sm">
+
+                <i class="bi bi-plus-circle"></i>
+                Adicionar Benefício
+
+            </a>
+
+        </div>
+
+        <div class="card-body">
+
+            @if (Model.Cliente.ClienteBeneficios != null &&
+                        Model.Cliente.ClienteBeneficios.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-striped">
+
+                        <thead class="table-dark">
+
+                            <tr>
+                                <th>Órgão</th>
+                                <th>Benefício</th>
+                                <th>NB</th>
+                                <th>Senha</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var item in Model.Cliente.ClienteBeneficios)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @item.Beneficio?.Orgaos?.Nome
+                                    </td>
+
+                                    <td>
+                                        @item.Beneficio?.Descricao
+                                    </td>
+
+                                    <td>
+
+                                        <span>
+                                            @item.NumeroBeneficio
+                                        </span>
+
+                                    </td>
+
+                                    <td>
+                                        @item.SenhaOrgao
+                                    </td>
+
+                                    <td class="text-center">
+
+                                        <a asp-controller="ClienteBeneficio"
+                                           asp-action="Editar"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-warning btn-sm">
+
+                                            Editar
+
+                                        </a>
+
+                                        <button class="btn btn-danger btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalExcluir_@item.Id">
+
+                                            Excluir
+
+                                        </button>
+
+
+                                    </td>
+
+                                </tr>
+                                <div class="modal fade"
+                                     id="modalExcluir_@item.Id"
+                                     tabindex="-1"
+                                     aria-hidden="true">
+
+                                    <div class="modal-dialog modal-dialog-centered">
+
+                                        <div class="modal-content rounded-4 border-0 shadow">
+
+                                            <div class="modal-header bg-danger text-white">
+
+                                                <h5 class="modal-title">
+                                                    Excluir Benefício
+                                                </h5>
+
+                                                <button type="button"
+                                                        class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal">
+                                                </button>
+
+                                            </div>
+
+                                            <div class="modal-body text-center p-4">
+
+                                                <h5 class="text-danger mb-3">
+                                                    Atenção!
+                                                </h5>
+
+                                                <p class="fs-5">
+
+                                                    Deseja realmente excluir o benefício
+
+                                                    <strong class="text-primary">
+                                                        @item.Beneficio.Descricao
+                                                    </strong>
+
+                                                    do(a) cliente
+
+                                                    <strong class="text-primary">
+                                                        @item.Cliente.Nome
+                                                    </strong>?
+
+                                                </p>
+
+                                            </div>
+
+                                            <div class="modal-footer border-0">
+
+                                                <button type="button"
+                                                        class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">
+
+                                                    Cancelar
+
+                                                </button>
+
+                                                <form asp-controller="ClienteBeneficio"
+                                                      asp-action="Apagar"
+                                                      method="post">
+
+                                                    <input type="hidden"
+                                                           name="id"
+                                                           value="@item.Id" />
+
+                                                    <button type="submit"
+                                                            class="btn btn-danger">
+
+                                                        Excluir
+
+                                                    </button>
+
+                                                </form>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info mb-0">
+
+                    Este cliente ainda não possui benefícios cadastrados.
+
+                </div>
+            }
+
+        </div>
+
     </div>
 
+    <div class="text">
+
+        <a asp-action="Index"
+           class="btn btn-outline-secondary">
+
+            <i class="bi bi-arrow-left"></i>
+            Voltar
+
+        </a>
+
+    </div>
+    
 
 </div>
+
+
+<script>
+
+    setTimeout(function () {
+
+        $("#alertaSucesso").fadeOut("slow");
+        $("#alertaErro").fadeOut("slow");
+
+    }, 3000);
+
+</script>

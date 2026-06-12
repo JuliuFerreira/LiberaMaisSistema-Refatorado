@@ -35,6 +35,7 @@ namespace LiberaMais.Controllers
             
             if (ModelState.IsValid)
             {
+                orgao.Nome = orgao.Nome.ToUpper();
                 _orgaoRepositorio.Adicionar(orgao);
                 TempData["MensagemSucesso"] = "Orgão adicionado com sucesso.";
                 return RedirectToAction("Index");
@@ -72,7 +73,7 @@ namespace LiberaMais.Controllers
 
             if (ModelState.IsValid)
             {
-                orgaoDb.Nome = orgao.Nome;
+                orgaoDb.Nome = orgao.Nome.ToUpper();
                 _orgaoRepositorio.Atualizar(orgaoDb);
                 TempData["MensagemSucesso"] = "Orgão editado com sucesso.";
                 return RedirectToAction("Index");

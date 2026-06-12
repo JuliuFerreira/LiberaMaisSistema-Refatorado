@@ -10,17 +10,14 @@
 
 <div class="container-fluid mt-4">
 
-    <div class="justify-content-center align-items-center mb-4 mt-4 mt-5">
+    <div class="card shadow-sm mt-5 rounded-4">
 
-        <div class="card-header text-white rounded-top-4"
-             style="background-color:dodgerblue;">
-
+        <div class="card-header bg-primary text-white">
             <h3 class="text-center mb-0">
                 Clientes
             </h3>
 
         </div>
-
     </div>
 
     @if (TempData["MensagemSucesso"] != null)
@@ -37,17 +34,22 @@
         </div>
     }
 
-    <a asp-action="Criar"
-       class="btn btn-success rounded-4 shadow-sm px-4 mb-3 ">
 
-        <i class="bi bi-plus-circle-fill"></i>
-        Adicionar Cliente
-
-    </a>
 
     <div class="table-responsive">
 
-        <table class="table table-striped table-hover">
+        <div class="mb-3 mt-3">
+
+            <a asp-action="Criar"
+               class="btn btn-success rounded-4 shadow-sm px-4 mb-3 ">
+
+                <i class="bi bi-plus-circle-fill"></i>
+                Adicionar Cliente
+
+            </a>
+        </div>
+
+        <table class="table table-striped table-bordered">
 
             <thead class="table-dark">
                 <tr>
@@ -74,7 +76,7 @@
                             idade = DateTime.Today.Year
                             - cliente.DataNascimento.Value.Year;
 
-                            if(cliente.DataNascimento.Value.Date > DateTime.Today.AddYears(-idade))
+                            if (cliente.DataNascimento.Value.Date > DateTime.Today.AddYears(-idade))
                             {
                                 idade--;
                             }
@@ -87,7 +89,6 @@
                             <td>@cliente.Endereco?.Cidade</td>
                             <td>@idade anos</td>
                             <td>@cliente.Usuario?.Nome</td>
-
                             <td class="text-center">
                                 <a asp-action="Detalhes"
                                    asp-route-id="@cliente.Id"
@@ -95,11 +96,11 @@
                                     Detalhes
                                 </a>
 
-                                <a asp-action="Editar"
+                                @*  <a asp-action="Editar"
                                    asp-route-id="@cliente.Id"
                                    class="btn btn-warning btn-sm">
                                     Editar
-                                </a>
+                                </a>*@
                                 <button class="btn btn-danger btn-sm"
                                         data-bs-toggle="modal"
                                         data-bs-target="#modalExcluir_@cliente.Id">
@@ -108,7 +109,7 @@
 
                                 </button>
                             </td>
-                                
+
 
 
 
@@ -139,7 +140,7 @@
 
                                         <p class="fs-5 mb-0">
 
-                                            Deseja excluir 
+                                            Deseja excluir
 
                                             <strong class="text-primary">
                                                 @cliente.Nome
@@ -197,7 +198,7 @@
         </table>
 
     </div>
-    <div class="mt-4">
+    <div>
 
         <a class="btn btn-outline-secondary rounded-4 px-4"
            asp-controller="Apps"
@@ -211,4 +212,15 @@
     </div>
 
 </div>
+
+<script>
+
+    setTimeout(function () {
+
+        $("#alertaSucesso").fadeOut("slow");
+        $("#alertaErro").fadeOut("slow");
+
+    }, 3000);
+
+</script>
 

@@ -1,5 +1,7 @@
 ﻿using LiberaMais.Filters;
+using LiberaMais.Helper;
 using LiberaMais.Models;
+using LiberaMais.Models.Enums;
 using LiberaMais.Repositorio;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +11,11 @@ namespace LiberaMais.Controllers
     public class UsuarioController : Controller
     {
 
-        private readonly IUsuarioRepositorio _usuarioRepositorio;
-        public UsuarioController(IUsuarioRepositorio usuarioRepositorio)
+        private readonly IUsuarioRepositorio _usuarioRepositorio; ISessao _sessao;
+        public UsuarioController(IUsuarioRepositorio usuarioRepositorio, ISessao sessao)
         {
             _usuarioRepositorio = usuarioRepositorio;
+            _sessao = sessao;
         }
         public IActionResult Index()
         {
@@ -90,9 +93,13 @@ namespace LiberaMais.Controllers
         [HttpPost]
         public IActionResult Apagar(int id)
         {
+            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+
             try
             {
                 bool apagado = _usuarioRepositorio.Apagar(id);
+                                          
 
                 if (apagado)
                 {

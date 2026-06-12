@@ -1,11 +1,10 @@
-﻿@model Util
+﻿@model Beneficio
 
 @{
     Layout = "LayoutSistema";
 }
 
-<div class="row justify-content-center">
-
+<div class="row justify-content-center">    
 
     <div class="card shadow border-0 rounded-4 col-10 mt-5">
 
@@ -13,22 +12,22 @@
              style="background-color:green;">
 
             <h3 class="text-center mb-0">
-                Cadastro de Links
-            </h3>                        
+                Cadastrar Benefício
+            </h3>
 
         </div>
 
-        @if (TempData["MensagemSucesso"] != null)
+        @if (TempData["mensagemSucesso"] != null)
         {
             <div id="alertaSucesso" class="alert alert-success">
-                @TempData["MensagemSucesso"]
+                @TempData["mensagemSucesso"]
             </div>
         }
 
-        @if (TempData["MensagemErro"] != null)
+        @if (TempData["mensagemErro"] != null)
         {
             <div id="alertaErro" class="alert alert-danger">
-                @TempData["MensagemErro"]
+                @TempData["mensagemErro"]
             </div>
         }
 
@@ -36,51 +35,56 @@
         <div class="card-body p-4">
 
             <form id="promotoraForm"
-                  asp-controller="Util"
+                  asp-controller="Beneficio"
                   asp-action="Criar"
-                  method="post">
+                  method="post">                   
 
                 <div class="row g-6">
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
 
-                        <label asp-for="Nome"
-                               class="form-label fw-bold">
-                            Nome
+                        <label class="form-label">
+                            Orgão
                         </label>
 
-                        <input asp-for="Nome"
-                               class="form-control"
-                               maxlength="100"
-                               placeholder="Digite o nome do link" />
+                        <select asp-for="OrgaoId"
+                                class="form-select">
 
-                        <span asp-validation-for="Nome"
+                            <option value="">
+                                Selecione
+                            </option>
+
+                            @foreach (var ben in ViewBag.orgao)
+                            {
+                                <option value="@ben.Id">
+                                    @ben.Nome
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <label asp-for="Codigo"
+                               class="form-label fw-bold">
+                            Código
+                        </label>
+
+                        <input asp-for="Codigo"
+                               class="form-control"
+                               maxlength="15"
+                               placeholder="Código do benefício" />
+
+                        <span asp-validation-for="Codigo"
                               class="text-danger">
                         </span>
 
                     </div>
 
-                    
-
-                    <div class="col-md-4">
-
-                        <label asp-for="Url"
-                               class="form-label fw-bold">
-                            URL
-                        </label>
-
-                        <input asp-for="Url"
-                               class="form-control"
-                               maxlength="255"
-                               placeholder="https://site.com.br" />
-
-                        <span asp-validation-for="Url"
-                              class="text-danger">
-                        </span>
-
-                    </div>
-
-                    <div class="col-md-4">
+                    <div class="col-md-6">
 
                         <label asp-for="Descricao"
                                class="form-label fw-bold">
@@ -89,13 +93,14 @@
 
                         <input asp-for="Descricao"
                                class="form-control"
-                               maxlength="100"
-                               placeholder="Digite a descrição do link" />
-                                                    
+                               maxlength="60"
+                               placeholder="Descrição do benefício" />
+
+                        <span asp-validation-for="Descricao"
+                              class="text-danger">
+                        </span>
 
                     </div>
-
-
                 </div>
 
                 <hr class="my-4" />
