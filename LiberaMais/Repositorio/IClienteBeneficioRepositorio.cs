@@ -6,6 +6,7 @@ namespace LiberaMais.Repositorio
     {
         public List<ClienteBeneficio> ListarTodos();
 
+
         public ClienteBeneficio Adicionar(ClienteBeneficio clienteBeneficio);
 
         public ClienteBeneficio Atualizar(ClienteBeneficio clienteBeneficio);
@@ -13,5 +14,8 @@ namespace LiberaMais.Repositorio
         public ClienteBeneficio BuscarPorId(int id);
 
         public bool Apagar(int id);
+
+        List<ClienteBeneficio> ListarBeneficiosPorCliente(int clienteId);
+
     }
 }

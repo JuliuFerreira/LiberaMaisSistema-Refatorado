@@ -1,4 +1,4 @@
-using LiberaMais.Data;
+﻿using LiberaMais.Data;
 using LiberaMais.Helper;
 using LiberaMais.Repositorio;
 using LiberaMais.Services;
@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Collections.Generic; // Adicionado para a List de culturas
 using System.Globalization;
 
 namespace LiberaMais
@@ -18,7 +19,7 @@ namespace LiberaMais
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            //Conec��o com a string
+            //Conexão com a string
             var connectionString = builder.Configuration.GetConnectionString("DataBase");
 
             builder.Services.AddDbContext<BancoContext>(options =>
@@ -45,21 +46,13 @@ namespace LiberaMais
             builder.Services.AddTransient<IOrgaoRepositorio, OrgaoRepositorio>();
             builder.Services.AddTransient<IBeneficioRepositorio, BeneficioRepositorio>();
             builder.Services.AddTransient<IClienteBeneficioRepositorio, ClienteBeneficioRepositorio>();
-            builder.Services.AddScoped<PermissaoService>(); // Ao criar o Sevice, tem que registrar no Program.
+            builder.Services.AddScoped<PermissaoService>();
 
             builder.Services.AddSession(options =>
             {
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
                 options.IdleTimeout = TimeSpan.FromHours(2);
-            });
-
-            var supportedCultures = new[] { new CultureInfo(1046) };
-            builder.Services.Configure<RequestLocalizationOptions>(options =>
-            {
-                options.DefaultRequestCulture = new RequestCulture(new CultureInfo(1046));
-                options.SupportedCultures = supportedCultures;
-                options.SupportedUICultures = supportedCultures;
             });
 
             var app = builder.Build();
@@ -71,6 +64,16 @@ namespace LiberaMais
             }
 
             app.UseHttpsRedirection();
+
+            // Configuração de Cultura pt-BR (Coloque ANTES do UseRouting)
+            var supportedCultures = new[] { "pt-BR" };
+            var localizationOptions = new RequestLocalizationOptions()
+                .SetDefaultCulture(supportedCultures[0])
+                .AddSupportedCultures(supportedCultures)
+                .AddSupportedUICultures(supportedCultures);
+
+            app.UseRequestLocalization(localizationOptions);
+
             app.UseStaticFiles();
             app.UseRouting();
             app.UseSession();

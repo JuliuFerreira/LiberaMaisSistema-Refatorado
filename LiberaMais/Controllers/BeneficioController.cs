@@ -32,10 +32,18 @@ namespace LiberaMais.Controllers
         }
 
         [HttpPost]
-        public IActionResult Criar (Beneficio beneficio)
+        public IActionResult Criar (Beneficio beneficio, int orgaoId)
         {
             ViewBag.orgao = _OrgaoRepositorio.ListarTodos();
+            var beneficioExistente = _BeneficioRepositorio.BuscarPorNomeEOrgao(beneficio.Descricao, orgaoId); // Aqui ele verifciar se o beneficio cadastrado ja existe para o orgão pelo ID
 
+
+
+            if (beneficioExistente != null)
+            {
+                TempData["MensagemErro"] = "Já existe um beneficio cadastrado com esse nome.";
+                return View(beneficio);
+            }
 
             if (ModelState.IsValid)
             {
@@ -71,6 +79,7 @@ namespace LiberaMais.Controllers
         public IActionResult Editar(Beneficio beneficio)
         {
             var DbBeenficio = _BeneficioRepositorio.BuscarPorId(beneficio.Id);
+            var beneficioExistente = _BeneficioRepositorio.BuscarPorNomeEOrgao(beneficio.Descricao, beneficio.OrgaoId);
 
           ViewBag.orgao = _OrgaoRepositorio.ListarTodos();
 
@@ -78,6 +87,13 @@ namespace LiberaMais.Controllers
             {
                 TempData["MensagemErro"] = "Benefício não encontrado.";
                 return RedirectToAction("Index");
+            }
+
+            if(beneficioExistente != null)
+            {
+                TempData["MensagemErro"] = "Já existe um beneficio cadastrado com esse nome para esse Orgão.";
+                return View(beneficio);
+
             }
 
             if (!ModelState.IsValid)
@@ -134,7 +150,7 @@ namespace LiberaMais.Controllers
 
             catch (Exception)
             {
-                TempData["MensagemErro"] = "Não foi possivel excluir esse benenficio.";                
+                TempData["MensagemErro"] = "Erro ao excluir o beneficio, possivelmente exsite Cliente(s) cadastrados.";                
             }
 
             return RedirectToAction("Index");

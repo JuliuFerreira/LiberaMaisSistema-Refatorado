@@ -62,5 +62,18 @@ namespace LiberaMais.Repositorio
                 .Where(x => x.OrgaoId == orgaoId)
                 .ToList();
         }
+
+        public Beneficio BuscarPorNome(string descicao)
+        {
+            return _bancoContext.beneficios
+                .FirstOrDefault(b => b.Descricao == descicao);
+        }
+
+        public Beneficio BuscarPorNomeEOrgao(string descricao, int orgaoId)
+        {
+            return _bancoContext.beneficios
+                .FirstOrDefault(b => b.Descricao == descricao && b.OrgaoId == orgaoId);
+        }
+
     }
 }

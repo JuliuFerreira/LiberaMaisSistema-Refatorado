@@ -23,7 +23,15 @@ namespace LiberaMais.Models
         [Required(ErrorMessage = "Selecione o banco")]
         public int? BancoId { get; set; }
 
+        [Required(ErrorMessage = "Selecione o usuário responsável pelo login")]
+        public int? UsuarioId { get; set; }
         public Banco? Banco { get; set; }
+
+        public UsuarioModel? Usuario { get; set; }
+
+
+
+
 
     }
 }

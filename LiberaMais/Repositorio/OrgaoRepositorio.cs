@@ -50,5 +50,11 @@ namespace LiberaMais.Repositorio
             return true;
             
         }
+
+        public Orgao BuscarPorNome(string nome)
+        {
+            return _bancoContext.orgaos
+                .FirstOrDefault(o => o.Nome == nome);
+        }
     }
 }

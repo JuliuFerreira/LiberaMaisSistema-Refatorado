@@ -1,126 +1,126 @@
-﻿@model IEnumerable<ClienteBeneficio>
+﻿    @model IEnumerable<ClienteBeneficio>
 
-@{
-    Layout = "LayoutSistema";
-}
-
-<div class="card shadow-sm mt-5 rounded-4">    
-
-    <div class="card-header bg-primary text-white">
-        <h4 class="mb-0">
-            Lista de beneficios por cliente            
-        </h4>
-
-    </div>
-
-    @if (TempData["MensagemSucesso"] != null)
-    {
-        <div id="alertaSucesso" class="alert alert-success">
-            @TempData["MensagemSucesso"]
-        </div>
+    @{
+        Layout = "LayoutSistema";
     }
 
-    @if (TempData["MensagemErro"] != null)
-    {
-        <div id="alertaErro" class="alert alert-danger">
-            @TempData["MensagemErro"]
+    <div class="card shadow-sm mt-5 rounded-4">    
+
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                Lista de beneficios por cliente            
+            </h4>
+
         </div>
-    }
+
+        @if (TempData["MensagemSucesso"] != null)
+        {
+            <div id="alertaSucesso" class="alert alert-success">
+                @TempData["MensagemSucesso"]
+            </div>
+        }
+
+        @if (TempData["MensagemErro"] != null)
+        {
+            <div id="alertaErro" class="alert alert-danger">
+                @TempData["MensagemErro"]
+            </div>
+        }
 
 
-    <div class="table-responsive">
+        <div class="table-responsive">
 
-        <table class="table table-striped table-bordered">
+            <table class="table table-striped table-bordered">
 
-            <thead class="table-dark">
+                <thead class="table-dark">
 
-                <tr>
-                    <th>Cliente</th>
-                    <th>Cpf</th>
-                    <th>Orgão</th>
-                    <th>Beneficio</th>
-                    <th>Número do beneficio</th>
-                    <th>Senha</th>
-                </tr>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Cpf</th>
+                        <th>Orgão</th>
+                        <th>Beneficio</th>
+                        <th>Número do beneficio</th>
+                        <th>Senha</th>
+                    </tr>
 
-            </thead>
+                </thead>
 
-            <tbody>
+                <tbody>
 
-                @if (Model != null && Model.Any())
-                {
-                    @foreach (var item in Model)
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @item.Cliente.Nome
+                                </td>
+
+                                <td>@item.Cliente.Cpf</td>
+
+                                <td>
+                                    @item.Beneficio.Orgaos.Nome
+                                </td>
+
+                                <td>
+                                    @item.Beneficio.Descricao
+                                </td>
+
+                                <td>
+                                    @item.NumeroBeneficio
+                                </td>
+
+                                <td>
+                                    @item.SenhaOrgao
+                                </td>
+
+                            </tr>                      
+
+                        }
+                    }
+                    else
                     {
                         <tr>
 
-                            <td>
-                                @item.Cliente.Nome
+                            <td colspan="4" class="text-center text-muted">
+                                Nenhum beneficio encontrado.
                             </td>
 
-                            <td>@item.Cliente.Cpf</td>
-
-                            <td>
-                                @item.Beneficio.Orgaos.Nome
-                            </td>
-
-                            <td>
-                                @item.Beneficio.Descricao
-                            </td>
-
-                            <td>
-                                @item.NumeroBeneficio
-                            </td>
-
-                            <td>
-                                @item.SenhaOrgao
-                            </td>
-
-                        </tr>                      
-
+                        </tr>
                     }
-                }
-                else
-                {
-                    <tr>
 
-                        <td colspan="4" class="text-center text-muted">
-                            Nenhum beneficio encontrado.
-                        </td>
+                </tbody>
 
-                    </tr>
-                }
+            </table>
 
-            </tbody>
+        </div>
+    </div>
 
-        </table>
+
+
+    <div class="mt-4">
+
+        <a class="btn btn-outline-secondary"
+           asp-controller="Apps"
+           asp-action="Index">
+
+            <i class="bi bi-arrow-return-left"></i>
+            Voltar
+
+        </a>
 
     </div>
-</div>
-
-
-
-<div class="mt-4">
-
-    <a class="btn btn-outline-secondary"
-       asp-controller="Apps"
-       asp-action="Index">
-
-        <i class="bi bi-arrow-return-left"></i>
-        Voltar
-
-    </a>
-
-</div>
 
 
 
 
 
-<script>
-    setTimeout(function () {
+    <script>
+        setTimeout(function () {
 
-        $("#alertaSucesso").fadeOut("slow");
-        $("#alertaErro").fadeOut("slow");
+            $("#alertaSucesso").fadeOut("slow");
+            $("#alertaErro").fadeOut("slow");
 
-    }, 3000);
-</script>
+        }, 3000);
+    </script>

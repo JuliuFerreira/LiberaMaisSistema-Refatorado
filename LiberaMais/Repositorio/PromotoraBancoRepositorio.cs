@@ -48,6 +48,7 @@ namespace LiberaMais.Repositorio
             var promotoraBanco = _bancoContext.PromotoraBancos.
             Include(x  => x.Banco).
             Include(x => x.Promotora).
+            Include(x => x.Usuario).
             FirstOrDefault(x => x.Id == id);
             return promotoraBanco;
         }
@@ -57,6 +58,7 @@ namespace LiberaMais.Repositorio
             return _bancoContext.PromotoraBancos.
             Include(x => x.Banco).
             Include(x => x.Promotora).
+            Include(x => x.Usuario).
             ToList();
         }
 
@@ -65,8 +67,10 @@ namespace LiberaMais.Repositorio
             return _bancoContext.PromotoraBancos
                 .Include(pb => pb.Promotora)
                 .Include(pb => pb.Banco)
+                .Include(pb => pb.Usuario)
                 .Where(pb => pb.PromotoraId == promotoraId)
                 .ToList();
         }
+
     }
 }

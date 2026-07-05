@@ -3,148 +3,276 @@
 
 @{
     Layout = "LayoutSistema";
+    ViewData["Title"] = "Receitas";
 
-    decimal totalReceitas = Model.Sum(receita => receita.ValorRecebido);
+    // Calcula o total com segurança tratando nulos
+    decimal totalReceitas = Model?.Sum(receita => receita.ValorRecebido) ?? 0;
+
+    // Resgata com segurança os dados da finança mãe enviados via ViewBag pela controller
+    var financaMae = ViewBag.financa;
+
+    // Converte o Enum para String antes do operador de coalescência nula (??) para evitar o erro CS0019
+    string nomeMes = financaMae?.Mesdescription?.ToString() ?? "Mês";
+    string ano = financaMae?.Ano?.ToString() ?? "0";
+    int idFinanca = ViewBag.idFinanca ?? 0;
 }
 
-<div class="container-fluid">
-    <h2 style="text-align:center; margin-top: 30px; margin-bottom: 20px">
-        RECEITA DE @Model?.FirstOrDefault().Financa?.Mesdescription.GetDisplayName() DE @Model?.FirstOrDefault().Financa?.Ano
-    </h2>
-    <h3 style="text-align:center; margin-top: 20px; margin-bottom: 20px">
-        <strong style="color:forestgreen"> @totalReceitas.ToString("C2", new CultureInfo(1046))</strong>
-    </h3>
+<div class="container-fluid py-4 inner-system-page">
 
-    <form method="get" action="/ListarPromotora" class="search-form">
-        <div class="column" style="text-align: right">
-            <a class="icon-link" asp-route-idFinanca="@Model?.FirstOrDefault().FinancaId" asp-controller="Receita" asp-action="CriarReceita">
-                <div class="icon-container-fluid">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-folder-plus" viewBox="0 0 16 16">
-                        <path d="m.5 3 .04.87a2 2 0 0 0-.342 1.311l.637 7A2 2 0 0 0 2.826 14H9v-1H2.826a1 1 0 0 1-.995-.91l-.637-7A1 1 0 0 1 2.19 4h11.62a1 1 0 0 1 .996 1.09L14.54 8h1.005l.256-2.819A2 2 0 0 0 13.81 3H9.828a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 6.172 1H2.5a2 2 0 0 0-2 2m5.672-1a1 1 0 0 1 .707.293L7.586 3H2.19q-.362.002-.683.12L1.5 2.98a1 1 0 0 1 1-.98z" />
-                        <path d="M13.5 9a.5.5 0 0 1 .5.5V11h1.5a.5.5 0 1 1 0 1H14v1.5a.5.5 0 1 1-1 0V12h-1.5a.5.5 0 0 1 0-1H13V9.5a.5.5 0 0 1 .5-.5" />
-                    </svg>
-                    <h4 class="card-text" style="text-align:center; font-size: 16px;">Adicionar <br />Receitas</h4>
-                </div>
-            </a>
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 border-bottom pb-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-1 text-uppercase tracking-wide" style="font-size: 1.5rem;">
+                Receita de @nomeMes de @ano
+            </h2>
+            <div class="mt-2">
+                <span class="text-muted small d-block">Total Arrecadado</span>
+                <span class="fw-bold text-success fs-3 tracking-tight">
+                    @totalReceitas.ToString("C2", new CultureInfo(1046))
+                </span>
+            </div>
         </div>
-    </form>
 
-    <div style="margin-top: 30px">
-        <div class="table-responsive">
-            <table class="table table-hover" id="table-libera" style="width: 100%">
-                <thead style="background-color: #666; color: white">
-                    <tr>
-                        <th>Data</th>
-                        <th>Descrição</th>
-                        <th>Promotora</th>
-                        <th>Conta</th>
-                        <th style="text-align: start">Valor (R$)</th>
-                        <th class="text-center">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var receita in Model)
-                    {
-                        <tr style="Background-color: #e6ffcc;color: green; font-size: 16px; border:black">
-                            <td>@receita.DataReceita.ToString("dd/MM/yyyy")</td>
-                            <td>@receita.Descricao</td>
-                            <td>@Html.DisplayFor(model => receita.PromotoraDescription)</td>
-                            <td>@Html.DisplayFor(model => receita.UsuarioDescription)</td>
-                            <td style="text-align: start">@receita.ValorRecebido.ToString("C2", new CultureInfo(1046))</td>
-                            <td class="text-end">
-                                <div class="d-flex justify-content-center">
-                                    <a role="button" asp-route-id="@receita.Id" asp-controller="Receita" asp-action="EditarReceita">
-                                        <div class="d-flex flex-column align-items-center mr-2">
-                                            <button type="button" class="btn btn-warning">
-                                                <i class="bi bi-pencil-square text-white" style="font-size: 16px;"></i>
-                                            </button>
-                                        </div>
-                                    </a>
-                                    <a role="button">
-                                        <div class="d-flex flex-column align-items-center">
-                                            <button type="button" class="btn btn-danger delete-receita-button" data-id="@receita.Id" data-url="@Url.Action("Apagar", "Receita", new { id = receita.Id })">
-                                                <i class="bi bi-trash" style="font-size: 16px;"></i>
-                                            </button>
-                                        </div>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        <div class="d-flex align-items-end">
+            <a class="btn btn-dark d-flex align-items-center gap-2 px-3 py-2 btn-adicionar shadow-sm"
+               asp-route-idFinanca="@idFinanca" asp-controller="Receita" asp-action="CriarReceita">
+                <i class="bi bi-plus-lg" style="font-size: 1rem;"></i>
+                <span class="fw-semibold small">Adicionar Receitas</span>
+            </a>
         </div>
     </div>
 
-    <div class="text-left" style="margin-bottom: 15px">
-        <a class="btn btn-outline-secondary btn-lg" style="border-radius: 10px; font-size:16px" asp-controller="Financa" asp-action="Index">
-            <i class="bi bi-arrow-return-left"></i> Voltar
+    @if (TempData["mensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-2 small">
+            <i class="bi bi-check-circle-fill fs-6"></i> <span>@TempData["mensagemSucesso"]</span>
+        </div>
+    }
+
+    @if (TempData["mensagemErro"] != null)
+    {
+        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-2 small">
+            <i class="bi bi-exclamation-triangle-fill fs-6"></i> <span>@TempData["mensagemErro"]</span>
+        </div>
+    }
+
+    <div class="card card-table shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="ps-4">Data</th>
+                            <th scope="col">Descrição</th>
+                            <th scope="col">Promotora</th>
+                            <th scope="col">Conta</th>
+                            <th scope="col">Valor</th>
+                            <th scope="col" class="text-end pe-4">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var receita in Model)
+                            {
+                                var editarUrl = Url.Action("EditarReceita", "Receita", new { id = receita.Id });
+
+                                // Usa '_self' para garantir a abertura estritamente na mesma aba do navegador
+                                <tr onclick="window.open('@editarUrl', '_self')" style="cursor: pointer;" title="Clique para editar">
+                                    <td class="ps-4 text-muted">
+                                        @receita.DataReceita.ToString("dd/MM/yyyy")
+                                    </td>
+                                    <td class="fw-bold text-dark">
+                                        @receita.Descricao
+                                    </td>
+                                    <td>
+                                        @receita.Promotora.Nome
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(model => receita.UsuarioDescription)
+                                    </td>
+                                    <td class="fw-bold text-success">
+                                        @receita.ValorRecebido.ToString("C2", new CultureInfo(1046))
+                                    </td>
+                                    <td class="pe-4" onclick="event.stopPropagation();">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <button type="button" class="btn btn-outline-danger btn-action-sm d-flex align-items-center justify-content-center"
+                                                    data-bs-toggle="modal" data-bs-target="#modalExcluir_@receita.Id" title="Excluir Receita">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <div class="modal fade" id="modalExcluir_@receita.Id" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+                                        <div class="modal-content modal-custom shadow-lg border-0">
+                                            <div class="modal-body text-center p-4">
+                                                <div class="modal-icon-container mb-3 text-danger">
+                                                    <i class="bi bi-trash3-fill fs-3"></i>
+                                                </div>
+
+                                                <h5 class="fw-bold text-dark mb-2">Excluir Receita?</h5>
+                                                <p class="text-muted small mb-4 px-2">
+                                                    Deseja realmente remover a receita <strong class="text-dark">@receita.Descricao</strong> do sistema? Esta ação não poderá ser desfeita.
+                                                </p>
+
+                                                <div class="d-flex flex-column gap-2 w-100">
+                                                    <form asp-action="Apagar" asp-controller="Receita" method="post" class="m-0 p-0 w-100">
+                                                        <input type="hidden" name="id" value="@receita.Id" />
+                                                        <button type="submit" class="btn btn-danger w-100 py-2 fw-medium btn-modal-confirm">
+                                                            Confirmar Exclusão
+                                                        </button>
+                                                    </form>
+                                                    <button type="button" class="btn btn-light w-100 py-2 fw-medium btn-modal-cancel border" data-bs-dismiss="modal">
+                                                        Cancelar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-cash-stack mb-2 d-block text-secondary" style="font-size: 2.2rem;"></i>
+                                    Nenhuma receita lançada para este período.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a class="btn btn-link text-decoration-none text-secondary d-inline-flex align-items-center gap-2 fw-medium p-0 btn-back-hover"
+           asp-controller="Financa" asp-action="Index">
+            <i class="bi bi-arrow-left-short" style="font-size: 1.4rem;"></i> Voltar às finanças
         </a>
     </div>
 
 </div>
 
+<style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .card-table {
+        border-radius: 14px;
+        overflow: hidden;
+        background-color: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    }
+
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .table-custom thead {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #efefef;
+        }
+
+        .table-custom th {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-uppercase: true;
+            color: #5c636a;
+            padding: 14px 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .table-custom tbody tr {
+            border-bottom: 1px solid #f1f3f5;
+            transition: background-color 0.15s ease;
+        }
+
+            .table-custom tbody tr:hover {
+                background-color: #f8f9fa !important;
+            }
+
+        .table-custom tbody td {
+            padding: 14px 10px;
+            font-size: 0.92rem;
+            color: #495057;
+        }
+
+    .btn-action-sm {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-adicionar {
+        border-radius: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-back-hover {
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+        .btn-back-hover:hover {
+            color: #212529 !important;
+            transform: translateX(-2px);
+        }
+
+    /* ESTILIZAÇÃO DA MODAL PREMIUM MINIMALISTA */
+    .modal-custom {
+        border-radius: 16px !important;
+        overflow: hidden;
+    }
+
+    .modal-icon-container {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 52px;
+        height: 52px;
+        background-color: #ffebee;
+        border-radius: 50%;
+    }
+
+    .btn-modal-confirm {
+        font-size: 0.9rem !important;
+        border-radius: 8px !important;
+        background-color: #dc3545 !important;
+        border: none !important;
+    }
+
+    .btn-modal-cancel {
+        font-size: 0.9rem !important;
+        border-radius: 8px !important;
+        background-color: #f8f9fa !important;
+        color: #6c757d !important;
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const deleteButtons = document.querySelectorAll('.delete-receita-button');
+        setTimeout(function () {
+            const alertSucesso = document.getElementById('alertaSucesso');
+            const alertErro = document.getElementById('alertaErro');
 
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const id = button.getAttribute('data-id');
-                const url = button.getAttribute('data-url');
-
-                Swal.fire({
-                    text: `Deseja realmente excluir essa receita?`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Excluir',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: JSON.stringify({ id: id })
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    Swal.fire({
-                                        title: 'Receita excluida com sucesso!',
-                                        text: 'Atualizando a lista...',
-                                        icon: 'success',
-                                        showConfirmButton: false,
-                                        timer: 2000 // Tempo de exibição da mensagem de sucesso
-                                    }).then(() => {
-                                        // Atualizar a lista de bancos na página
-                                        window.location.reload(); // Recarregar a página para atualizar a lista
-                                    });
-                                } else {
-                                    Swal.fire({
-                                        title: 'Erro!',
-                                        text: data.message,
-                                        icon: 'error',
-                                        confirmButtonText: 'Ok'
-                                    });
-                                }
-                            })
-                            .catch(error => {
-                                Swal.fire({
-                                    title: 'Erro!',
-                                    text: 'Ocorreu um erro ao tentar excluir o receita.',
-                                    icon: 'error',
-                                    confirmButtonText: 'Ok'
-                                });
-                            });
-                    }
-                });
-            });
-        });
+            if (alertSucesso) {
+                alertSucesso.style.transition = "opacity 0.5s ease";
+                alertSucesso.style.opacity = "0";
+                setTimeout(() => alertSucesso.remove(), 500);
+            }
+            if (alertErro) {
+                alertErro.style.transition = "opacity 0.5s ease";
+                alertErro.style.opacity = "0";
+                setTimeout(() => alertErro.remove(), 500);
+            }
+        }, 3000);
     });
 </script>

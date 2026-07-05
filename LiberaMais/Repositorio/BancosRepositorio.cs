@@ -56,5 +56,12 @@ namespace LiberaMais.Repositorio
             var verificarBanco = _bancoContext.Bancos.FirstOrDefault(b => b.Nome == nome);
             return verificarBanco == null;
         }
+
+        public Banco BuscarPorNome(string nome)
+        {
+            return _bancoContext.Bancos
+                .FirstOrDefault(b => b.Nome == nome);
+                
+        }
     }
 }

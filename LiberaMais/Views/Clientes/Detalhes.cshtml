@@ -5,404 +5,279 @@
     ViewData["Title"] = "Detalhes do Cliente";
 }
 
-<div class="container-fluid mt-4">
+<style>
+    /* Estilo sutil para os rótulos de informação */
+    .info-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
 
+    /* Suavização das tabelas */
+    .table th {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #495057;
+    }
 
-    <div class="justify-content-center align-items-center mb-4 mt-4 mt-5">
+    /* Linhas divisórias mais discretas nos blocos de informação */
+    .info-divider {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    }
 
-        <div class="card-header text-white rounded-top-4"
-             style="background-color:dodgerblue;">
+    /* Link sutil na tabela de benefícios ocupando a célula inteira */
+    .link-tabela {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.15s ease;
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
 
-            <h3 class="text-center mb-0">
-                Detalhes do cliente
-            </h3>
+    .table tr:hover .link-tabela-texto {
+        color: #0d6efd !important; /* Destaca o texto ao passar o mouse na linha */
+    }
 
+    /* Efeito hover no botão voltar */
+    .btn-back-hover {
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+        .btn-back-hover:hover {
+            color: #212529 !important;
+            transform: translateX(-2px);
+        }
+
+    /* ANIMAÇÃO PISCAR ALERTA */
+    .animacao-piscar {
+        animation: pulse-danger 2s infinite;
+    }
+</style>
+
+<div class="container-fluid px-0 mt-4">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom border-light-subtle">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Detalhes do Cliente</h3>
+            <p class="text-muted small mb-0">Visualize os dados cadastrais, endereço e histórico de benefícios do cliente.</p>
         </div>
-
     </div>
 
     @if (TempData["MensagemSucesso"] != null)
     {
-        <div id="alertaSucesso" class="alert alert-success">
-            @TempData["MensagemSucesso"]
+        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 py-3">
+            <i class="bi bi-check-circle-fill me-2 text-success"></i> @TempData["MensagemSucesso"]
         </div>
     }
 
     @if (TempData["MensagemErro"] != null)
     {
-        <div id="alertaErro" class="alert alert-danger">
-            @TempData["MensagemErro"]
+        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 py-3">
+            <i class="bi bi-exclamation-triangle-fill me-2 text-danger"></i> @TempData["MensagemErro"]
         </div>
     }
 
-    <!-- DADOS DO CLIENTE -->
-
-    <div class="card shadow-sm mb-4">
-
-        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-
-            <span>
-                <i class="bi bi-person"></i>
-                Dados do Cliente
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+            <span class="text-dark fw-bold fs-5">
+                <i class="bi bi-person text-primary me-2"></i> Dados Pessoais
             </span>
-
-            <div>
-
-                <a asp-action="Editar"
-                   asp-route-id="@Model.Cliente.Id"
-                   class="btn btn-warning btn-sm">
-
-                    <i class="bi bi-pencil"></i>
-                    Editar
-
-                </a>
-
-            </div>
-
+            <a asp-action="Editar" asp-route-id="@Model.Cliente.Id" class="btn btn-sm btn-outline-primary rounded-3 px-3 fw-medium d-flex align-items-center gap-1">
+                <i class="bi bi-pencil-square"></i> Editar Cadastro
+            </a>
         </div>
 
-        <div class="card-body">
+        <div class="card-body px-4 pt-2 pb-4">
+            <div class="row g-3">
+                <div class="col-6 col-md-3 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">Nome Completo</small>
+                    <div class="text-dark fw-semibold fs-6">@Model.Cliente.Nome</div>
+                </div>
 
-            <div class="row">
+                <div class="col-6 col-md-3 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">CPF</small>
+                    <div class="text-dark fw-medium">@Model.Cliente.Cpf</div>
+                </div>
 
-                <div class="col-md-3 mb-3">
-                    <div class="border rounded p-3 bg-light">
-                        <small class="text-muted">Nome</small>
-                        <div class="fw-bold">@Model.Cliente.Nome</div>
+                <div class="col-6 col-md-3 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">Telefone</small>
+                    <div class="text-dark fw-medium">@Model.Cliente.Fone</div>
+                </div>
+
+                <div class="col-6 col-md-3 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">Data de Nascimento</small>
+                    <div class="text-dark fw-medium">
+                        @Model.Cliente.DataNascimento?.ToString("dd/MM/yyyy")
                     </div>
                 </div>
 
-                <div class="col-md-3 mb-3">
-                    <div class="border rounded p-3 bg-light">
-                        <small class="text-muted">CPF</small>
-                        <div class="fw-bold">@Model.Cliente.Cpf</div>
-                    </div>
+                <div class="col-12 col-md-4 mt-3">
+                    <small class="text-muted d-block info-label mb-1">E-mail</small>
+                    <div class="text-dark fw-medium">@Model.Cliente.Email</div>
                 </div>
 
-                <div class="col-md-3 mb-3">
-                    <div class="border rounded p-3 bg-light">
-                        <small class="text-muted">Telefone</small>
-                        <div class="fw-bold">@Model.Cliente.Fone</div>
+                <div class="col-12 col-md-8 mt-3">
+                    <small class="text-muted d-block info-label mb-1">Observações interna</small>
+                    <div class="text-secondary bg-light rounded-3 p-2.5 small min-vh-50">
+                        @(string.IsNullOrWhiteSpace(Model.Cliente.Observacoes) ? "Nenhuma observação registrada." : Model.Cliente.Observacoes)
                     </div>
                 </div>
-
-                <div class="col-md-3 mb-3">
-                    <div class="border rounded p-3 bg-light">
-                        <small class="text-muted">Nascimento</small>
-                        <div class="fw-bold">
-                            @Model.Cliente.DataNascimento?.ToString("dd/MM/yyyy")
-                        </div>
-                    </div>
-                </div>
-
             </div>
-
-            <div class="row">
-
-                <div class="col-md-4 mb-3">
-                    <div class="border rounded p-3 bg-light">
-                        <small class="text-muted">E-mail</small>
-                        <div class="fw-bold">@Model.Cliente.Email</div>
-                    </div>
-                </div>
-
-                <div class="col-md-8 mb-3">
-                    <div class="border rounded p-3 bg-light">
-                        <small class="text-muted">Observações</small>
-                        <div class="fw-bold">@Model.Cliente.Observacoes</div>
-                    </div>
-                </div>
-
-            </div>
-
         </div>
-
     </div>
 
-    <!-- ENDEREÇO -->
-
-    <div class="card shadow-sm mb-4">
-
-        <div class="card-header bg-secondary text-white">
-
-            <i class="bi bi-geo-alt"></i>
-            Endereço
-
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+            <span class="text-dark fw-bold fs-5">
+                <i class="bi bi-geo-alt text-secondary me-2"></i> Endereço Residencial
+            </span>
         </div>
 
-        <div class="card-body">
-
-            <div class="row">
-
-                <div class="col-md-2 mb-3">
-                    <div class="border rounded p-3 bg-light">
-                        <small class="text-muted">CEP</small>
-                        <div class="fw-bold">@Model.Endereco?.Cep</div>
-                    </div>
+        <div class="card-body px-4 pt-2 pb-4">
+            <div class="row g-3">
+                <div class="col-6 col-md-2 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">CEP</small>
+                    <div class="text-dark fw-medium">@Model.Endereco?.Cep</div>
                 </div>
 
-                <div class="col-md-5 mb-3">
-                    <div class="border rounded p-3 bg-light">
-                        <small class="text-muted">Rua</small>
-                        <div class="fw-bold">@Model.Endereco?.Rua</div>
-                    </div>
+                <div class="col-12 col-md-5 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">Logradouro (Rua/Av)</small>
+                    <div class="text-dark fw-medium">@Model.Endereco?.Rua</div>
                 </div>
 
-                <div class="col-md-2 mb-3">
-                    <div class="border rounded p-3 bg-light">
-                        <small class="text-muted">Número</small>
-                        <div class="fw-bold">@Model.Endereco?.Numero</div>
-                    </div>
+                <div class="col-6 col-md-2 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">Número</small>
+                    <div class="text-dark fw-medium">@Model.Endereco?.Numero</div>
                 </div>
 
-                <div class="col-md-3 mb-3">
-                    <div class="border rounded p-3 bg-light">
-                        <small class="text-muted">Bairro</small>
-                        <div class="fw-bold">@Model.Endereco?.Bairro</div>
-                    </div>
+                <div class="col-6 col-md-3 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">Bairro</small>
+                    <div class="text-dark fw-medium">@Model.Endereco?.Bairro</div>
                 </div>
 
+                <div class="col-6 col-md-4 mt-3">
+                    <small class="text-muted d-block info-label mb-1">Cidade</small>
+                    <div class="text-dark fw-medium">@Model.Endereco?.Cidade</div>
+                </div>
+
+                <div class="col-6 col-md-2 mt-3">
+                    <small class="text-muted d-block info-label mb-1">UF / Estado</small>
+                    <div class="text-dark fw-medium">@Model.Endereco?.Estado</div>
+                </div>
             </div>
-
-            <div class="row">
-
-                <div class="col-md-4 mb-3">
-                    <div class="border rounded p-3 bg-light">
-                        <small class="text-muted">Cidade</small>
-                        <div class="fw-bold">@Model.Endereco?.Cidade</div>
-                    </div>
-                </div>
-
-                <div class="col-md-2 mb-3">
-                    <div class="border rounded p-3 bg-light">
-                        <small class="text-muted">Estado</small>
-                        <div class="fw-bold">@Model.Endereco?.Estado</div>
-                    </div>
-                </div>
-
-            </div>
-
         </div>
-
     </div>
 
-    <!-- BENEFÍCIOS -->
-
-    <div class="card shadow-sm mb-4">
-
-        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-
-            <span>
-                <i class="bi bi-credit-card"></i>
-                Benefícios do Cliente
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+            <span class="text-dark fw-bold fs-5">
+                <i class="bi bi-credit-card text-success me-2"></i> Benefícios Ativos
             </span>
-
             <a asp-controller="ClienteBeneficio"
                asp-action="Criar"
                asp-route-clienteId="@Model.Cliente.Id"
-               class="btn btn-light btn-sm">
-
-                <i class="bi bi-plus-circle"></i>
-                Adicionar Benefício
-
+               class="btn btn-success btn-sm rounded-3 px-3 fw-medium d-flex align-items-center gap-1 shadow-sm">
+                <i class="bi bi-plus-lg"></i> Adicionar Benefício
             </a>
-
         </div>
 
-        <div class="card-body">
-
-            @if (Model.Cliente.ClienteBeneficios != null &&
-                        Model.Cliente.ClienteBeneficios.Any())
+        <div class="card-body px-4 pt-2 pb-4">
+            @if (Model.Cliente.ClienteBeneficios != null && Model.Cliente.ClienteBeneficios.Any())
             {
                 <div class="table-responsive">
-
-                    <table class="table table-bordered table-striped">
-
-                        <thead class="table-dark">
-
+                    <table class="table table-hover align-middle border-0 mb-0">
+                        <thead class="table-light border-0">
                             <tr>
-                                <th>Órgão</th>
+                                <th class="ps-3">Órgão</th>
                                 <th>Benefício</th>
-                                <th>NB</th>
-                                <th>Senha</th>
-                                <th class="text-center">Ações</th>
+                                <th>NB (Número)</th>
+                                <th>Senha do Órgão</th>
+                                <th class="text-end pe-3">Ações</th>
                             </tr>
-
                         </thead>
-
                         <tbody>
-
                             @foreach (var item in Model.Cliente.ClienteBeneficios)
                             {
-                                <tr>
-
-                                    <td>
-                                        @item.Beneficio?.Orgaos?.Nome
-                                    </td>
-
-                                    <td>
-                                        @item.Beneficio?.Descricao
-                                    </td>
-
-                                    <td>
-
-                                        <span>
-                                            @item.NumeroBeneficio
-                                        </span>
-
-                                    </td>
-
-                                    <td>
-                                        @item.SenhaOrgao
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <a asp-controller="ClienteBeneficio"
-                                           asp-action="Editar"
-                                           asp-route-id="@item.Id"
-                                           class="btn btn-warning btn-sm">
-
-                                            Editar
-
+                                <tr class="border-bottom border-light-subtle">
+                                    <td class="ps-3 fw-semibold">
+                                        <a asp-controller="ClienteBeneficio" asp-action="Editar" asp-route-id="@item.Id" class="link-tabela link-tabela-texto text-secondary">
+                                            @item.Beneficio?.Orgaos?.Nome
                                         </a>
-
-                                        <button class="btn btn-danger btn-sm"
+                                    </td>
+                                    <td>
+                                        <a asp-controller="ClienteBeneficio" asp-action="Editar" asp-route-id="@item.Id" class="link-tabela link-tabela-texto text-dark">
+                                            @item.Beneficio?.Descricao
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a asp-controller="ClienteBeneficio" asp-action="Editar" asp-route-id="@item.Id" class="link-tabela font-monospace text-dark">
+                                            @item.NumeroBeneficio
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a asp-controller="ClienteBeneficio" asp-action="Editar" asp-route-id="@item.Id" class="link-tabela font-monospace text-secondary">
+                                            <span class="bg-light px-2 py-0.5 rounded" style="font-size: 0.85rem;">@item.SenhaOrgao</span>
+                                        </a>
+                                    </td>
+                                    <td class="text-end pe-3">
+                                        <button class="btn btn-sm btn-link text-danger text-decoration-none fw-medium p-0 px-1"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#modalExcluir_@item.Id">
-
-                                            Excluir
-
+                                            <i class="bi bi-trash3"></i> Excluir
                                         </button>
-
-
                                     </td>
-
                                 </tr>
-                                <div class="modal fade"
-                                     id="modalExcluir_@item.Id"
-                                     tabindex="-1"
-                                     aria-hidden="true">
 
-                                    <div class="modal-dialog modal-dialog-centered">
-
-                                        <div class="modal-content rounded-4 border-0 shadow">
-
-                                            <div class="modal-header bg-danger text-white">
-
-                                                <h5 class="modal-title">
-                                                    Excluir Benefício
-                                                </h5>
-
-                                                <button type="button"
-                                                        class="btn-close btn-close-white"
-                                                        data-bs-dismiss="modal">
-                                                </button>
-
-                                            </div>
-
-                                            <div class="modal-body text-center p-4">
-
-                                                <h5 class="text-danger mb-3">
-                                                    Atenção!
-                                                </h5>
-
-                                                <p class="fs-5">
-
-                                                    Deseja realmente excluir o benefício
-
-                                                    <strong class="text-primary">
-                                                        @item.Beneficio.Descricao
-                                                    </strong>
-
-                                                    do(a) cliente
-
-                                                    <strong class="text-primary">
-                                                        @item.Cliente.Nome
-                                                    </strong>?
-
+                                <div class="modal fade" id="modalExcluir_@item.Id" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                                        <div class="modal-content rounded-4 border-0 shadow-lg">
+                                            <div class="modal-body text-center p-4 pt-5">
+                                                <div class="text-danger mb-3">
+                                                    <i class="bi bi-exclamation-circle" style="font-size: 2.5rem;"></i>
+                                                </div>
+                                                <h5 class="fw-bold text-dark mb-2">Excluir Benefício?</h5>
+                                                <p class="text-muted small mb-0">
+                                                    Deseja realmente remover o benefício <strong class="text-dark">@item.Beneficio?.Descricao</strong> vinculado a este cliente?
                                                 </p>
-
                                             </div>
-
-                                            <div class="modal-footer border-0">
-
-                                                <button type="button"
-                                                        class="btn btn-secondary"
-                                                        data-bs-dismiss="modal">
-
-                                                    Cancelar
-
-                                                </button>
-
-                                                <form asp-controller="ClienteBeneficio"
-                                                      asp-action="Apagar"
-                                                      method="post">
-
-                                                    <input type="hidden"
-                                                           name="id"
-                                                           value="@item.Id" />
-
-                                                    <button type="submit"
-                                                            class="btn btn-danger">
-
-                                                        Excluir
-
-                                                    </button>
-
+                                            <div class="modal-footer border-0 d-flex flex-column w-100 gap-1 p-4 pt-0">
+                                                <form asp-controller="ClienteBeneficio" asp-action="Apagar" method="post" class="w-100 m-0">
+                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                    <button type="submit" class="btn btn-danger w-100 rounded-3 py-2 fw-medium">Confirmar Exclusão</button>
                                                 </form>
-
+                                                <button type="button" class="btn btn-light border w-100 rounded-3 py-2 text-secondary fw-medium" data-bs-dismiss="modal">Cancelar</button>
                                             </div>
-
                                         </div>
-
                                     </div>
-
                                 </div>
                             }
-
                         </tbody>
-
                     </table>
-
                 </div>
             }
             else
             {
-                <div class="alert alert-info mb-0">
-
-                    Este cliente ainda não possui benefícios cadastrados.
-
+                <div class="text-center text-muted py-4 bg-light rounded-4 border border-dashed">
+                    <i class="bi bi-credit-card-2-back display-6 d-block mb-2 opacity-50"></i>
+                    <p class="mb-0 small">Este cliente ainda não possui benefícios cadastrados.</p>
                 </div>
             }
-
         </div>
-
     </div>
-
-    <div class="text">
-
-        <a asp-action="Index"
-           class="btn btn-outline-secondary">
-
-            <i class="bi bi-arrow-left"></i>
-            Voltar
-
-        </a>
-
-    </div>
-    
-
 </div>
 
+<div class="mt-4">
+    <a class="btn btn-link text-decoration-none text-secondary d-inline-flex align-items-center gap-2 fw-medium p-0 btn-back-hover"
+       asp-controller="Clientes" asp-action="Index">
+        <i class="bi bi-arrow-left-short" style="font-size: 1.4rem;"></i> Voltar a cliente
+    </a>
+</div>
 
 <script>
-
     setTimeout(function () {
-
         $("#alertaSucesso").fadeOut("slow");
         $("#alertaErro").fadeOut("slow");
-
     }, 3000);
-
 </script>

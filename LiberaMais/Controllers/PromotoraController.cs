@@ -84,6 +84,7 @@ namespace LiberaMais.Controllers
         {
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+            var promotoraExistente = _promotorasRepositorio.BuscarPorNome(promotora.Nome);
 
             try
             {
@@ -100,6 +101,12 @@ namespace LiberaMais.Controllers
 
                 };
 
+                }
+
+                if(promotoraExistente != null)
+                {
+                    TempData["MensagemErro"] = "Já existe uma promotora adicionada com esse nome.";
+                    return View(promotora);
                 }
 
                 if (ModelState.IsValid)
@@ -124,7 +131,7 @@ namespace LiberaMais.Controllers
                 }
                 else
                 {
-                    TempData["MensagemErro"] = "Não foi possivel adicionar a promotora!";
+                    TempData["MensagemErro"] = "Não foi possivel adicionar a promotora.";
                     ViewBag.Usuarios = new List<UsuarioModel>
                 {
                     usuarioLogado
@@ -148,7 +155,7 @@ namespace LiberaMais.Controllers
 
             if (!_permissaoService.UsuarioTemAcessoPromotora(usuarioLogado, promotora))
             {
-                TempData["mensagemErro"] = "Você não tem autorização";
+                TempData["mensagemErro"] = "Você não tem autorização.";
 
                 return RedirectToAction("Index", "Promotora");
             }
@@ -176,12 +183,13 @@ namespace LiberaMais.Controllers
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
             var promotoraDb = _promotorasRepositorio.BuscarPromotoraPorId(promotora.Id);
+            var promotoraExistente = _promotorasRepositorio.BuscarPorNome(promotora.Nome);
 
             try
             {
                 if (!_permissaoService.UsuarioTemAcessoPromotora(usuarioLogado, promotoraDb))
                 {
-                    TempData["mensagemErro"] = "Você não tem permissão";
+                    TempData["mensagemErro"] = "Você não tem permissão.";
 
                     return RedirectToAction("Index", "Promotora");
                 }
@@ -198,6 +206,13 @@ namespace LiberaMais.Controllers
                         usuarioLogado
                     };
                 }
+
+                if (promotoraExistente != null && promotoraExistente.Id != promotoraDb.Id)
+                {
+                    TempData["MensagemErro"] = "Já existe uma promotora adicionada com esse nome.";
+                    return View(promotora);
+                }
+
 
                 if (ModelState.IsValid)
                 {
@@ -237,7 +252,7 @@ namespace LiberaMais.Controllers
             }
             catch (Exception)
             {
-                TempData["MensagemErro"] = "Não foi possivel editar a promotora!";
+                TempData["MensagemErro"] = "Não foi possivel editar a promotora.";
                 return View(promotora);
             }
         }
@@ -272,7 +287,7 @@ namespace LiberaMais.Controllers
 
                 if (!_permissaoService.UsuarioTemAcessoPromotora(usuarioLogado, promotora))
                 {
-                    TempData["mensagemErro"] = "Você não tem permissão";
+                    TempData["mensagemErro"] = "Você não tem permissão.";
 
                     return RedirectToAction("Index", "Promotora");
                 }
@@ -301,7 +316,7 @@ namespace LiberaMais.Controllers
             }
             catch (Exception)
             {
-                TempData["MensagemErro"] = "Não foi possível excluir a promotora!";
+                TempData["MensagemErro"] = "Não foi possível excluir a promotora.";
                 return RedirectToAction("Index");
             }
         }

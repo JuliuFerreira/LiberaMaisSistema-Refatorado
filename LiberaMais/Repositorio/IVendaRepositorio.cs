@@ -1,15 +1,13 @@
-﻿using LiberaMais.Models;
+﻿using AspNetCoreGeneratedDocument;
+using LiberaMais.Models;
 
 namespace LiberaMais.Repositorio
 {
     public interface IVendaRepositorio
     {
-        Venda BuscarVendaPorId(long id);
+        List<Venda> ListarTodasVendas();
 
-        List<Venda> ListarVenda(int usuarioId);
-
-    List<Venda> ListarVendasPorPeriodoEUsuario(DateTime startDate, DateTime endDate, List<int> userIds, string searchString);
-
+        Venda BuscarVendaPorId(int id);
 
         Venda Adicionar(Venda venda);
 
@@ -17,14 +15,9 @@ namespace LiberaMais.Repositorio
 
         bool Apagar(int id);
 
-        bool VerificarCpfExistente(string cpf);
+        List<Venda> ListarVendasPorUsuario(int usuarioId);
 
-        List<Venda> ListarTodasVendas();
-
-        List<Venda> ListarVendasApenasPagos();
-
-
-
+        List<Venda> BuscarVendasPagasPorPeriodo(int mes, int ano);
 
     }
 }

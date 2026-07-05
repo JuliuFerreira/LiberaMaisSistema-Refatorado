@@ -1,5 +1,6 @@
 ﻿using LiberaMais.Data;
 using LiberaMais.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace LiberaMais.Repositorio
@@ -60,5 +61,13 @@ namespace LiberaMais.Repositorio
                 .FirstOrDefault(b => b.Id == id);
         }
 
+        public List<ClienteBeneficio> ListarBeneficiosPorCliente(int clienteId)
+        {
+            return _bancoContext.clienteBeneficio
+                .Include(cb => cb.Beneficio)
+                .ThenInclude(b => b.Orgaos)
+                .Where(cb => cb.ClienteId == clienteId)
+                .ToList();
+        }
     }
 }

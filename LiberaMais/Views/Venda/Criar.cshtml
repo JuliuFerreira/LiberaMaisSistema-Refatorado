@@ -1,0 +1,296 @@
+﻿@using LiberaMais.Models.Enums
+@model Venda
+
+@{
+    Layout = "LayoutSistema";
+    ViewData["Title"] = "Cadastrar Venda";
+
+    var cpf = ViewBag.Cpf as string;
+    var clienteId = ViewBag.ClienteId as int?;
+    var clienteNome = ViewBag.ClienteNome as string;
+    var beneficios = ViewBag.Beneficios as List<ClienteBeneficio>;
+    var IsAdmin = ViewBag.IsAdmin as bool? ?? false;
+}
+
+<div class="row justify-content-center">
+    <div class="card shadow border-0 rounded-4 col-10 mt-5">
+        <div class="card-header bg-success text-white">
+            <h4 class="text-center mb-0">Cadastrar Nova Venda</h4>
+        </div>
+
+        @if (TempData["MensagemSucesso"] != null)
+        {
+            <div id="alertaSucesso" class="alert alert-success mt-3 mx-4">@TempData["MensagemSucesso"]</div>
+        }
+
+        @if (TempData["MensagemErro"] != null)
+        {
+            <div class="alert alert-danger mt-3 mx-4">@TempData["MensagemErro"]</div>
+        }
+
+        <div class="card-body p-4">
+
+            <!-- PRIMEIRA LINHA: Campo de busca do cliente (Formulário Isolado) -->
+            <form asp-action="BuscarCliente" method="post" id="formBuscaCliente">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Buscar Cliente por CPF</label>
+                        <div class="input-group">
+                            <input name="cpf" class="form-control" value="@cpf" placeholder="Digite o CPF" />
+                            <button type="submit" class="btn btn-primary">Buscar</button>
+                        </div>
+                        @if (TempData["MensagemErroBusca"] != null)
+                        {
+                            <div class="alert alert-danger mt-2">@TempData["MensagemErroBusca"]</div>
+                            <div class="mt-2">
+                                <a asp-controller="Clientes" asp-action="Criar" class="btn btn-success btn-sm">Cadastrar Cliente</a>
+                                <a asp-controller="Venda" asp-action="Criar" class="btn btn-secondary btn-sm">Cancelar</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </form>
+
+            <hr />
+
+            <!-- FORMULÁRIO PRINCIPAL DE CADASTRO -->
+            <form asp-action="Criar" method="post" id="formVenda">
+                <input type="hidden" asp-for="ClienteId" value="@clienteId" />
+                <input type="hidden" name="Cpf" value="@cpf" />
+
+                <!-- SEGUNDA LINHA: Usuário operador -->
+                <div class="row mb-3">
+                    @if (IsAdmin)
+                    {
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Usuário / Operador *</label>
+                            <select asp-for="UsuarioId" class="form-select" asp-items='@(new SelectList(ViewBag.Usuario, "Id", "Nome"))' required>
+                                <option value="">Selecione o Operador</option>
+                            </select>
+                        </div>
+                    }
+                    else
+                    {
+                        <input type="hidden" asp-for="UsuarioId" value="@ViewBag.UsuarioLogadoId" />
+                    }
+                </div>
+
+                <!-- TERCEIRA LINHA: Dados do Cliente e Benefício -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Cliente Nome *</label>
+                        <input class="form-control bg-light" value="@clienteNome" readonly placeholder="Nome do Cliente" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Cliente CPF *</label>
+                        <input class="form-control bg-light" value="@cpf" readonly placeholder="CPF do Cliente" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Benefício *</label>
+                        <select asp-for="ClienteBeneficioId" class="form-select" required>
+                            <option value="">Selecione o Benefício</option>
+                            @if (beneficios != null)
+                            {
+                                foreach (var b in beneficios)
+                                {
+                                    <option value="@b.Id">@b.Beneficio?.Orgaos?.Nome - @b.Beneficio?.Descricao</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- QUARTA LINHA: Configuração do Contrato -->
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Promotora *</label>
+                        <select asp-for="PromotoraId" class="form-select" id="selectPromotora" required>
+                            <option value="">Selecione</option>
+                            @foreach (var p in ViewBag.Promotora ?? new List<Promotora>())
+                            {
+                                <option value="@p.Id">@p.Nome</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Banco *</label>
+                        <select asp-for="BancoId" class="form-select" id="selectBanco" required>
+                            <option value="">Selecione a promotora</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Operação *</label>
+                        <select asp-for="Operacao" class="form-select" id="selectOperacao" asp-items="Html.GetEnumSelectList<OperacaoEnum>()" required>
+                            <option value="">Selecione</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Status do Contrato *</label>
+                        <select asp-for="StatusContrato" class="form-select" id="selectStatus" asp-items="Html.GetEnumSelectList<StatusEnum>()" required>
+                            <option value="">Selecione</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- QUINTA LINHA: Valores Base Dinâmicos e Data de Pagamento -->
+                <div class="row mb-3">
+
+                    <!-- Seção de Valores de Contratos Comuns -->
+                    <div class="col-md-9" id="secaoValoresNormais">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">Valor da Parcela</label>
+                                <input type="text" asp-for="ValorParcela" value="@Model?.ValorParcela?.ToString("N2")" class="form-control decimal" placeholder="0,00" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Valor do Contrato</label>
+                                <input type="text" asp-for="ValorContrato" value="@Model?.ValorContrato?.ToString("N2")" class="form-control decimal" placeholder="0,00" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Quantidade de Parcelas</label>
+                                <input asp-for="NumeroDeParcelas" type="number" class="form-control" placeholder="Ex: 84" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campo Condicional de Data de Pagamento (Aparece se o status for 'Pago') -->
+                    <div class="col-md-3" id="divDataPagamento" style="display: none;">
+                        <label class="form-label fw-bold text-success">Data de Pagamento</label>
+                        <input asp-for="DataPgtoContrato" type="date" class="form-control border-success" />
+                    </div>
+                </div>
+
+                <!-- SEÇÃO EXCLUSIVA: Portabilidade -->
+                <div id="secaoPortabilidade" style="display: none;">
+                    <hr class="text-primary" />
+                    <h5 class="text-primary mb-3"><i class="bi bi-arrow-left-right me-2"></i>Dados da Portabilidade</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Número do Contrato Portado</label>
+                            <input asp-for="NumeroContrato" class="form-control" placeholder="Contrato de origem" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Banco de origem</label>
+                            <input asp-for="BancoComprado" class="form-control" placeholder="Contrato o banco de origem" />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Valor da Parcela (Origem)</label>
+                            <input type="text" asp-for="ValorParcelaPort" value="@Model?.ValorParcelaPort?.ToString("N2")" class="form-control decimal" placeholder="0,00" />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Saldo Devedor</label>
+                            <input type="text" asp-for="SaldoDevedor" value="@Model?.SaldoDevedor?.ToString("N2")" class="form-control decimal" placeholder="0,00" />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Parcelas Restantes</label>
+                            <input asp-for="ParcelasRestantes" type="number" class="form-control" placeholder="Qtd" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEXTA LINHA: Observação Geral -->
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label class="form-label">Observação Geral</label>
+                        <textarea asp-for="Observacao" class="form-control" rows="2" placeholder="Observações importantes..."></textarea>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+                    <button type="submit" class="btn btn-success px-4">Salvar Venda</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            // Alterna dinamicamente os blocks dependendo do tipo de Operação escolhido
+            function alternarCamposPorOperacao() {
+                let operacaoSelecionada = $("#selectOperacao option:selected").text().toLowerCase();
+
+                if (operacaoSelecionada.includes("portabilidade")) {
+                    $("#secaoPortabilidade").slideDown();      // Exibe os inputs de portabilidade
+                    $("#secaoValoresNormais").slideUp();       // Oculta os inputs normais
+                } else {
+                    $("#secaoPortabilidade").slideUp();        // Oculta os inputs de portabilidade
+                    $("#secaoValoresNormais").slideDown();     // Exibe os inputs normais
+                }
+            }
+
+            // Exibe a Data de Pagamento se o Status for igual a "Pago"
+            function verificarStatusPagamento() {
+                let statusSelecionado = $("#selectStatus option:selected").text().toLowerCase();
+
+                if (statusSelecionado.includes("pago")) {
+                    $("#divDataPagamento").fadeIn();
+                } else {
+                    $("#divDataPagamento").fadeOut();
+                    $("#DataPgtoContrato").val(""); // Reseta o valor caso mude o status
+                }
+            }
+
+            // Ativa os gatilhos imediatamente na carga inicial do DOM
+            alternarCamposPorOperacao();
+            verificarStatusPagamento();
+
+            // Ativa os escutadores de mudança nos selects de controle
+            $("#selectOperacao").change(alternarCamposPorOperacao);
+            $("#selectStatus").change(verificarStatusPagamento);
+
+            // AJAX: Busca de bancos vinculados ao selecionar a Promotora
+            $("#selectPromotora").change(function () {
+                let promotoraId = $(this).val();
+                let bancoSelect = $("#selectBanco");
+
+                if (!promotoraId) {
+                    bancoSelect.empty().append('<option value="">Selecione a promotora</option>');
+                    return;
+                }
+
+                $.get('/Venda/BuscarBancosPorPromotora', { promotoraId: promotoraId }, function(data) {
+                    bancoSelect.empty().append('<option value="">Selecione</option>');
+                    $.each(data, function(i, b) {
+                        bancoSelect.append(`<option value="${b.id}">${b.nome}</option>`);
+                    });
+                });
+            });
+
+            // CORREÇÃO AQUI: Não substitui a vírgula por ponto. Deixa o pt-BR do C# trabalhar!
+            $("#formVenda").on("submit", function (e) {
+                $(".decimal").each(function () {
+                    let val = $(this).val();
+                    if(val) {
+                        // Apenas remove espaços extras e símbolos se existirem, mas mantém a vírgula intacta
+                        val = val.replace("R$", "").trim();
+                        $(this).val(val);
+                    }
+                });
+                return true;
+            });
+        });
+    </script>
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Sem o ponto no milhar: o usuário digita 1500,25 e o C# entende perfeitamente
+        $('.decimal').mask('##0,00', { reverse: true });
+    });
+</script>
+
+<script>
+
+    setTimeout(function () {
+
+        $("#alertaSucesso").fadeOut("slow");
+    $("#alertaErro").fadeOut("slow");
+
+    }, 3000);
+
+</script>

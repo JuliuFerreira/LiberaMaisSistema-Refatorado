@@ -41,6 +41,9 @@ namespace LiberaMais.Data
         public DbSet<Beneficio> beneficios { get; set; }
 
         public DbSet<ClienteBeneficio> clienteBeneficio { get; set; }
+
+        public DbSet<Venda> Venda { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new VendaMap());
@@ -73,6 +76,8 @@ namespace LiberaMais.Data
             modelBuilder.Entity<Beneficio>().ToTable("Beneficio");
             modelBuilder.Entity<ClienteBeneficio>().HasKey(c => c.Id);
             modelBuilder.Entity<ClienteBeneficio>().ToTable("ClienteBeneficio");
+            modelBuilder.Entity<Venda>().HasKey(v => v.Id);
+            modelBuilder.Entity<Venda>().ToTable("Venda");
 
             // Configura relacionamento:
             // PromotoraBanco possui uma Promotora

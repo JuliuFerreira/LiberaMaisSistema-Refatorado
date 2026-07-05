@@ -21,11 +21,9 @@ namespace LiberaMais.Models
         public string? Url { get; set; }
 
         [Required(ErrorMessage = "O login é obrigatório")]
-
         public string Login { get; set; }
 
         [Required(ErrorMessage = "A senha é obrigatório")]
-
         public string Senha { get; set; }
 
         public List<PromotoraBanco>? PromotoraBancos { get; set; }

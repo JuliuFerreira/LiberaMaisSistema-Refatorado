@@ -40,11 +40,12 @@
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="PromotoraId" />
                 <input type="hidden" asp-for="BancoId" />
+                <input type="hidden" asp-for="UsuarioId" />
 
 
                 <div class="row g-3">
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
 
 
                         <label class="form-label">
@@ -58,7 +59,7 @@
                     </div>
 
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
 
                         <label class="form-label">
                             Banco
@@ -101,6 +102,34 @@
                         <span asp-validation-for="Senha"
                               class="text-danger">
                         </span>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Usuário responsável
+                        </label>
+
+                        <select asp-for="UsuarioId"
+                                class="form-select">
+
+                            <option value="">
+                                Selecione
+                            </option>
+
+                            @foreach (var user in ViewBag.Usuario)
+                            {
+                                <option value="@user.Id">
+                                    @user.Nome
+                                </option>
+                            }
+
+                        </select>
+                        <span asp-validation-for="UsuarioId"
+                              class="text-danger">
+                        </span>
+
 
                     </div>
 

@@ -69,5 +69,10 @@ namespace LiberaMais.Repositorio
                 .ToList();
         }
 
+        public Promotora BuscarPorNome(string nome)
+        {
+            return _bancoContext.Promotoras
+                .FirstOrDefault(p => p.Nome == nome);
+        }
     }
 }

@@ -40,8 +40,17 @@ namespace LiberaMais.Controllers
         [HttpPost]
         public IActionResult Criar(Banco bancos)
         {
+            var bancoExistente = _bancosRepositorio.BuscarPorNome(bancos.Nome);
+
             try
             {
+
+                if (bancoExistente != null)
+                {
+                    TempData["MensagemErro"] = "Já existe um banco com esse nome cadastrado.";
+                    return View(bancos);
+                }
+
                 if (ModelState.IsValid)
                 {
                     bancos.Nome = System.Globalization.CultureInfo.CurrentCulture.TextInfo

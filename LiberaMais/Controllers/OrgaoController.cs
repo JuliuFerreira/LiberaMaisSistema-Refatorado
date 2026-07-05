@@ -32,7 +32,14 @@ namespace LiberaMais.Controllers
         [HttpPost]
         public IActionResult Criar(Orgao orgao)
         {
+            var orgaoExistente = _orgaoRepositorio.BuscarPorNome(orgao.Nome);
             
+            if(orgaoExistente != null)
+            {
+                TempData["MensagemErro"] = "Já existe um Órgao cadastrado com esse nome.";
+                return View(orgao);
+            }
+
             if (ModelState.IsValid)
             {
                 orgao.Nome = orgao.Nome.ToUpper();
@@ -64,6 +71,8 @@ namespace LiberaMais.Controllers
         public IActionResult Editar(Orgao orgao)
         {
             var orgaoDb = _orgaoRepositorio.BuscarPorId(orgao.Id);
+            var orgaoExistente = _orgaoRepositorio.BuscarPorNome(orgao.Nome);
+            
 
             if(orgaoDb == null)
             {
@@ -71,11 +80,17 @@ namespace LiberaMais.Controllers
                 return RedirectToAction("Index");
             }
 
+            if(orgaoExistente != null && orgaoExistente.Id != orgao.Id)
+            {
+                TempData["MensagemErro"] = "Já existe um orgão cadastrado com esse nome.";
+                return View(orgao);
+            }
+
             if (ModelState.IsValid)
             {
                 orgaoDb.Nome = orgao.Nome.ToUpper();
                 _orgaoRepositorio.Atualizar(orgaoDb);
-                TempData["MensagemSucesso"] = "Orgão editado com sucesso.";
+                TempData["MensagemSucesso"] = "Orgão editado com sucesso!";
                 return RedirectToAction("Index");
             }
 
@@ -103,7 +118,9 @@ namespace LiberaMais.Controllers
         {
             try
             {
+                
                 bool apagado = _orgaoRepositorio.Apagar(id);
+                               
 
                 if (apagado)
                 {
@@ -120,7 +137,7 @@ namespace LiberaMais.Controllers
 
             catch (Exception ex)
             {
-                TempData["MensagemErro"] = "Erro ao excluir o orgão.";
+                TempData["MensagemErro"] = "Erro ao excluir o orgão, possivelmente existem beneficios cadastrados.";
             }
             return RedirectToAction("Index");
 

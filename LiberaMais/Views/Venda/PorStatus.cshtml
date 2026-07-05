@@ -1,0 +1,172 @@
+﻿@using LiberaMais.Models.Enums
+@model List<LiberaMais.Models.Venda>
+
+@{
+    Layout = "LayoutSistema";
+    ViewData["Title"] = $"Vendas - {ViewBag.StatusAtual}";
+
+    var listaBancos = ViewBag.Bancos as IEnumerable<dynamic>;
+    bool exibirColunaPortabilidade = Model != null && Model.Any(v => v.Operacao.ToString().ToLower().Contains("portabilidade"));
+}
+
+<div class="container-fluid py-4 inner-system-page">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-1 text-uppercase tracking-wide" style="font-size: 1.6rem;">
+                Vendas: @ViewBag.StatusAtual
+            </h2>
+            <small class="text-muted">Gerenciamento e controle de contratos com status @ViewBag.StatusAtual</small>
+        </div>
+        <div>
+            <a asp-action="Criar" class="btn btn-dark d-flex align-items-center gap-2 px-3 py-2 shadow-sm rounded-3">
+                <i class="bi bi-plus-circle-fill"></i>
+                <span class="fw-semibold small">Nova Venda</span>
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso" class="alert alert-success shadow-sm border-0 rounded-3 mb-3">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["MensagemSucesso"]
+        </div>
+    }
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro" class="alert alert-danger shadow-sm border-0 rounded-3 mb-3">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["MensagemErro"]
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                    <tr>
+                        <th class="ps-4">Data</th>
+                        <th>CPF</th>
+                        <th>Cliente</th>
+                        <th>Operação</th>
+                        <th>Banco</th>
+                        @if (exibirColunaPortabilidade)
+                        {
+                            <th>Banco Origem</th>
+                        }
+                        <th>@(exibirColunaPortabilidade ? "Parcela Portada" : "Parcela")</th>
+                        <th>@(exibirColunaPortabilidade ? "Saldo" : "Valor Contrato")</th>
+                        <th class="text-center pe-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var venda in Model)
+                        {
+                            bool ehPortabilidade = venda.Operacao.ToString().ToLower().Contains("portabilidade");
+                            <tr class="linha-clicavel" data-href="@Url.Action("Detalhe", "Venda", new { id = venda.Id })">
+                                <td class="ps-4 text-muted small">@venda.DataCadastro?.ToString("dd/MM/yyyy")</td>
+                                <td class="fw-medium">@venda.Cliente?.Cpf</td>
+                                <td>@venda.Cliente?.Nome</td>
+                                <td><span class="badge bg-light text-dark border rounded-2">@venda.Operacao</span></td>
+                                <td>
+                                    <span class="fw-bold">
+                                        @(listaBancos?.FirstOrDefault(b => b.Id == venda.BancoId)?.Nome ?? venda.Banco?.Nome ?? "N/A")
+                                    </span>
+                                </td>
+                                @if (exibirColunaPortabilidade)
+                                {
+                                    <td>
+                                        <span class="badge bg-primary-subtle text-primary rounded-2">
+                                            @(string.IsNullOrEmpty(venda.BancoComprado) ? "-" : venda.BancoComprado)
+                                        </span>
+                                    </td>
+                                }
+                                <td class="text-danger fw-bold">@((ehPortabilidade ? venda.ValorParcelaPort : venda.ValorParcela)?.ToString("C"))</td>
+                                <td class="fw-medium">@((ehPortabilidade ? venda.SaldoDevedor : venda.ValorContrato)?.ToString("C"))</td>
+                                <td class="text-center pe-4 ignorar-clique">
+                                    <button type="button" class="btn btn-outline-danger btn-action-sm d-inline-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#modalExcluir_@venda.Id" title="Excluir Venda">
+                                        <i class="bi bi-trash3-fill"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <div class="modal fade" id="modalExcluir_@venda.Id" tabindex="-1" aria-hidden="true" onclick="event.stopPropagation();">
+                                <div class="modal-dialog modal-dialog-centered modal-sm">
+                                    <div class="modal-content rounded-4 border-0 shadow-lg">
+                                        <div class="modal-body text-center p-4 pt-5">
+                                            <div class="text-danger mb-3">
+                                                <i class="bi bi-exclamation-circle" style="font-size: 2.5rem;"></i>
+                                            </div>
+                                            <h5 class="fw-bold text-dark mb-2">Excluir Venda?</h5>
+                                            <p class="text-muted small mb-0">
+                                                Deseja realmente remover a venda do cliente <strong class="text-dark">@venda.Cliente?.Nome</strong> do sistema? Esta ação não pode ser desfeita.
+                                            </p>
+                                        </div>
+                                        <div class="modal-footer border-0 d-flex flex-column w-100 gap-1 p-4 pt-0">
+                                            <form asp-action="Apagar" method="post" class="w-100 m-0">
+                                                <input type="hidden" name="id" value="@venda.Id" />
+                                                <button type="submit" class="btn btn-danger w-100 rounded-3 py-2 fw-medium">Confirmar Exclusão</button>
+                                            </form>
+                                            <button type="button" class="btn btn-light border w-100 rounded-3 py-2 text-secondary fw-medium" data-bs-dismiss="modal">Cancelar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="9" class="text-center py-5 text-muted">Nenhuma venda encontrada.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-controller="Venda" asp-action="Index" class="btn btn-link text-decoration-none text-secondary p-0 d-inline-flex align-items-center gap-2 btn-back-hover">
+            <i class="bi bi-arrow-left-short fs-4"></i> Voltar ao painel
+        </a>
+    </div>
+</div>
+
+<style>
+    .linha-clicavel {
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+        .linha-clicavel:hover {
+            background-color: #f8f9fa !important;
+        }
+
+    .btn-action-sm {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-back-hover {
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+        .btn-back-hover:hover {
+            color: #212529 !important;
+            transform: translateX(-2px);
+        }
+</style>
+
+@section Scripts {
+    <script>
+        $(".linha-clicavel").click(function (e) {
+            if (!$(e.target).closest('.ignorar-clique').length) {
+                window.location.href = $(this).data("href");
+            }
+        });
+        setTimeout(() => { $(".alert").fadeOut("slow"); }, 3000);
+    </script>
+}

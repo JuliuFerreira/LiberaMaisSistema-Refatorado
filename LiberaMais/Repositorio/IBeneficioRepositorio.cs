@@ -16,5 +16,11 @@ namespace LiberaMais.Repositorio
 
         public Beneficio BuscarPorId(int id);
 
+        public Beneficio BuscarPorNome(string descicao);
+
+
+        public Beneficio BuscarPorNomeEOrgao(string descricao, int orgaoId);
+
+
     }
 }

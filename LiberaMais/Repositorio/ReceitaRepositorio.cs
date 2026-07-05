@@ -22,21 +22,11 @@ namespace LiberaMais.Repositorio
 
         public List<Receita> ListarReceitas(int idFinanca)
         {
-            var listarReceitas = _bancoContext.receitas.Where(j => j.FinancaId == idFinanca).ToList();
-
-            if (listarReceitas.Count == 0)
-            {
-                var receita = new Receita()
-                {
-                    FinancaId = idFinanca,
-                };
-
-                listarReceitas.Add(receita);
-            }
-
-            return listarReceitas;
+            return _bancoContext.receitas
+                           .Include(r => r.Promotora) // <-- Crucial para não vir nulo na listagem!
+                           .Where(x => x.FinancaId == idFinanca)
+                           .ToList();
         }
-    
 
         public Receita Adicionar(Receita receita)
         {

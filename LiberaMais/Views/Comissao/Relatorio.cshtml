@@ -1,0 +1,322 @@
+﻿@model List<LiberaMais.Models.ComissaoRelatorioViewModel>
+
+@{
+    Layout = "LayoutSistema";
+    ViewData["Title"] = "Relatório de Comissões";
+
+    int mesFechamento = ViewBag.MesFechamento ?? DateTime.Today.Month;
+    int anoFechamento = ViewBag.AnoFechamento ?? DateTime.Today.Year;
+    decimal totalSalarioMes = ViewBag.TotalSalarioMes ?? 0m;
+    int quantidadePagaMes = ViewBag.QuantidadePagaMes ?? 0;
+}
+
+<div class="container-fluid py-4 inner-system-page">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 border-bottom pb-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-1 text-uppercase tracking-wide" style="font-size: 1.6rem;">
+                Controle Geral de Comissões
+            </h2>
+            <small class="text-muted">Monitore, filtre e gerencie os prazos e recebimentos de comissões</small>
+        </div>
+
+        <div>
+            <form method="get" asp-controller="Comissao" asp-action="Relatorio" class="mb-0">
+                <input type="hidden" name="mesFechamento" value="@mesFechamento" />
+                <input type="hidden" name="anoFechamento" value="@anoFechamento" />
+
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <select name="usuarioId" class="form-select form-select-sm border-2 layout-select" style="min-width: 180px;">
+                        <option value="">Todos os Usuários</option>
+                        @if (ViewBag.Usuarios != null)
+                        {
+                            foreach (var user in ViewBag.Usuarios)
+                            {
+                                <!option value="@user.Id" @(ViewBag.UsuarioAtual == user.Id ? "selected" : "")>@user.Nome</!option>
+                            }
+                        }
+                    </select>
+
+                    <select name="filtroStatus" class="form-select form-select-sm border-2 layout-select" style="min-width: 160px;">
+                        <option value="">Todos os Status</option>
+                        <!option value="Paga" @(ViewBag.FiltroAtual == "Paga" ? "selected" : "")>Paga</!option>
+                        <!option value="Em Atraso" @(ViewBag.FiltroAtual == "Em Atraso" ? "selected" : "")>Em Atraso</!option>
+                        <!option value="Aguardando Recebimento" @(ViewBag.FiltroAtual == "Aguardando Recebimento" ? "selected" : "")>Aguardando Recebimento</!option>
+                    </select>
+
+                    <button type="submit" class="btn btn-sm btn-dark px-3 py-2 d-flex align-items-center gap-1 shadow-sm rounded-3">
+                        <i class="bi bi-funnel-fill small"></i> <span class="fw-semibold small">Filtrar</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card card-table shadow-sm border-0 mb-5">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="ps-4">Cliente / CPF</th>
+                            <th scope="col">Promotora</th>
+                            <th scope="col">Banco</th>
+                            <th scope="col">Data Pgto Contrato</th>
+                            <th scope="col">Status Comissão</th>
+                            <th scope="col">Informações de Prazo</th>
+                            <th scope="col" class="text-end pe-4">Valor Comissão</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-dark">@item.Venda.Cliente?.Nome</div>
+                                        <small class="text-muted font-monospace" style="font-size: 0.8rem;">@item.Venda.Cliente?.Cpf</small>
+                                    </td>
+
+                                    <td>@item.Venda.Promotora?.Nome</td>
+
+                                    <td>
+                                        <span class="badge bg-light text-dark border px-2 py-1 fw-medium">@item.Venda.Banco?.Nome</span>
+                                    </td>
+
+                                    <td>@item.Venda.DataPgtoContrato?.ToString("dd/MM/yyyy")</td>
+
+                                    <td>
+                                        @if (item.StatusFinanceiro == "Paga")
+                                        {
+                                            <span class="badge badge-status bg-success-subtle text-success border border-success-subtle">Paga</span>
+                                        }
+                                        else if (item.StatusFinanceiro == "Em Atraso")
+                                        {
+                                            <span class="badge badge-status bg-danger-subtle text-danger border border-danger-subtle">Em Atraso</span>
+                                        }
+                                        else if (item.StatusFinanceiro == "Aguardando Recebimento")
+                                        {
+                                            <span class="badge badge-status bg-warning-subtle text-warning-dark border border-warning-subtle">Aguardando Comissão</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-status bg-light text-secondary border">Aguardando Pgto Contrato</span>
+                                        }
+                                    </td>
+
+                                    <td class="small">
+                                        @if (item.StatusFinanceiro == "Em Atraso")
+                                        {
+                                            var diasAtraso = item.Venda.DataPgtoContrato != null ? (DateTime.Today - item.Venda.DataPgtoContrato.Value.AddDays(5)).Days : 0;
+                                            <span class="text-danger fw-semibold d-inline-flex align-items-center gap-1">
+                                                <i class="bi bi-exclamation-triangle-fill"></i> Atrasado há @diasAtraso dias!
+                                            </span>
+                                        }
+                                        else if (item.StatusFinanceiro == "Aguardando Recebimento")
+                                        {
+                                            var diasRestantes = item.Venda.DataPgtoContrato != null ? (item.Venda.DataPgtoContrato.Value.AddDays(5) - DateTime.Today).Days : 0;
+                                            <span class="text-muted">Faltam @diasRestantes dias para o prazo</span>
+                                        }
+                                        else if (item.StatusFinanceiro == "Paga")
+                                        {
+                                            <span class="text-success fw-medium">Recebida em @item.Venda.DataPgtoComissao?.ToString("dd/MM/yyyy")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-primary font-monospace">Contrato em andamento</span>
+                                        }
+                                    </td>
+
+                                    <td class="text-end pe-4 fw-bold text-success font-monospace" style="font-size: 0.95rem;">
+                                        @item.Venda.ValorComissao?.ToString("C2")
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="bi bi-wallet2 mb-2 d-block text-secondary" style="font-size: 2rem;"></i>
+                                    Nenhuma comissão encontrada no sistema.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 bg-white border" style="max-width: 700px;">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <div class="bg-dark text-white rounded-3 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                    <i class="bi bi-calculator-fill small"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-0">Relatório de Comissão Mensal</h5>
+            </div>
+            <p class="text-muted small mb-4">Escolha a competência desejada para consolidar os valores liquidados e pagos no período.</p>
+
+            <form asp-controller="Comissao" asp-action="Relatorio" method="get" class="row g-2 align-items-center mb-4">
+                <input type="hidden" name="usuarioId" value="@ViewBag.UsuarioAtual" />
+                <input type="hidden" name="filtroStatus" value="@ViewBag.FiltroAtual" />
+
+                <div class="col-sm-5 col-md-4">
+                    <select name="mesFechamento" class="form-select form-select-sm border-2 layout-select">
+                        <!option value="1" @(mesFechamento == 1 ? "selected" : "")>Janeiro</!option>
+                        <!option value="2" @(mesFechamento == 2 ? "selected" : "")>Fevereiro</!option>
+                        <!option value="3" @(mesFechamento == 3 ? "selected" : "")>Março</!option>
+                        <!option value="4" @(mesFechamento == 4 ? "selected" : "")>Abril</!option>
+                        <!option value="5" @(mesFechamento == 5 ? "selected" : "")>Maio</!option>
+                        <!option value="6" @(mesFechamento == 6 ? "selected" : "")>Junho</!option>
+                        <!option value="7" @(mesFechamento == 7 ? "selected" : "")>Julho</!option>
+                        <!option value="8" @(mesFechamento == 8 ? "selected" : "")>Agosto</!option>
+                        <!option value="9" @(mesFechamento == 9 ? "selected" : "")>Setembro</!option>
+                        <!option value="10" @(mesFechamento == 10 ? "selected" : "")>Outubro</!option>
+                        <!option value="11" @(mesFechamento == 11 ? "selected" : "")>Novembro</!option>
+                        <!option value="12" @(mesFechamento == 12 ? "selected" : "")>Dezembro</!option>
+                    </select>
+                </div>
+
+                <div class="col-sm-4 col-md-3">
+                    <select name="anoFechamento" class="form-select form-select-sm border-2 layout-select">
+                        @for (int i = DateTime.Today.Year - 2; i <= DateTime.Today.Year + 1; i++)
+                        {
+                            <!option value="@i" @(anoFechamento == i ? "selected" : "")>@i</!option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-sm-3">
+                    <button type="submit" class="btn btn-sm btn-dark px-3 py-2 d-flex align-items-center gap-2 rounded-3">
+                        <i class="bi bi-search small"></i>
+                        <span class="fw-semibold small">Visualizar</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="p-3 border rounded-3 bg-light d-flex justify-content-between align-items-center shadow-sm">
+                        <div>
+                            @{
+                                var meses = new string[] { "", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro" };
+                                string nomeMes = meses[mesFechamento];
+                            }
+                            <small class="d-block text-muted text-uppercase fw-bold tracking-wide mb-1" style="font-size: 0.65rem;">
+                                Comissões consolidadas em @nomeMes de @anoFechamento
+                            </small>
+                            <span class="fs-4 fw-bold text-dark font-monospace">@totalSalarioMes.ToString("C2")</span>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-dark text-white fw-semibold d-block mb-1 px-2 py-1 small">@quantidadePagaMes Itens</span>
+                            <i class="bi bi-cash-coin fs-4 text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a class="btn btn-link text-decoration-none text-secondary d-inline-flex align-items-center gap-2 fw-medium p-0 btn-back-hover"
+           asp-controller="Apps" asp-action="Index">
+            <i class="bi bi-arrow-left-short" style="font-size: 1.4rem;"></i> Voltar ao painel
+        </a>
+    </div>
+
+</div>
+
+<style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .card-table {
+        border-radius: 14px;
+        overflow: hidden;
+        background-color: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    }
+
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .table-custom thead {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #efefef;
+        }
+
+        .table-custom th {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-uppercase: true;
+            color: #5c636a;
+            padding: 14px 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .table-custom tbody tr {
+            border-bottom: 1px solid #f1f3f5;
+            transition: background-color 0.15s ease;
+        }
+
+            .table-custom tbody tr:hover {
+                background-color: #f8f9fa !important;
+            }
+
+        .table-custom tbody td {
+            padding: 14px 10px;
+            font-size: 0.92rem;
+            color: #495057;
+        }
+
+    .layout-select {
+        border-color: #f1f3f5 !important;
+        border-radius: 8px;
+        color: #495057;
+        font-size: 0.85rem !important;
+        height: 34px;
+    }
+
+        .layout-select:focus {
+            border-color: #212529 !important;
+            box-shadow: none;
+        }
+
+    .badge-status {
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 5px 10px;
+        border-radius: 6px;
+    }
+
+    .bg-success-subtle {
+        background-color: #e8f5e9 !important;
+    }
+
+    .bg-danger-subtle {
+        background-color: #ffebee !important;
+    }
+
+    .bg-warning-subtle {
+        background-color: #fff8e1 !important;
+    }
+
+    .text-warning-dark {
+        color: #b78103 !important;
+    }
+
+    .btn-back-hover {
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+        .btn-back-hover:hover {
+            color: #212529 !important;
+            transform: translateX(-2px);
+        }
+</style>

@@ -4,55 +4,69 @@
 
 @{
     Layout = "LayoutSistema";
+    ViewData["Title"] = "Alterar Senha";
 }
 
-<body>
-    
+<div class="card shadow border-0 rounded-4 mt-4">
+    <!-- HEADER NO PADRÃO PADRONIZADO DO SISTEMA -->
+    <div class="card-header bg-dark text-white py-3">
+        <h4 class="mb-0 text-center text-md-start">Alterar Senha</h4>
+    </div>
 
-    <form style="border: solid 1px black; padding:10px; border-radius: 10px" id="trocarSenhaForm" asp-controller="AlterarSenha" asp-action="Alterar" method="post" class="row g-3">
-        
+    <div class="card-body p-4">
+        <form id="trocarSenhaForm" asp-controller="AlterarSenha" asp-action="Alterar" method="post">
 
-        <h2 style="text-align:center; margin-top: 50px; margin-bottom: 50px">ALTERAR SENHA</h2>
+            <div class="row g-4">
+                <!-- SENHA ATUAL -->
+                <div class="col-md-4">
+                    <label for="senhaAtual" class="form-label fw-semibold text-secondary">Senha Atual</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-shield-lock-fill"></i></span>
+                        <input type="password" asp-for="SenhaAtual" class="form-control border-start-0 ps-0" id="senhaAtual" placeholder="Digite a sua senha atual">
+                    </div>
+                    <div class="text-danger small mt-1">
+                        @Html.ValidationMessageFor(x => x.SenhaAtual)
+                    </div>
+                </div>
 
+                <!-- NOVA SENHA -->
+                <div class="col-md-4">
+                    <label for="novaSenha" class="form-label fw-semibold text-secondary">Nova Senha</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-key-fill"></i></span>
+                        <input type="password" asp-for="NovaSenha" class="form-control border-start-0 ps-0" id="novaSenha" placeholder="Digite a nova senha">
+                    </div>
+                    <div class="text-danger small mt-1">
+                        @Html.ValidationMessageFor(x => x.NovaSenha)
+                    </div>
+                </div>
 
-        <div class="col-md-4">
-            <label for="senhaAtual" class="form-label">Senha atual</label>
-            <input type="password" asp-for="SenhaAtual" class="form-control" id="senhaAtual" placeholder="Digite a sua senha atual">
-            @Html.ValidationMessageFor(x => x.SenhaAtual)
-        </div>
+                <!-- CONFIRMAR NOVA SENHA -->
+                <div class="col-md-4">
+                    <label for="confirmarSenha" class="form-label fw-semibold text-secondary">Confirmar Nova Senha</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-key-fill"></i></span>
+                        <input type="password" asp-for="ConfirmarNovaSenha" class="form-control border-start-0 ps-0" id="confirmarSenha" placeholder="Confirme a nova senha">
+                    </div>
+                    <div class="text-danger small mt-1">
+                        @Html.ValidationMessageFor(x => x.ConfirmarNovaSenha)
+                    </div>
+                </div>
+            </div>
 
-        <div class="col-md-4">
-            <label for="novaSenha" class="form-label">Nova senha</label>
-            <input type="password" asp-for="NovaSenha" class="form-control" id="novaSenha" placeholder="Digite a nova senha">
-            @Html.ValidationMessageFor(x => x.NovaSenha)
-        </div>
+            <!-- RODAPÉ DE AÇÕES DO FORMULÁRIO -->
+            <div class="mt-4 pt-3 border-top d-flex flex-wrap gap-2 justify-content-end">
+                <a class="btn btn-outline-secondary rounded-3 px-4" asp-controller="Venda" asp-action="Index">
+                    <i class="bi bi-x-circle-fill me-1"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-success rounded-3 px-4">
+                    <i class="bi bi-floppy2-fill me-1"></i> Salvar Alteração
+                </button>
+            </div>
 
-        <div class="col-md-4">
-            <label for="confirmarSenha" class="form-label">Confirmar nova senha</label>
-            <input type="password" asp-for="ConfirmarNovaSenha" class="form-control" id="confirmarSenha" placeholder="Confirme a nova senha">
-            @Html.ValidationMessageFor(x => x.ConfirmarNovaSenha)
-        </div>
-
-
-        <div class="col-12">
-            <button type="submit" class="btn btn-outline-success" onclick="return validarForm();">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy2-fill" viewBox="0 0 16 16">
-                    <path d="M12 2h-2v3h2z" />
-                    <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v13A1.5 1.5 0 0 0 1.5 16h13a1.5 1.5 0 0 0 1.5-1.5V2.914a1.5 1.5 0 0 0-.44-1.06L14.147.439A1.5 1.5 0 0 0 13.086 0zM4 6a1 1 0 0 1-1-1V1h10v4a1 1 0 0 1-1 1zM3 9h10a1 1 0 0 1 1 1v5H2v-5a1 1 0 0 1 1-1" />
-                </svg>
-                Alterar
-            </button>
-
-            <a type="button" class="btn btn-outline-danger" asp-controller="Venda" asp-action="Venda">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
-                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" />
-                </svg>
-                Cancelar
-            </a>
-        </div>
-    </form>
-
-</body>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -74,15 +88,14 @@
                                 title: 'Nova senha cadastrada com sucesso!',
                                 text: 'Redirecionando...',
                                 icon: 'success',
-                                timer: 3000, // 3 segundos
+                                timer: 3000,
                                 showConfirmButton: false,
-                                position: 'top-center', // Alerta aparece na parte superior central
-                                toast: true, // Exibe como um toast (pequeno, não modal)
+                                position: 'top-center',
+                                toast: true,
                                 customClass: {
-                                    container: 'swal2-toast-custom' // Aplica a classe customizada ao toast
+                                    container: 'swal2-toast-custom'
                                 }
                             }).then(() => {
-                                // Redireciona para a view Clientes após 3 segundos
                                 window.location.href = "@Url.Action("Venda", "Venda")";
                             });
                         } else {
@@ -90,12 +103,12 @@
                                 title: 'Erro',
                                 text: response.message,
                                 icon: 'error',
-                                timer: 3000, // 3 segundos
+                                timer: 3000,
                                 showConfirmButton: false,
-                                position: 'top-center', // Alerta aparece na parte superior central
-                                toast: true, // Exibe como um toast (pequeno, não modal)
+                                position: 'top-center',
+                                toast: true,
                                 customClass: {
-                                    container: 'swal2-toast-custom' // Aplica a classe customizada ao toast
+                                    container: 'swal2-toast-custom'
                                 }
                             });
                         }
@@ -105,12 +118,12 @@
                             title: 'Erro',
                             text: 'Ops, ocorreu um erro. Tente novamente.',
                             icon: 'error',
-                            timer: 3000, // 3 segundos
+                            timer: 3000,
                             showConfirmButton: false,
-                            position: 'top-center', // Alerta aparece na parte superior central
-                            toast: true, // Exibe como um toast (pequeno, não modal)
+                            position: 'top-center',
+                            toast: true,
                             customClass: {
-                                container: 'swal2-toast-custom' // Aplica a classe customizada ao toast
+                                container: 'swal2-toast-custom'
                             }
                         });
                     }

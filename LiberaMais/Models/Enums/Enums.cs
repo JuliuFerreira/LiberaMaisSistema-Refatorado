@@ -35,7 +35,10 @@ namespace LiberaMais.Models.Enums
 
         [Display(Name = ("REFIN AUTO"))]
         RefinAuto = 10
+
     }
+
+
 
     public enum OrgaoEnum : int
     {
@@ -60,11 +63,19 @@ namespace LiberaMais.Models.Enums
         [Display(Name = ("OUTROS"))]
         OUTROS = 7,
 
-        [Display(Name = ("PESSOAL"))]
+        [Display(Name = ("CRÉDITO PESSOAL"))]
         Pessoal = 8,
 
-        [Display(Name = ("CLT"))]
-        Clt = 9
+        [Display(Name = ("EMPRÉSTIMO CLT"))]
+        Clt = 9,
+
+        [Display(Name = ("PREFEITURA DE PALHOÇA"))]
+        PrefeituraDePalhoca = 10,
+
+        [Display(Name = ("PREFEITURA DE BIGUAÇU"))]
+        PrefeituraDeBiguacu = 11
+
+
     }
 
     public enum BeneficioEnum : int
@@ -97,17 +108,21 @@ namespace LiberaMais.Models.Enums
     public enum StatusEnum : int
     {
         [Display(Name = ("DIGITADO"))]
-        DIGITADO = 1,
+        Digitado = 1,
 
         [Display(Name = ("ASSINADO"))]
-        ASSINADO = 2,
+        Assinado = 2,
 
-        [Display(Name = ("PAGO"))]
-        PAGO = 4,
+        [Display(Name = ("CONTRATO PAGO AGUARDA COMISSÃO"))]
+        Pago = 4,
+
+        [Display(Name = ("COMISSÃO PAGA"))]
+        ComissaoPaga = 5,
 
         [Display(Name = ("CANCELADO"))]
-        CANCELADO = 5
+        Cancelado = 6
     }
+
 
     public enum ComissaoEnum : int
     {
@@ -237,7 +252,7 @@ namespace LiberaMais.Models.Enums
         [Display(Name = ("SENFF"))]
         Senff = 38,
 
-        [Display(Name =("RED CONSIG BRB"))]
+        [Display(Name = ("RED CONSIG BRB"))]
         Redconsig = 39,
 
         [Display(Name = ("CONSIG 360 BRB"))]
@@ -277,7 +292,7 @@ namespace LiberaMais.Models.Enums
         [Display(Name = ("OUTROS"))]
         Outros = 6,
 
-        [Display(Name =  ("GFT PROMOTORA"))]
+        [Display(Name = ("GFT PROMOTORA"))]
         Gft = 7,
 
         [Display(Name = ("UNICA PROMOTORA"))]

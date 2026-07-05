@@ -69,7 +69,6 @@ namespace LiberaMais.Controllers
         public IActionResult Criar(int promotoraId)
         {
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-
             var promotora = _promotorasRepositorio.BuscarPromotoraPorId(promotoraId);
 
             if(!_permissaoService.UsuarioTemAcessoPromotora(usuarioLogado, promotora))
@@ -82,9 +81,11 @@ namespace LiberaMais.Controllers
 
             ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
             ViewBag.Banco = _bancosRepositorio.ListarBancos();
+            ViewBag.Usuario = _usuarioRepositorio.ListarTodosUsuarios();
 
             ViewBag.PromotoraId = promotoraId;
             ViewBag.NomePromotora = promotora.Nome;
+
 
             return View();
 
@@ -113,6 +114,8 @@ namespace LiberaMais.Controllers
                 ViewBag.promotoraId = promotoraBanco.PromotoraId;
                 ViewBag.NomePromotora = promotora.Nome;
                 ViewBag.Banco = _bancosRepositorio.ListarBancos();
+                ViewBag.Usuario = _usuarioRepositorio.ListarTodosUsuarios();
+
                 return View(promotoraBanco);
             }
 
@@ -139,6 +142,8 @@ namespace LiberaMais.Controllers
             }
 
             ViewBag.Banco = _bancosRepositorio.ListarBancos();
+            ViewBag.Usuario = _usuarioRepositorio.ListarTodosUsuarios();
+
 
 
             if (promotoraBanco == null)
@@ -173,6 +178,7 @@ namespace LiberaMais.Controllers
             {
                 TempData["MensagemErro"] = "Não foi possivel alterar o login";
                 ViewBag.Banco = _bancosRepositorio.ListarBancos();
+                ViewBag.Usuario = _usuarioRepositorio.ListarTodosUsuarios();
                 ViewBag.PromotoraId = promotoraBancoDb.PromotoraId;
                 ViewBag.NomePromotora = _promotorasRepositorio.BuscarPromotoraPorId(promotoraBancoDb.PromotoraId).Nome;
                 return View(promotoraBanco);
@@ -181,6 +187,7 @@ namespace LiberaMais.Controllers
             promotoraBancoDb.Login = promotoraBanco.Login;
             promotoraBancoDb.Senha = promotoraBanco.Senha;
             promotoraBancoDb.BancoId = promotoraBanco.BancoId;
+            promotoraBancoDb.UsuarioId = promotoraBanco.UsuarioId;
 
             _promotoraBancoRepositorio.Atualizar(promotoraBancoDb);
             TempData["MensagemSucesso"] = "Login atualizado com sucesso!";

@@ -5,192 +5,247 @@
     Layout = "LayoutSistema";
 }
 
+<div class="container-fluid py-4 inner-system-page">
 
-<div class="container-fluid">
-
-    <div class="justify-content-center align-items-center mb-4 mt-4 mt-5">
-
-        <div class="card-header text-white rounded-top-4"
-             style="background-color:dodgerblue;">
-
-            <h3 class="text-center mb-0">
-                Financeiro
-            </h3>
-
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 border-bottom pb-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-1 text-uppercase tracking-wide" style="font-size: 1.6rem;">
+                Gestão Financeira
+            </h2>
+            <small class="text-muted">Acompanhe o fluxo de caixa, receitas e despesas mensais do LiberaMais</small>
         </div>
 
+        <div class="d-flex gap-2">
+            <a class="btn btn-dark d-flex align-items-center gap-2 px-3 py-2 btn-adicionar shadow-sm"
+               asp-controller="Financa" asp-action="AddMesAno">
+                <i class="bi bi-calendar3" style="font-size: 1.1rem;"></i>
+                <span class="fw-semibold small">Adicionar Mês/Ano</span>
+            </a>
+        </div>
     </div>
 
-    <div class="top-actions">
+    <div class="card card-table shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0" id="table-financas-normal" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="ps-4">Período / Mês de Referência</th>
+                            <th scope="col" class="text-center">Valor em Caixa</th>
+                            <th scope="col" class="text-end pe-4">Ações Financeiras</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var financa in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-semibold text-dark text-uppercase" style="letter-spacing: 0.5px;">
+                                        @financa.Mesdescription de @financa.Ano
+                                    </td>
 
-        <a class="action-card"
-           asp-controller="Financa"
-           asp-action="AddMesAno">
+                                    <td class="text-center fw-bold text-dark">
+                                        <span class="badge bg-light text-dark border px-3 py-2 rounded-2" style="font-size: 0.95rem;">
+                                            @financa.SaldoTotal.ToString("C2", new CultureInfo(1046))
+                                        </span>
+                                    </td>
 
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 width="35"
-                 height="35"
-                 fill="currentColor"
-                 class="bi bi-calendar3"
-                 viewBox="0 0 16 16">
+                                    <td class="pe-4">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a asp-route-idFinanca="@financa.Id" asp-controller="Receita" asp-action="Index"
+                                               class="btn btn-outline-success btn-action-financeiro d-flex align-items-center gap-1 px-2 py-1 small fw-medium" title="Receitas">
+                                                <i class="bi bi-arrow-up-left-square-fill"></i> Receitas
+                                            </a>
 
-                <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857z" />
-                <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
+                                            <a asp-route-idFinanca="@financa.Id" asp-controller="Despesa" asp-action="Index"
+                                               class="btn btn-outline-danger btn-action-financeiro d-flex align-items-center gap-1 px-2 py-1 small fw-medium" title="Despesas">
+                                                <i class="bi bi-arrow-down-right-square-fill"></i> Despesas
+                                            </a>
 
-            </svg>
+                                            <a asp-route-id="@financa.Id" asp-controller="Financa" asp-action="FechamentoCaixa"
+                                               class="btn btn-dark btn-action-financeiro d-flex align-items-center gap-1 px-2 py-1 small fw-medium" title="Fechamento de Caixa">
+                                                <i class="bi bi-safe2"></i> Fechamento
+                                            </a>
 
-            <p>
-                Adicionar <br />
-                mês / ano
-            </p>
-
-        </a>
-
-        <a class="action-card"
-           asp-controller="Venda"
-           asp-action="RelatorioVendas">
-
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 width="35"
-                 height="35"
-                 fill="currentColor"
-                 class="bi bi-person-lines-fill"
-                 viewBox="0 0 16 16">
-
-                <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1z" />
-
-            </svg>
-
-            <p>
-                Relatório <br />
-                comissão
-            </p>
-
-        </a>
-
-    </div>
-
-        <div class="cards-container">
-
-        @foreach (var financa in Model)
-        {
-            <div class="card financa-card">
-
-                <div class="card-body">
-
-                    <div class="financa-header">
-
-                        <div class="financa-title">
-                            @financa.Mesdescription.GetDisplayName() DE @financa.Ano
-                        </div>
-
-                        <a href="#"
-                           class="btn-delete-financa"
-                           data-id="@financa.Id"
-                           data-mes="@financa.Mesdescription"
-                           data-ano="@financa.Ano"
-                           data-url="@Url.Action("Apagar", "Financa", new { id = financa.Id })">
-
-                            <i class="bi bi-trash delete-icon"></i>
-
-                        </a>
-
-                    </div>
-
-                    <div class="saldo-box">
-
-                        <div class="saldo-label">
-                            VALOR EM CAIXA
-                        </div>
-
-                        <div class="saldo-valor">
-                            @financa.SaldoTotal.ToString("C2", new CultureInfo(1046))
-                        </div>
-
-                    </div>
-
-                    <div class="d-grid gap-2">
-
-                        <a asp-route-idFinanca="@financa.Id"
-                           asp-controller="Receita"
-                           asp-action="Index"
-                           class="btn btn-outline-success btn-financa">
-
-                            <i class="bi bi-arrow-up-left-square-fill"></i>
-                            Receitas
-
-                        </a>
-
-                        <a asp-route-idFinanca="@financa.Id"
-                           asp-controller="Despesa"
-                           asp-action="Index"
-                           class="btn btn-outline-danger btn-financa">
-
-                            <i class="bi bi-arrow-down-right-square-fill"></i>
-                            Despesas
-
-                        </a>
-
-                        <a asp-route-id="@financa.Id"
-                           asp-controller="Financa"
-                           asp-action="FechamentoCaixa"
-                           class="btn btn-dark btn-financa">
-
-                            <i class="bi bi-safe2"></i>
-                            Fechamento de Caixa
-
-                        </a>
-
-                    </div>
-
-                </div>
-
+                                            <button type="button" class="btn btn-outline-danger btn-action-sm d-flex align-items-center justify-content-center btn-delete-financa"
+                                                    data-id="@financa.Id" data-mes="@financa.Mesdescription" data-ano="@financa.Ano"
+                                                    data-url="@Url.Action("Apagar", "Financa", new { id = financa.Id })" title="Excluir Período">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center py-5 text-muted">
+                                    <i class="bi bi-calendar-x mb-2 d-block text-secondary" style="font-size: 2rem;"></i>
+                                    Nenhum período financeiro cadastrado.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
-        }
-
+        </div>
     </div>
 
-    <div>
-
-        <a class="btn btn-outline-secondary rounded-4 px-4"
-           asp-controller="Apps"
-           asp-action="Index">
-
-            <i class="bi bi-arrow-return-left"></i>
-            Voltar
-
+    <div class="mt-4">
+        <a class="btn btn-link text-decoration-none text-secondary d-inline-flex align-items-center gap-2 fw-medium p-0 btn-back-hover"
+           asp-controller="Apps" asp-action="Index">
+            <i class="bi bi-arrow-left-short" style="font-size: 1.4rem;"></i> Voltar ao painel
         </a>
-
     </div>
 
 </div>
 
+<style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .card-table {
+        border-radius: 14px;
+        overflow: hidden;
+        background-color: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    }
+
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .table-custom thead {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #efefef;
+        }
+
+        .table-custom th {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-uppercase: true;
+            color: #5c636a;
+            padding: 14px 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .table-custom tbody tr {
+            border-bottom: 1px solid #f1f3f5;
+            transition: background-color 0.15s ease;
+        }
+
+            .table-custom tbody tr:hover {
+                background-color: #f8f9fa !important;
+            }
+
+        .table-custom tbody td {
+            padding: 12px 10px;
+            font-size: 0.92rem;
+            color: #495057;
+        }
+
+    .btn-action-financeiro {
+        font-size: 0.8rem;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .btn-action-sm {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-adicionar {
+        border-radius: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-back-hover {
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+        .btn-back-hover:hover {
+            color: #212529 !important;
+            transform: translateX(-2px);
+        }
+
+    /* Ajustes customizados para o SweetAlert seguir o estilo das suas modais */
+    .swal2-popup-custom {
+        border-radius: 16px !important;
+        font-family: 'Segoe UI', system-ui, sans-serif !important;
+        padding: 1.5rem !important;
+    }
+
+    .swal2-actions-custom {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 6px !important;
+        margin-top: 15px !important;
+    }
+
+    .swal2-confirm-custom {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 10px 0 !important;
+        font-size: 0.95rem !important;
+        font-weight: 500 !important;
+        border-radius: 8px !important;
+        background-color: #dc3545 !important;
+    }
+
+    .swal2-cancel-custom {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 10px 0 !important;
+        font-size: 0.95rem !important;
+        font-weight: 500 !important;
+        border-radius: 8px !important;
+        background-color: #f8f9fa !important;
+        color: #6c757d !important;
+        border: 1px solid #dee2e6 !important;
+    }
+</style>
+
 <script>
-
     document.addEventListener('DOMContentLoaded', function () {
-
         const deleteButtons = document.querySelectorAll('.btn-delete-financa');
 
         deleteButtons.forEach(button => {
-
             button.addEventListener('click', function (event) {
-
                 event.preventDefault();
 
+                const id = button.getAttribute('data-id');
+                const mes = button.getAttribute('data-mes');
+                const ano = button.getAttribute('data-ano');
                 const url = button.getAttribute('data-url');
 
                 Swal.fire({
-                    text: 'Confirma a exclusão?',
-                    icon: 'warning',
+                    title: 'Excluir Período?',
+                    html: `Deseja realmente remover o período de <strong class="text-dark">${mes} de ${ano}</strong> do sistema? Esta ação não pode ser desfeita.`,
+                    icon: 'overflow', // desativa o layout gigante padrão
+                    iconColor: '#dc3545',
                     showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Excluir',
-                    cancelButtonText: 'Cancelar'
+                    confirmButtonText: 'Confirmar Exclusão',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true,
+                    customClass: {
+                        popup: 'swal2-popup-custom shadow-lg',
+                        actions: 'swal2-actions-custom',
+                        confirmButton: 'swal2-confirm-custom btn btn-danger',
+                        cancelButton: 'swal2-cancel-custom btn btn-light'
+                    },
+                    buttonsStyling: false
                 }).then((result) => {
-
                     if (result.isConfirmed) {
-
                         fetch(url, {
                             method: 'POST',
                             headers: {
@@ -199,52 +254,38 @@
                         })
                         .then(response => response.json())
                         .then(data => {
-
                             if (data.success) {
-
                                 Swal.fire({
-                                    title: 'Exclusão efetuada com sucesso!',
-                                    text: 'Redirecionando...',
+                                    title: 'Sucesso!',
+                                    text: 'Período excluído com sucesso.',
                                     icon: 'success',
                                     showConfirmButton: false,
-                                    timer: 3000
+                                    timer: 1500
                                 }).then(() => {
-
                                     window.location.reload();
-
                                 });
-
                             } else {
-
                                 Swal.fire({
                                     title: 'Erro!',
-                                    text: data.message,
+                                    text: data.message || 'Não foi possível excluir o período.',
                                     icon: 'error',
-                                    confirmButtonText: 'Ok'
+                                    confirmButtonText: 'Ok',
+                                    confirmButtonColor: '#212529'
                                 });
-
                             }
-
                         })
                         .catch(error => {
-
                             Swal.fire({
                                 title: 'Erro!',
-                                text: 'Ocorreu um erro ao tentar excluir.',
+                                text: 'Ocorreu um problema de rede ou no servidor.',
                                 icon: 'error',
-                                confirmButtonText: 'Ok'
+                                confirmButtonText: 'Ok',
+                                confirmButtonColor: '#212529'
                             });
-
                         });
-
                     }
-
                 });
-
             });
-
         });
-
     });
-
 </script>

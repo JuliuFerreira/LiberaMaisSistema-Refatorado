@@ -14,6 +14,8 @@ namespace LiberaMais.Repositorio
 
         public bool Apagar(int id);
 
+        public Orgao BuscarPorNome(string nome);
+
 
     }
 }

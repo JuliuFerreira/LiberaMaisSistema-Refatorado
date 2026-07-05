@@ -18,5 +18,7 @@ namespace LiberaMais.Repositorio
         bool Apagar(int id);
 
         bool VerificarPromotoraExistente(string nome);
+
+        Promotora BuscarPorNome(string nome);
     }
 }

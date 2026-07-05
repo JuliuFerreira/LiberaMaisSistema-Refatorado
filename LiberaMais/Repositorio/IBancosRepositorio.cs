@@ -15,5 +15,7 @@ namespace LiberaMais.Repositorio
 
         bool VerificarBancoExistente(string nome);
 
+        Banco BuscarPorNome(string nome);
+
     }
 }
