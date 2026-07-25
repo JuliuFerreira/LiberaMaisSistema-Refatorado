@@ -28,9 +28,9 @@ namespace LiberaMais.Data
 
         public DbSet<Financa> financas { get; set; }
 
-        public DbSet<Receita> receitas { get; set; }
+        //public DbSet<Receita> receitas { get; set; }
 
-        public DbSet<Despesa> despesas { get; set; }
+        //public DbSet<Despesa> despesas { get; set; }
 
         public DbSet<PromotoraBanco> PromotoraBancos { get; set; }
 
@@ -54,17 +54,16 @@ namespace LiberaMais.Data
             modelBuilder.Entity<Endereco>().HasKey(e => e.Id);
             modelBuilder.Entity<Endereco>().ToTable("Endereco");
             //modelBuilder.Entity<Venda>().HasKey(j => j.Id);
-            modelBuilder.Entity<Venda>().ToTable("Venda");
             modelBuilder.Entity<Promotora>().HasKey(j => j.Id);
             modelBuilder.Entity<Promotora>().ToTable("Promotora");
             modelBuilder.Entity<Banco>().HasKey(j => j.Id);
             modelBuilder.Entity<Banco>().ToTable("Banco");
             modelBuilder.Entity<Financa>().HasKey(j => j.Id);
             modelBuilder.Entity<Financa>().ToTable("Financa");
-            modelBuilder.Entity<Receita>().HasKey(j => j.Id);
-            modelBuilder.Entity<Receita>().ToTable("Receita");
-            modelBuilder.Entity<Despesa>().HasKey(j => j.Id);
-            modelBuilder.Entity<Despesa>().ToTable("Despesa");
+            //modelBuilder.Entity<Receita>().HasKey(j => j.Id);
+            //modelBuilder.Entity<Receita>().ToTable("Receita");
+            //modelBuilder.Entity<Despesa>().HasKey(j => j.Id);
+            //modelBuilder.Entity<Despesa>().ToTable("Despesa");
             modelBuilder.Entity<UsuarioModel>().ToTable("Usuarios");
             modelBuilder.Entity<PromotoraBanco>().HasKey(j => j.Id);
             modelBuilder.Entity<PromotoraBanco>().ToTable("PromotoraBanco");
@@ -99,9 +98,14 @@ namespace LiberaMais.Data
             //.Property(v => v.Status)
             //.HasConversion<int>();
 
+            foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
+            {
+                foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
+            }
+
+
 
         }
-
     }
-
 }
+

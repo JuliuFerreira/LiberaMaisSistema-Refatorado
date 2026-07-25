@@ -38,21 +38,33 @@ namespace LiberaMais.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    usuario = _usuarioRepositorio.Adicionar(usuario);
-                    return Json(new { success = true, message = "Usuário cadastrado com sucesso!" });
+                    // 💡 A MÁGICA ACONTECE AQUI: Tratamos o nome para salvar apenas as primeiras maiúsculas
+                    string nomeMinusculo = usuario.Nome.Trim().ToLower();
+                    usuario.Nome = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(nomeMinusculo);
 
+                    // 1. Buscamos no banco se já existe alguém com o mesmo NOME
+                    // (Agora comparamos usando o nome que já foi tratado acima)
+                    var usuarioExiste = _usuarioRepositorio.BuscarPorNome(usuario.Nome);
+
+                    if (usuarioExiste != null)
+                    {
+                        TempData["MensagemErro"] = "Já existe um usuário cadastrado com esse nome.";
+                        return View(usuario);
+                    }
+
+                    // 2. Agora sim! O 'usuario.Nome' vai salvo formatado como "Nome Sobrenome"
+                    _usuarioRepositorio.Adicionar(usuario);
+                    TempData["MensagemSucesso"] = "Usuário cadastrado com sucesso!";
+                    return RedirectToAction("Index");
                 }
-                else
-                {
-                    return Json(new { success = false, message = "Ops, não foi possível cadastrar o usuário!" });
-                }
+
+                return View(usuario);
             }
-
-            catch ( System.Exception erro) 
+            catch (Exception erro)
             {
-                return Json(new { success = false, message = $"Ops, não foi possível cadastrar o usuário! Detalhe do erro: {erro.Message}" });
+                TempData["MensagemErro"] = $"Ops, não conseguimos cadastrar o usuário. Detalhe: {erro.Message}";
+                return RedirectToAction("Index");
             }
-
         }
 
         public IActionResult Editar(int id)
@@ -66,21 +78,34 @@ namespace LiberaMais.Controllers
         {
             try
             {
-
-                if (!ModelState.IsValid)
-                {               
-                    usuario = _usuarioRepositorio.Atualizar(usuario);
-                    return Json(new { success = true, message = "Alteração realizada com sucesso!" });
-                }
-                else
+                if (ModelState.IsValid)
                 {
-                    return Json(new { success = false, message = "Ops, não foi possível alterar o usuário!" });
-                }
-            }
+                    // 1. Tratamos o nome para salvar apenas as primeiras maiúsculas (Title Case)
+                    string nomeMinusculo = usuario.Nome.Trim().ToLower();
+                    usuario.Nome = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(nomeMinusculo);
 
-            catch (System.Exception erro) 
+                    // 2. Buscamos se JÁ EXISTE OUTRO usuário com esse mesmo nome (ignorando o ID atual)
+                    var usuarioExiste = _usuarioRepositorio.BuscarPorNome(usuario.Nome);
+
+                    // Se encontrou um usuário com o mesmo nome, mas com ID diferente, barra a edição
+                    if (usuarioExiste != null && usuarioExiste.Id != usuario.Id)
+                    {
+                        TempData["MensagemErro"] = "Já existe outro usuário cadastrado com esse nome.";
+                        return View(usuario);
+                    }
+
+                    // 3. Se passou na validação, atualiza o registro
+                    _usuarioRepositorio.Atualizar(usuario);
+                    TempData["MensagemSucesso"] = "Usuário atualizado com sucesso!";
+                    return RedirectToAction("Index");
+                }
+
+                return View(usuario);
+            }
+            catch (Exception erro)
             {
-                return Json(new { success = false, message = $"Ops, não foi possível possível editar o usuário! Detalhe do erro: {erro.Message}" });
+                TempData["MensagemErro"] = $"Ops, não conseguimos atualizar o usuário. Detalhe: {erro.Message}";
+                return RedirectToAction("Index");
             }
         }
 
@@ -103,16 +128,19 @@ namespace LiberaMais.Controllers
 
                 if (apagado)
                 {
-                    return Json(new { success = true });
+                    TempData["MensagemSucesso"] = "Usuário excluido com sucesso!";
+                    return RedirectToAction("Index");
                 }
                 else
                 {
-                    return Json(new { success = false, message = "Não foi possível excluir o usuário." });
+                    TempData["MensagemErro"] = "Usuário não excluido.";
+                    return RedirectToAction("Index");
                 }
             }
             catch (Exception erro)
             {
-                return Json(new { success = false, message = $"Não foi possível excluir o usuário. Detalhes do erro: {erro.Message}" });
+                TempData["MensagemErro"] = "Não foi possível excluir esse usuário.";
+                return RedirectToAction("Index");
             }
         }
     }

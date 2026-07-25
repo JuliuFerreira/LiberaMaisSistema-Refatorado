@@ -2,54 +2,46 @@
 @model IEnumerable<Beneficio>
 
 @{
-    Layout = "LayoutSistema";
+    Layout = "_LayoutSistema";
     ViewData["Title"] = "Benefícios Cadastrados";
-    var isAdmin = ViewBag.IsAdmin as bool? ?? false;
 }
 
 <div class="container-fluid py-4 inner-system-page">
 
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 border-bottom pb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
         <div>
-            <h2 class="fw-bold text-dark mb-1 text-uppercase tracking-wide" style="font-size: 1.6rem;">
-                Benefícios Cadastrados
-            </h2>
+            <h2 class="fw-bold text-dark mb-1" style="font-size: 1.6rem;">Benefícios Cadastrados</h2>
             <small class="text-muted">Gerencie as regras, códigos e descrições dos benefícios no sistema</small>
         </div>
 
-        <div class="d-flex gap-2">
-            <a class="btn btn-dark d-flex align-items-center gap-2 px-3 py-2 btn-adicionar shadow-sm"
-               asp-action="Criar">
-                <i class="bi bi-plus-lg" style="font-size: 1rem;"></i>
-                <span class="fw-semibold small">Adicionar Benefício</span>
-            </a>
-        </div>
+        <a asp-action="Criar" class="btn btn-dark d-flex align-items-center gap-2 shadow-sm px-3 py-2 rounded-3">
+            <i class="bi bi-plus-lg"></i> <span class="fw-semibold small">Adicionar Benefício</span>
+        </a>
     </div>
 
     @if (TempData["mensagemSucesso"] != null)
     {
-        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-2 small">
-            <i class="bi bi-check-circle-fill fs-6"></i> <span>@TempData["mensagemSucesso"]</span>
+        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-check-circle-fill"></i> @TempData["mensagemSucesso"]
         </div>
     }
-
     @if (TempData["mensagemErro"] != null)
     {
-        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-2 small">
-            <i class="bi bi-exclamation-triangle-fill fs-6"></i> <span>@TempData["mensagemErro"]</span>
+        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["mensagemErro"]
         </div>
     }
 
-    <div class="card card-table shadow-sm border-0">
+    <div class="card card-table shadow-sm border-0 mb-3">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-custom align-middle mb-0" style="width: 100%">
+                <table class="table table-custom align-middle mb-0">
                     <thead>
                         <tr>
-                            <th scope="col" class="ps-4">Órgão</th>
-                            <th scope="col">Código</th>
-                            <th scope="col">Descrição</th>
-                            <th scope="col" class="text-end pe-4">Ações</th>
+                            <th class="ps-4" style="width: 30%;">Órgão</th>
+                            <th style="width: 15%;">Código</th>
+                            <th style="width: 45%;">Tipo de Benefício</th>
+                            <th class="text-center pe-4" style="width: 10%;">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -57,55 +49,39 @@
                         {
                             foreach (var ben in Model)
                             {
-                                var editarUrl = Url.Action("Editar", new { id = ben.Id });
-
-                                <tr onclick="location.href='@editarUrl'" style="cursor: pointer;" title="Clique para editar">
-                                    <td class="ps-4 fw-bold text-dark">
-                                        @ben.Orgaos?.Nome
+                                <tr class="linha-clicavel" onclick="navegarParaEditar(event, '@Url.Action("Editar", new { id = ben.Id })')">
+                                    <td class="ps-4">
+                                        <span class="fw-bold text-dark">@ben.Orgaos?.Nome</span>
                                     </td>
-
                                     <td>
-                                        <span class="badge bg-light text-dark border px-2 py-1.5 fw-mono" style="font-size: 0.85rem;">@ben.Codigo</span>
+                                        <span class="badge bg-light text-dark border px-2 py-1.5 font-monospace" style="font-size: 0.85rem;">@ben.Codigo</span>
                                     </td>
-
-                                    <td class="text-muted">
+                                    <td class="text-secondary text-truncate" style="max-width: 400px;">
                                         @ben.Descricao
                                     </td>
-
-                                    <td class="pe-4" onclick="event.stopPropagation();">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <button type="button" class="btn btn-outline-danger btn-action-sm d-flex align-items-center justify-content-center"
-                                                    data-bs-toggle="modal" data-bs-target="#modalExcluir_@ben.Id" title="Excluir Benefício">
-                                                <i class="bi bi-trash3-fill"></i>
-                                            </button>
-                                        </div>
+                                    <td class="text-center pe-4" onclick="event.stopPropagation();">
+                                        <button class="btn btn-sm btn-outline-danger border-0" data-bs-toggle="modal" data-bs-target="#modalExcluir_@ben.Id">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
                                     </td>
                                 </tr>
 
-                                <div class="modal fade" id="modalExcluir_@ben.Id" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
-                                        <div class="modal-content modal-custom shadow-lg border-0">
-                                            <div class="modal-body text-center p-4">
-                                                <div class="modal-icon-container mb-3 text-danger">
-                                                    <i class="bi bi-trash3-fill fs-3"></i>
-                                                </div>
-
-                                                <h5 class="fw-bold text-dark mb-2">Excluir Benefício?</h5>
-                                                <p class="text-muted small mb-4 px-2">
-                                                    Deseja realmente remover o benefício <strong class="text-dark">@ben.Descricao</strong> do sistema? Esta ação não poderá ser desfeita.
-                                                </p>
-
-                                                <div class="d-flex flex-column gap-2 w-100">
-                                                    <form asp-action="Apagar" method="post" class="m-0 p-0 w-100">
-                                                        <input type="hidden" name="id" value="@ben.Id" />
-                                                        <button type="submit" class="btn btn-danger w-100 py-2 fw-medium btn-modal-confirm">
-                                                            Confirmar Exclusão
-                                                        </button>
-                                                    </form>
-                                                    <button type="button" class="btn btn-light w-100 py-2 fw-medium btn-modal-cancel border" data-bs-dismiss="modal">
-                                                        Cancelar
-                                                    </button>
-                                                </div>
+                                <div class="modal fade" id="modalExcluir_@ben.Id" tabindex="-1" aria-hidden="true" onclick="event.stopPropagation();">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content border-0 shadow">
+                                            <div class="modal-header border-0">
+                                                <h5 class="modal-title">Confirmar Exclusão</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Deseja realmente remover o registro <strong>@ben.Descricao</strong>?
+                                            </div>
+                                            <div class="modal-footer border-0">
+                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <form asp-action="Apagar" method="post" class="d-inline">
+                                                    <input type="hidden" name="id" value="@ben.Id" />
+                                                    <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
@@ -115,10 +91,7 @@
                         else
                         {
                             <tr>
-                                <td colspan="4" class="text-center py-5 text-muted">
-                                    <i class="bi bi-award mb-2 d-block text-secondary" style="font-size: 2.2rem;"></i>
-                                    Nenhum benefício cadastrado no sistema.
-                                </td>
+                                <td colspan="4" class="text-center text-muted py-4">Nenhum registro encontrado.</td>
                             </tr>
                         }
                     </tbody>
@@ -128,13 +101,39 @@
     </div>
 
     <div class="mt-4">
-        <a class="btn btn-link text-decoration-none text-secondary d-inline-flex align-items-center gap-2 fw-medium p-0 btn-back-hover"
-           asp-controller="Setup" asp-action="Index">
-            <i class="bi bi-arrow-left-short" style="font-size: 1.4rem;"></i> Voltar ao painel
+        <a asp-controller="Setup" asp-action="Index" class="text-decoration-none text-muted fw-medium d-flex align-items-center gap-1">
+            <i class="bi bi-arrow-left"></i> Voltar a configuração
         </a>
     </div>
-
 </div>
+
+<script>
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            var alertas = [document.getElementById("alertaSucesso"), document.getElementById("alertaErro")];
+            alertas.forEach(function(alerta) {
+                if (alerta) {
+                    alerta.style.transition = "opacity 0.5s ease";
+                    alerta.style.opacity = "0";
+                    setTimeout(function() { alerta.style.display = "none"; }, 500);
+                }
+            });
+        }, 3000);
+    });
+
+    function navegarParaEditar(event, url) {
+        // Evita navegar se o usuário estiver apenas selecionando texto
+        const selecao = window.getSelection().toString();
+        if (selecao.length > 0) {
+            return;
+        }
+        // Evita navegar se clicar em modais ou botões internos
+        if (event.target.closest('.modal') || event.target.closest('button') || event.target.closest('a')) {
+            return;
+        }
+        window.location.href = url;
+    }
+</script>
 
 <style>
     .inner-system-page {
@@ -144,118 +143,36 @@
     .card-table {
         border-radius: 14px;
         overflow: hidden;
-        background-color: #ffffff;
-        border: 1px solid rgba(0, 0, 0, 0.05) !important;
+        border: 1px solid rgba(0,0,0,0.05);
     }
 
-    .table-custom {
-        width: 100%;
-        border-collapse: collapse;
+    .table-custom th {
+        font-size: 0.82rem;
+        color: #5c636a;
+        padding: 14px 10px;
+        text-transform: uppercase;
     }
 
-        .table-custom thead {
-            background-color: #f8f9fa;
-            border-bottom: 2px solid #efefef;
+    .table-custom td {
+        padding: 14px 10px;
+        font-size: 0.92rem;
+    }
+
+    .btn-outline-secondary {
+        color: #6c757d;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #f1f3f5;
+            color: #212529;
         }
 
-        .table-custom th {
-            font-size: 0.82rem;
-            font-weight: 700;
-            text-uppercase: true;
-            color: #5c636a;
-            padding: 14px 10px;
-            letter-spacing: 0.5px;
+    .linha-clicavel {
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+    }
+
+        .linha-clicavel:hover {
+            background-color: rgba(0, 0, 0, 0.02) !important;
         }
-
-        .table-custom tbody tr {
-            border-bottom: 1px solid #f1f3f5;
-            transition: background-color 0.15s ease;
-        }
-
-            .table-custom tbody tr:hover {
-                background-color: #f8f9fa !important;
-            }
-
-        .table-custom tbody td {
-            padding: 14px 10px;
-            font-size: 0.92rem;
-            color: #495057;
-        }
-
-    .fw-mono {
-        font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
-    }
-
-    .btn-action-sm {
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        transition: all 0.2s ease;
-    }
-
-    .btn-adicionar {
-        border-radius: 10px;
-        transition: all 0.2s ease;
-    }
-
-    .btn-back-hover {
-        transition: color 0.2s ease, transform 0.2s ease;
-    }
-
-        .btn-back-hover:hover {
-            color: #212529 !important;
-            transform: translateX(-2px);
-        }
-
-    /* ESTILIZAÇÃO DA MODAL PREMIUM MINIMALISTA */
-    .modal-custom {
-        border-radius: 16px !important;
-        overflow: hidden;
-    }
-
-    .modal-icon-container {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 52px;
-        height: 52px;
-        background-color: #ffebee;
-        border-radius: 50%;
-    }
-
-    .btn-modal-confirm {
-        font-size: 0.9rem !important;
-        border-radius: 8px !important;
-        background-color: #dc3545 !important;
-        border: none !important;
-    }
-
-    .btn-modal-cancel {
-        font-size: 0.9rem !important;
-        border-radius: 8px !important;
-        background-color: #f8f9fa !important;
-        color: #6c757d !important;
-    }
 </style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        setTimeout(function () {
-            const alertSucesso = document.getElementById('alertaSucesso');
-            const alertErro = document.getElementById('alertaErro');
-
-            if (alertSucesso) {
-                alertSucesso.style.transition = "opacity 0.5s ease";
-                alertSucesso.style.opacity = "0";
-                setTimeout(() => alertSucesso.remove(), 500);
-            }
-            if (alertErro) {
-                alertErro.style.transition = "opacity 0.5s ease";
-                alertErro.style.opacity = "0";
-                setTimeout(() => alertErro.remove(), 500);
-            }
-        }, 3000);
-    });
-</script>

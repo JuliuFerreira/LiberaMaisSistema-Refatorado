@@ -69,5 +69,18 @@ namespace LiberaMais.Repositorio
                 .Where(cb => cb.ClienteId == clienteId)
                 .ToList();
         }
+
+        public void ApagarPorClienteId(int clienteId)
+        {
+            // 1. Busca todos os benefícios daquele cliente
+            var beneficios = _bancoContext.clienteBeneficio.Where(b => b.ClienteId == clienteId).ToList();
+
+            // 2. Se houver algum, deleta todos de uma vez só
+            if (beneficios.Any())
+            {
+                _bancoContext.clienteBeneficio.RemoveRange(beneficios);
+                _bancoContext.SaveChanges();
+            }
+        }
     }
 }

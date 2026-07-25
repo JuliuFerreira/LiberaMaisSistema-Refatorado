@@ -6,6 +6,8 @@ namespace LiberaMais.Repositorio
     {
         UsuarioModel BuscarPorLogin(string login);
 
+        UsuarioModel BuscarPorNome(string nome);
+
         UsuarioModel BuscarPorEmailELogin(string email, string login);
 
         UsuarioModel BuscarUsuarioPorId(int id);

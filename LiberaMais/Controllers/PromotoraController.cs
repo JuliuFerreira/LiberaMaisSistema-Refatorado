@@ -281,6 +281,13 @@ namespace LiberaMais.Controllers
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             var promotora = _promotorasRepositorio.BuscarPromotoraPorId(id);
 
+            // VALIDAÇÃO: Se não achar a promotora no banco, já para aqui antes de dar erro
+            if (promotora == null)
+            {
+                TempData["MensagemErro"] = "Promotora não localizada.";
+                return RedirectToAction("Index");
+            }
+
             try
             {
                 var login = _promotoraBancoRepositorio.ListarPorPromotora(id);
@@ -288,35 +295,38 @@ namespace LiberaMais.Controllers
                 if (!_permissaoService.UsuarioTemAcessoPromotora(usuarioLogado, promotora))
                 {
                     TempData["mensagemErro"] = "Você não tem permissão.";
-
                     return RedirectToAction("Index", "Promotora");
                 }
 
                 if (login.Any())
                 {
                     TempData["MensagemErro"] = "Não é possível excluir essa promotora, pois existem bancos cadastrados.";
-
                     return RedirectToAction("Index");
                 }
 
+                _promotorasRepositorio.DesvincularFinancas(id);
+
+                // Passamos o próprio objeto já rastreado se o seu repositório aceitar, 
+                // ou mantemos o ID se ele fizer o extermínio direto.
                 bool apagado = _promotorasRepositorio.Apagar(id);
 
                 if (apagado)
                 {
-                    TempData["MensagemSucesso"] = "Promotora Excluida com sucesso!";
-
+                    TempData["MensagemSucesso"] = "Promotora Excluída com sucesso!";
                     return RedirectToAction("Index");
                 }
-
                 else
                 {
-                    TempData["MensagemErro"] = "Promotora não excluida.";
+                    TempData["MensagemErro"] = "Não foi possível concluir a exclusão no banco.";
                 }
                 return RedirectToAction("Index");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                TempData["MensagemErro"] = "Não foi possível excluir a promotora.";
+                // ESSA LINHA VAI TE DIZER EXATAMENTE O QUE ESTÁ QUEBRANDO:
+                // Pode ser erro de código, nulo, ou outra tabela oculta.
+                TempData["MensagemErro"] = $"Erro técnico ao excluir: {ex.Message} -> {(ex.InnerException != null ? ex.InnerException.Message : "")}";
+
                 return RedirectToAction("Index");
             }
         }

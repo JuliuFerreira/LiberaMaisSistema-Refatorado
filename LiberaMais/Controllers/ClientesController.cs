@@ -20,9 +20,18 @@ namespace LiberaMais.Controllers
         private readonly IEnderecoRepositorio _enderecoRepositorio;
         private readonly ISessao _sessao;
         private readonly IUsuarioRepositorio _usuarioRepositorio;
+        private readonly IClienteBeneficioRepositorio _clienteBeneficioRepositorio;
         private readonly PermissaoService _permissaoService;
+        private readonly IVendaRepositorio _vendaRepositorio;
 
-        public ClientesController(IClienteRepositorio clienteRepositorio, IEnderecoRepositorio enderecoRepositorio, ISessao sessao, BancoContext bancoContext, IUsuarioRepositorio usuarioRepositorio, PermissaoService permissaoService)
+        public ClientesController(IClienteRepositorio clienteRepositorio,
+                          IEnderecoRepositorio enderecoRepositorio,
+                          ISessao sessao,
+                          BancoContext bancoContext,
+                          IUsuarioRepositorio usuarioRepositorio,
+                          PermissaoService permissaoService,
+                          IClienteBeneficioRepositorio clienteBeneficioRepositorio,
+                          IVendaRepositorio vendaRepositorio) // <-- Aqui mudou!
         {
             _clienteRepositorio = clienteRepositorio;
             _enderecoRepositorio = enderecoRepositorio;
@@ -30,29 +39,101 @@ namespace LiberaMais.Controllers
             _bancoContext = bancoContext;
             _usuarioRepositorio = usuarioRepositorio;
             _permissaoService = permissaoService;
+            _clienteBeneficioRepositorio = clienteBeneficioRepositorio; // Agora vai funcionar perfeitamente!
+            _vendaRepositorio = vendaRepositorio;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string busca, int? usuarioId, int pagina = 1)
         {
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+            bool isAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+            ViewBag.IsAdmin = isAdmin;
+            ViewBag.BuscaAtual = busca;
 
-            List<Cliente> cliente;
 
-            if (usuarioLogado.Perfil == PerfilEnum.Admin)
+            if(usuarioId == 0)
             {
-                cliente = _clienteRepositorio.ListarTodosClientes();
+                usuarioId = null;
+            }
+            // Carrega a ViewBag dos usuários para preencher o <select> se for Admin
+            if (isAdmin)
+            {
+                ViewBag.Usuarios = _usuarioRepositorio.BuscarTodos(); // Substitua pelo seu método real de listar usuários se necessário
+
+                // Define o comportamento padrão do filtro se for a primeira vez carregando a tela (sem busca e sem filtro explícito)
+                if (usuarioId == null && !Request.Query.ContainsKey("usuarioId") && string.IsNullOrWhiteSpace(busca))
+                {
+                    usuarioId = usuarioLogado.Id; // Padrão: Vendas/Clientes do Admin logado
+                }
+
+                ViewBag.UsuarioAtual = usuarioId;
+
+                //ViewBag.TodosUsuario = (usuarioId == null && Request.Query.ContainsKey("usuarioId")) ? "true" : "False";
             }
 
+            int tamanhoPagina = 10;
+            int totalRegistros = 0;
+            List<Cliente> clientesFinal;
+
+            // 1. SE HOUVER BUSCA
+            if (!string.IsNullOrWhiteSpace(busca))
+            {
+                var resultadoBusca = _clienteRepositorio.BuscarPorNomeOuCpfPaginado(busca, pagina, tamanhoPagina, out totalRegistros);
+
+                if (isAdmin)
+                {
+                    // Se for Admin e escolheu um usuário específico no select DURANTE a busca
+                    if (usuarioId.HasValue)
+                    {
+                        clientesFinal = resultadoBusca.Where(c => c.UsuarioId == usuarioId.Value).ToList();
+                        totalRegistros = _bancoContext.Clientes.Count(c => c.UsuarioId == usuarioId.Value && (c.Nome.Contains(busca) || c.Cpf.Contains(busca)));
+                    }
+                    else
+                    {
+                        clientesFinal = resultadoBusca;
+                    }
+                }
+                else
+                {
+                    clientesFinal = resultadoBusca.Where(c => c.UsuarioId == usuarioLogado.Id).ToList();
+                    totalRegistros = _bancoContext.Clientes.Count(c => c.UsuarioId == usuarioLogado.Id && (c.Nome.Contains(busca) || c.Cpf.Contains(busca)));
+                }
+            }
+            // 2. SE NÃO HOUVER BUSCA (Carregamento padrão da sua Index por queryBase)
             else
             {
-                cliente = _clienteRepositorio.BuscarClientesPorUsuarioId(usuarioLogado.Id);
+                var queryBase = _bancoContext.Clientes.Include(c => c.Usuario).AsQueryable();
+
+                if (isAdmin)
+                {
+                    // Se o Admin selecionou um usuário específico (ou iniciou com o ID dele próprio)
+                    if (usuarioId.HasValue)
+                    {
+                        queryBase = queryBase.Where(c => c.UsuarioId == usuarioId.Value);
+                    }
+                    // Se clicou em "Todos os Usuários", usuarioId virá nulo mas a chave existirá na URL, não aplicando o Where.
+                }
+                else
+                {
+                    // Se não for admin, vê rigidamente apenas os seus registros
+                    queryBase = queryBase.Where(c => c.UsuarioId == usuarioLogado.Id);
+                }
+
+                totalRegistros = queryBase.Count();
+
+                clientesFinal = queryBase.OrderBy(c => c.Nome)
+                                         .Skip((pagina - 1) * tamanhoPagina)
+                                         .Take(tamanhoPagina)
+                                         .ToList();
             }
 
-            return View(cliente);
+            // Passa os dados de controle para os botões da View saberem o que fazer
+            ViewBag.PaginaAtual = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling((double)totalRegistros / tamanhoPagina);
+            ViewBag.TotalRegistros = totalRegistros;
+
+            return View(clientesFinal);
         }
-
-
         //public IActionResult Detalhes(int id)
         //{
         //    var cliente = _clienteRepositorio.BuscarDadosCompletos(id);
@@ -147,14 +228,15 @@ namespace LiberaMais.Controllers
 
                 model.Endereco.ClienteId = model.Cliente.Id;
 
+                var cliente = _clienteRepositorio.BuscarClientePorId(model.Cliente.Id);
 
                 model.Cliente.Nome = System.Globalization.CultureInfo.CurrentCulture.TextInfo
                 .ToTitleCase(model.Cliente.Nome.ToLower());
                 _enderecoRepositorio.Adicionar(model.Endereco);
 
-                TempData["MensagemSucesso"] = "Cliente adicionado com sucesso";
+                TempData["MensagemSucesso"] = "Cliente adicionado com sucesso, agora adicione o benefício.  ";
 
-                return RedirectToAction("Index");
+                return RedirectToAction("Criar", "ClienteBeneficio", new { clienteId = cliente.Id });
             }
 
             catch (Exception)
@@ -332,6 +414,7 @@ namespace LiberaMais.Controllers
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             var cliente = _clienteRepositorio.BuscarClientePorId(id);
 
+
             if (cliente == null)
             {
                 TempData["MensagemErro"] = "Cliente não localizado.";
@@ -352,13 +435,11 @@ namespace LiberaMais.Controllers
         [HttpPost]
         public IActionResult Apagar(int id)
         {
-
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             var cliente = _clienteRepositorio.BuscarClientePorId(id);
 
             try
             {
-
                 if (cliente == null)
                 {
                     TempData["MensagemErro"] = "Cliente não encontrado";
@@ -368,32 +449,46 @@ namespace LiberaMais.Controllers
                 if (!_permissaoService.UsuarioTemAcessoCliente(usuarioLogado, cliente))
                 {
                     TempData["MensagemErro"] = "Você não tem permissão";
-
                     return RedirectToAction("Index");
                 }
 
+                bool pussuiVenda = _bancoContext.Venda.Any(v => v.ClienteId == id);
+
+                if (pussuiVenda)
+                {
+                    TempData["MensagemErro"] = "Não é possível excluir o cliente, pois existem vendas cadastradas em seu nome.";
+                    TempData.Keep("MensagemErro");
+                    return RedirectToAction("Index");
+                }
+
+                // Deixamos o trabalho pesado para o repositório do cliente, evitando erros de injeção de dependência
                 bool apagado = _clienteRepositorio.Apagar(id);
 
                 if (apagado)
                 {
-                    TempData["mensagemSucesso"] =
-                        "Cliente excluido com sucesso";
+                    TempData["mensagemSucesso"] = "Cliente excluído com sucesso";
                     return RedirectToAction("Index");
                 }
-
                 else
                 {
                     TempData["MensagemErro"] = "Não foi possível excluir o cliente";
                     return RedirectToAction("Index");
                 }
-
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                TempData["MensagemErro"] = "Não foi possível excluir o cliente!";
+                if (ex.InnerException != null && (ex.InnerException.Message.Contains("FOREIGN KEY") || ex.InnerException.Message.Contains("REFERENCE")))
+                {
+                    TempData["MensagemErro"] = "Não é possível excluir o cliente, pois existem registros (Vendas) vinculados a ele.";
+                }
+                else
+                {
+                    TempData["MensagemErro"] = "Erro ao excluir: " + ex.GetBaseException().Message;
+                }
+
+                TempData.Keep("MensagemErro");
                 return RedirectToAction("Index");
             }
-
         }
         //[HttpGet]
         //public IActionResult VerificarCpfExistente(string cpf)

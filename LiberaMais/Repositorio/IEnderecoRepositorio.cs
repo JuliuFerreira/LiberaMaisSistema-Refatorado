@@ -16,5 +16,8 @@ namespace LiberaMais.Repositorio
 
         public bool Apagar (int id);
 
+        public void ApagarPorClienteId(int clienteId);
+
+
     }
 }

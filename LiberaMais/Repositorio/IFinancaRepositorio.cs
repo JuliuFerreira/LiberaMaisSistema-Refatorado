@@ -4,15 +4,13 @@ namespace LiberaMais.Repositorio
 {
     public interface IFinancaRepositorio
     {
-        Financa BuscarMesAnoPorId(int id);
-        List<Financa> ListaFinanca();
+        List<Financa> BuscarTodos(int usuarioId, int mes, int ano);
+
+        List<Financa> ListarPorPeriodo(int mes, int ano, int? usuarioId);
         Financa Adicionar(Financa financa);
         Financa Atualizar(Financa financa);
         bool Apagar(int id);
-        bool ExisteMesEAno(int mes, int ano);
-        decimal CalcularTotalReceitas(int financaId);
-        decimal CalcularTotalDespesas(int financaId);
-        IQueryable<Receita> GetReceitas();
-        IQueryable<Despesa> GetDespesas();
+        Financa BuscarPorId(int id);
+ 
     }
 }

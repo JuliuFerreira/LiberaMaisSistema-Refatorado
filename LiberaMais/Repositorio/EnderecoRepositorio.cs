@@ -51,6 +51,18 @@ namespace LiberaMais.Repositorio
             return true;
         }
 
+        public void ApagarPorClienteId(int clienteId)
+        {
+            // 1. Busca o endereço que está atrelado àquele ClienteId
+            var endereco = _bancoContext.Enderecos.FirstOrDefault(e => e.ClienteId == clienteId);
+
+            // 2. Se encontrar, remove do contexto e salva no banco
+            if (endereco != null)
+            {
+                _bancoContext.Enderecos.Remove(endereco);
+                _bancoContext.SaveChanges();
+            }
+        }
 
     }
 }

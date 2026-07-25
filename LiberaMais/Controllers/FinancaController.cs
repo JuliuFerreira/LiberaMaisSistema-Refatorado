@@ -10,172 +10,165 @@ namespace LiberaMais.Controllers
     public class FinancaController : Controller
     {
         private readonly IFinancaRepositorio _financaRepositorio;
+        private readonly IUsuarioRepositorio _usuarioRepositorio;
+        private readonly IPromotorasRepositorio _promotorasRepositorio;
 
-        public FinancaController(IFinancaRepositorio financaRepositorio)
+        public FinancaController(IFinancaRepositorio financaRepositorio, IUsuarioRepositorio usuarioRepositorio, IPromotorasRepositorio promotorasRepositorio)
         {
             _financaRepositorio = financaRepositorio;
+            _usuarioRepositorio = usuarioRepositorio;
+            _promotorasRepositorio = promotorasRepositorio;
         }
 
 
-        public IActionResult FechamentoCaixa(int id)
+        public IActionResult Index(int? mes, int? ano, int? usuarioId)
         {
-            Financa financa = _financaRepositorio.BuscarMesAnoPorId(id);
+            // Se o usuário não enviou o mês/ano, assume o atual
+            int mesAtual = mes ?? DateTime.Now.Month;
+            int anoAtual = ano ?? DateTime.Now.Year;
 
-            if (financa == null)
-            {
-                return RedirectToAction("Index", "Financa");
-            }
+            ViewBag.Mes = mesAtual;
+            ViewBag.Ano = anoAtual;
+            ViewBag.UsuarioSelecionado = usuarioId;
+            ViewBag.Usuarios = _usuarioRepositorio.BuscarTodos();
 
-            int usuarioJulioId = (int)UsuarioEnum.JULIO;
-            int usuarioRafaelId = (int)UsuarioEnum.RAFAEL;
+            // Filtra pelo Mês/Ano e (opcionalmente) pelo Usuário
+            var lista = _financaRepositorio.ListarPorPeriodo(mesAtual, anoAtual, usuarioId);
 
-            decimal receitasJulio = financa.Receitas
-                .Where(r => r.Usuario == usuarioJulioId)
-                .Select(r => r.ValorRecebido)
-                .DefaultIfEmpty(0)
-                .Sum();
-
-            decimal despesasJulio = financa.Despesas
-                .Where(d => d.Usuario == usuarioJulioId)
-                .Select(d => d.ValorDespesa)
-                .DefaultIfEmpty(0)
-                .Sum();
-
-            decimal receitasRafael = financa.Receitas
-                .Where(r => r.Usuario == usuarioRafaelId)
-                .Select(r => r.ValorRecebido)
-                .DefaultIfEmpty(0)
-                .Sum();
-
-            decimal despesasRafael = financa.Despesas
-                .Where(d => d.Usuario == usuarioRafaelId)
-                .Select(d => d.ValorDespesa)
-                .DefaultIfEmpty(0)
-                .Sum();
-
-            var viewModel = new FechamentoCaixaViewModel
-            {
-                Mes = financa.Mes,
-                Ano = financa.Ano,
-                ReceitaContaJulio = receitasJulio,
-                DespesaContaJulio = despesasJulio,
-                ReceitaContaRafael = receitasRafael,
-                DespesaContaRafael = despesasRafael
-            };
-
-            decimal diferencaParaIgualarSalario = viewModel.Salario - viewModel.SaldoContaJulio;
-
-            if (diferencaParaIgualarSalario < 0)
-            {
-                // Julio deve repassar a diferença positiva para Rafael
-                viewModel.DiferencaSaldoParaIgualarSalario = $"Julio deve repassar {Math.Abs(diferencaParaIgualarSalario).ToString("C2")} para Rafael";
-            }
-            else if (diferencaParaIgualarSalario > 0)
-            {
-                // Rafael deve repassar a diferença positiva para Julio
-                viewModel.DiferencaSaldoParaIgualarSalario = $"Rafael deve repassar {diferencaParaIgualarSalario.ToString("C2")} para Julio";
-            }
-            else
-            {
-                // Saldo já igualado
-                viewModel.DiferencaSaldoParaIgualarSalario = "Não há diferença no saldo total entre as contas de Julio e Rafael";
-            }
-
-            return View(viewModel);
+            return View(lista);
         }
 
-        public IActionResult Index()
+        public IActionResult Fechamento(int mes, int ano)
         {
+            // Busca todos os dados daquele mês específico, sem filtro de conta
+            var lista = _financaRepositorio.ListarPorPeriodo(mes, ano, null);
 
-            var financas = _financaRepositorio.ListaFinanca();
-            return View(financas);
+            ViewBag.Mes = mes;
+            ViewBag.Ano = ano;
+
+            return View(lista);
         }
 
-
-
-        public IActionResult AddMesAno()
+        public IActionResult Criar  ()
         {
-            ViewBag.Anos = Utils.Utils.GerarAno();
+            ViewBag.Usuarios = _usuarioRepositorio.BuscarTodos();
+            ViewBag.Promotoras = _promotorasRepositorio.ListarPromotora();
+
             return View();
         }
 
-        public IActionResult VerificarDuplicidade(int mes, int ano)
-        {
-            bool exists = _financaRepositorio.ExisteMesEAno(mes, ano);
-            return Json(new { exists });
-        }
+
 
         [HttpPost]
-        public IActionResult AddMesAno(Financa financa)
+        public IActionResult Criar(Financa financa)
         {
-            try
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
-                {
-                    _financaRepositorio.Adicionar(financa);
-                    return Json(new { success = true, message = "Mês/ano adicionado com sucesso!" });
-                }
-                return Json(new { success = false, message = "Dados inválidos." });
+                financa.Mes = financa.Data.Month;
+                financa.Ano = financa.Data.Year;
+
+                _financaRepositorio.Adicionar(financa);
+                TempData["MensagemSucesso"] = "Finança adicionada com sucesso.";
+
+                return RedirectToAction("Index", new {mes = financa.Mes, ano = financa.Ano, usuarioId = financa.UsuarioId});
+                    
             }
-            catch (System.Exception erro)
+
+            else
             {
-                return Json(new { success = false, message = $"Ops, não foi possível criar o mês/ano! Detalhe do erro: {erro.Message}" });
+                TempData["MensagemErro"] = "Não foi possível adicionar a finança.";
+
             }
+
+            ViewBag.Usuarios = _usuarioRepositorio.BuscarTodos();
+            ViewBag.Promotoras = _promotorasRepositorio.ListarPromotora();
+            return View(financa);
         }
 
-        public IActionResult EditarMesAno(int id)
+        public IActionResult Editar (int id)
         {
-            var edit = _financaRepositorio.BuscarMesAnoPorId(id);
-            ViewBag.Anos = Utils.Utils.GerarAno();
-            return View(edit);
-        }
+            var financa = _financaRepositorio.BuscarPorId(id);
+            ViewBag.Usuarios = _usuarioRepositorio.BuscarTodos();
+            ViewBag.Promotoras = _promotorasRepositorio.ListarPromotora();
 
-        [HttpPost]
-        public IActionResult EditarMesAno(Financa financa)
-        {
-            try
+            if(financa == null)
             {
-                if (ModelState.IsValid)
-                {
-                    _financaRepositorio.Atualizar(financa);
-                    TempData["MensagemSucesso"] = "Mês/ano atualizado com sucesso!";
-                    return RedirectToAction("Index");
-                }
-                return View(financa);
-            }
-            catch (System.Exception erro)
-            {
-                TempData["MensagemErro"] = $"Ops, não foi possivel atualizar o mês/ano!, detalhe do erro:{erro.Message}";
+                TempData["MensagemErro"] = "Registro não localizado.";
                 return RedirectToAction("Index");
             }
+
+            return View(financa);
         }
 
-        public IActionResult DeletarMesAno(int id)
-        {
-            var edit = _financaRepositorio.BuscarMesAnoPorId(id);
-            return View(edit);
-        }
+        [HttpPost]
+        public IActionResult Editar(Financa financa)
+            {
+            // Recarrega os dados necessários caso a validação falhe
+            ViewBag.Usuarios = _usuarioRepositorio.BuscarTodos();
+            ViewBag.Promotoras = _promotorasRepositorio.ListarPromotora();
 
+            if (!ModelState.IsValid)
+            {
+                TempData["MensagemErro"] = "Erro ao alterar o registro. Verifique os campos.";
+                // Retorna o objeto financa para a view para manter os dados preenchidos
+                return View(financa);
+            }
+
+            // Busca o objeto original do banco para garantir que não estamos perdendo dados
+            var financaDb = _financaRepositorio.BuscarPorId(financa.Id);
+
+            if (financaDb == null)
+            {
+                TempData["MensagemErro"] = "Registro não encontrado.";
+                return RedirectToAction("Index");
+            }
+
+            // Atualiza os campos
+            financaDb.Data = financa.Data;
+            financaDb.Tipo = financa.Tipo;
+            financaDb.ContaSocio = financa.ContaSocio;
+            financaDb.PromotoraId = financa.PromotoraId;
+            financaDb.Valor = financa.Valor;
+            financaDb.Descricao = financa.Descricao;
+
+            _financaRepositorio.Atualizar(financaDb);
+
+            TempData["MensagemSucesso"] = "Registro alterado com sucesso!";
+            return RedirectToAction("Index");
+        }
         [HttpPost]
         public IActionResult Apagar(int id)
         {
             try
             {
+                var financa = _financaRepositorio.BuscarPorId(id);
+
+                if(financa == null)
+                {
+                    TempData["MensagemEssro"] = "Registro não localizado.";
+                    return RedirectToAction("Index");
+                }                
+
                 bool apagado = _financaRepositorio.Apagar(id);
 
-                if (apagado)
-                {
-                    return Json(new { success = true });
+                if (apagado)               
+                {                  
+
+                    TempData["MensagemSucesso"] = "Receita/Despesa excluida com sucesso!";
+                    return RedirectToAction("Index");
                 }
                 else
                 {
-                    return Json(new { success = false, message = "Ops, não foi possível excluir o mês/ano." });
+                    TempData["MensagemErro"] = "Não foi possível excluir essa Receira/Despesa.";
+                    return RedirectToAction("Index");
                 }
             }
             catch (Exception erro)
             {
-                return Json(new { success = false, message = $"Ops, não foi possível excluir o mês/ano. Detalhes do erro: {erro.Message}" });
+                TempData["MensagemErro"] = "Ops, não foi possível excluir o registro de finança. Detalhes do erro: {erro.Message}";
+                return RedirectToAction("Index");
             }
+
         }
 
     }

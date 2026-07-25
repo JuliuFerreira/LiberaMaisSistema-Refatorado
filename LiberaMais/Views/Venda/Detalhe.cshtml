@@ -2,20 +2,236 @@
 @model Venda
 
 @{
-    Layout = "LayoutSistema";
+    Layout = "_LayoutSistema";
     ViewData["Title"] = "Detalhes da Venda";
 
     // Identifica de forma segura se o tipo de operação atual envolve portabilidade
     bool ehPortabilidade = Model.Operacao.ToString().ToLower().Contains("portabilidade");
 }
 
+<div class="container-fluid px-0 mt-4 inner-system-page">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom border-light-subtle">
+        <div>
+            <h3 class="fw-bold text-dark mb-1 tracking-tight">
+                Detalhes da Venda
+                <span class="badge bg-light text-dark border border-light-subtle align-middle rounded-2 px-2.5 py-1.5 ms-2 font-monospace" style="font-size: 0.75rem;">
+                    @(Model.StatusContrato.ToString() ?? "N/A")
+                </span>
+            </h3>
+            <p class="text-muted small mb-0">Confira as informações cadastrais, operacionais e financeiras desta venda.</p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 mb-4 card">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+            <span class="text-dark fw-bold fs-5 tracking-tight">
+                <i class="bi bi-calendar3 text-secondary me-2"></i> Informações de Cadastro
+            </span>
+        </div>
+        <div class="card-body px-4 pt-2 pb-4">
+            <div class="row g-3">
+                <div class="col-6 col-md-6 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">Data do Cadastro</small>
+                    <div class="text-dark fw-semibold small">@(Model.DataCadastro?.ToString("dd/MM/yyyy"))</div>
+                </div>
+
+                <div class="col-6 col-md-6 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">Usuário Digitador</small>
+                    <div class="text-dark fw-semibold small">@(Model.Usuario.Nome)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card border-0 shadow-sm rounded-4 mb-4 card-custom">    
+        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+            <span class="text-dark fw-bold fs-5 tracking-tight">
+                <i class="bi bi-person text-secondary me-2"></i> Cliente / Benefício
+            </span>
+        </div>
+        <div class="card-body px-4 pt-2 pb-4">
+            <div class="row g-3">    
+
+                <div class="col-12 col-md-6 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">Nome do Cliente</small>
+                    <div class="text-dark fw-semibold small">@(Model.Cliente?.Nome ?? "Não Informado")</div>
+                </div>
+
+                <div class="col-12 col-md-6 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">Benefício Vinculado</small>
+                    <div class="text-dark fw-medium small">
+                        @if (Model.ClienteBeneficio?.Beneficio?.Orgaos != null)
+                        {
+                            <span>@Model.ClienteBeneficio.Beneficio.Orgaos.Nome — @Model.ClienteBeneficio.Beneficio.Descricao</span>
+                        }
+                        else
+                        {
+                            <span class="text-secondary opacity-70">Nenhum benefício vinculado</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 mb-4 card-custom">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+            <span class="text-dark fw-bold fs-5 tracking-tight">
+                <i class="bi bi-building text-secondary me-2"></i> Promotora / Banco
+            </span>
+        </div>
+        <div class="card-body px-4 pt-2 pb-4">
+            <div class="row g-3">
+                <div class="col-6 col-md-6 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">Promotora</small>
+                    <div class="text-dark fw-semibold small">@(Model.Promotora?.Nome ?? "Não Informada")</div>
+                </div>
+
+                <div class="col-6 col-md-6 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">Banco de Destino (Digitado)</small>
+                    <div class="text-dark fw-semibold small">@(Model.Banco?.Nome ?? "Não Carregado")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 mb-4 card-custom">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+            <span class="text-dark fw-bold fs-5 tracking-tight">
+                <i class="bi bi-gear text-secondary me-2"></i> Dados da Operação
+            </span>
+        </div>
+        <div class="card-body px-4 pt-2 pb-4">
+
+            <div class="mb-4 bg-light rounded-2 px-2.5 py-1.5 d-inline-flex align-items-center gap-2 border border-light-subtle">
+                <small class="text-muted info-label mb-0">Tipo de Operação:</small>
+                <span class="fw-bold text-dark font-monospace small">@Model.Operacao</span>
+            </div>
+
+            @if (ehPortabilidade)
+            {
+                <div class="alert bg-primary-subtle text-primary border-0 rounded-3 py-2 px-3 mb-4 small fw-medium">
+                    <i class="bi bi-arrow-left-right me-2"></i> Informações Exclusivas da Portabilidade
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-6 col-md-2 info-divider pb-2">
+                        <small class="text-muted d-block info-label mb-1">Banco Comprado (Origem)</small>
+                        <div class="text-dark fw-medium small">@(string.IsNullOrEmpty(Model.BancoComprado) ? "Não Informado" : Model.BancoComprado)</div>
+                    </div>
+
+                    <div class="col-6 col-md-2 info-divider pb-2">
+                        <small class="text-muted d-block info-label mb-1">Nº Contrato Origem</small>
+                        <div class="text-dark font-monospace fw-semibold small">@(string.IsNullOrEmpty(Model.NumeroContrato) ? "N/A" : Model.NumeroContrato)</div>
+                    </div>
+
+                    <div class="col-6 col-md-2 info-divider pb-2">
+                        <small class="text-muted d-block info-label mb-1">Parcelas Restantes</small>
+                        <div class="text-dark fw-semibold small">@(Model.ParcelasRestantes?.ToString() ?? "0")</div>
+                    </div>
+
+                    <div class="col-6 col-md-2 info-divider pb-2">
+                        <small class="text-muted d-block info-label mb-1">Valor Parcela Portada</small>
+                        <div class="text-danger fw-bold small">@(Model.ValorParcelaPort?.ToString("C") ?? "R$ 0,00")</div>
+                    </div>
+
+                    <div class="col-6 col-md-2 info-divider pb-2">
+                        <small class="text-muted d-block info-label mb-1">Saldo Devedor</small>
+                        <div class="text-dark fw-bold small">@(Model.SaldoDevedor?.ToString("C") ?? "R$ 0,00")</div>
+                    </div>
+
+                    @if (Model.DataPgtoContrato != null)
+                    {
+                        <div class="col-6 col-md-2 info-divider pb-2">
+                            <small class="text-muted d-block info-label mb-1">Data de Pagamento do Contrato</small>
+                            <div class="text-dark fw-medium small">@Model.DataPgtoContrato?.ToString("dd/MM/yyyy")</div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert bg-success-subtle text-success border-0 rounded-3 py-2 px-3 mb-4 small fw-medium">
+                    <i class="bi bi-file-earmark-text me-2"></i> Informações do Contrato Padrão
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-6 col-md-3 info-divider pb-2">
+                        <small class="text-muted d-block info-label mb-1">Valor Parcela</small>
+                        <div class="text-dark fw-medium small">@(Model.ValorParcela?.ToString("C") ?? "R$ 0,00")</div>
+                    </div>
+
+                    <div class="col-6 col-md-3 info-divider pb-2">
+                        <small class="text-success d-block info-label mb-1">Valor Contrato</small>
+                        <div class="text-success fw-bold small">@(Model.ValorContrato?.ToString("C") ?? "R$ 0,00")</div>
+                    </div>
+
+                    <div class="col-6 col-md-2 info-divider pb-2">
+                        <small class="text-muted d-block info-label mb-1">Nº Parcelas</small>
+                        <div class="text-dark fw-semibold small">@(Model.NumeroDeParcelas?.ToString() ?? "N/A")</div>
+                    </div>
+
+                    @if (Model.DataPgtoContrato != null)
+                    {
+                        <div class="col-6 col-md-4 info-divider pb-2">
+                            <small class="text-muted d-block info-label mb-1">Data de Pagamento do Contrato</small>
+                            <div class="text-dark fw-medium small">@Model.DataPgtoContrato?.ToString("dd/MM/yyyy")</div>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (Model.ValorComissao != null || Model.DataPgtoComissao != null)
+            {
+                <div class="row g-3 mt-2">
+                    @if (Model.ValorComissao != null)
+                    {
+                        <div class="col-6 col-md-3">
+                            <small class="text-muted d-block info-label mb-1">Valor da Comissão</small>
+                            <div class="text-primary fw-bold small">@Model.ValorComissao?.ToString("C")</div>
+                        </div>
+                    }
+
+                    @if (Model.DataPgtoComissao != null)
+                    {
+                        <div class="col-6 col-md-4">
+                            <small class="text-muted d-block info-label mb-1">Data de Pagamento da Comissão</small>
+                            <div class="text-dark fw-medium small">@Model.DataPgtoComissao?.ToString("dd/MM/yyyy")</div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="javascript:history.back()" class="btn btn-link text-decoration-none text-secondary d-inline-flex align-items-center gap-2 fw-medium p-0 btn-back-hover">
+        <i class="bi bi-arrow-left-short fs-4"></i> <span class="small">Voltar</span>
+    </a>
+</div>
+
 <style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .tracking-tight {
+        letter-spacing: -0.5px;
+    }
+
+    .card-custom {
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
     /* Estilo sutil para os rótulos de informação */
     .info-label {
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        font-weight: 600;
+        font-weight: 700;
     }
 
     /* Linhas divisórias mais discretas nos blocos de informação */
@@ -33,176 +249,3 @@
             transform: translateX(-2px);
         }
 </style>
-
-<div class="container-fluid px-0 mt-4">
-
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom border-light-subtle">
-        <div>
-            <h3 class="fw-bold text-dark mb-1">
-                Detalhes da Venda
-                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fs-6 rounded-3 px-3 py-1.5 ms-2 alignment-middle">
-                    @(Model.StatusContrato.ToString() ?? "N/A")
-                </span>
-            </h3>
-            <p class="text-muted small mb-0">Confira as informações cadastrais, operacionais e financeiras desta venda.</p>
-        </div>
-    </div>
-
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
-            <span class="text-dark fw-bold fs-5">
-                <i class="bi bi-person text-primary me-2"></i> Cliente / Benefício
-            </span>
-        </div>
-        <div class="card-body px-4 pt-2 pb-4">
-            <div class="row g-3">
-                <div class="col-12 col-md-4 info-divider pb-2">
-                    <small class="text-muted d-block info-label mb-1">Nome do Cliente</small>
-                    <div class="text-dark fw-semibold fs-6">@(Model.Cliente?.Nome ?? "Não Informado")</div>
-                </div>
-
-                <div class="col-12 col-md-8 info-divider pb-2">
-                    <small class="text-muted d-block info-label mb-1">Benefício Vinculado</small>
-                    <div class="text-dark fw-medium">
-                        @if (Model.ClienteBeneficio?.Beneficio?.Orgaos != null)
-                        {
-                            <span>@Model.ClienteBeneficio.Beneficio.Orgaos.Nome — @Model.ClienteBeneficio.Beneficio.Descricao</span>
-                        }
-                        else
-                        {
-                            <span class="text-muted small">Nenhum benefício vinculado</span>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
-            <span class="text-dark fw-bold fs-5">
-                <i class="bi bi-building text-secondary me-2"></i> Promotora / Banco
-            </span>
-        </div>
-        <div class="card-body px-4 pt-2 pb-4">
-            <div class="row g-3">
-                <div class="col-6 col-md-6 info-divider pb-2">
-                    <small class="text-muted d-block info-label mb-1">Promotora</small>
-                    <div class="text-dark fw-medium">@(Model.Promotora?.Nome ?? "Não Informada")</div>
-                </div>
-
-                <div class="col-6 col-md-6 info-divider pb-2">
-                    <small class="text-muted d-block info-label mb-1">Banco de Destino (Digitado)</small>
-                    <div class="text-dark fw-medium">@(Model.Banco?.Nome ?? "Não Carregado")</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
-            <span class="text-dark fw-bold fs-5">
-                <i class="bi bi-gear text-secondary me-2"></i> Dados da Operação
-            </span>
-        </div>
-        <div class="card-body px-4 pt-2 pb-4">
-
-            <div class="mb-4 bg-light rounded-3 p-2.5 d-inline-flex align-items-center gap-2">
-                <small class="text-muted info-label mb-0 ms-1">Tipo de Operação:</small>
-                <span class="fw-bold text-primary me-1">@Model.Operacao</span>
-            </div>
-
-            @if (ehPortabilidade)
-            {
-                <div class="alert alert-primary border-0 shadow-sm rounded-3 py-2.5 px-3 mb-4 small fw-medium">
-                    <i class="bi bi-arrow-left-right me-2 text-primary"></i> Informações Exclusivas da Portabilidade
-                </div>
-
-                <div class="row g-3">
-                    <div class="col-6 col-md-3 info-divider pb-2">
-                        <small class="text-muted d-block info-label mb-1">Banco Comprado (Origem)</small>
-                        <div class="text-dark fw-medium">@(string.IsNullOrEmpty(Model.BancoComprado) ? "Não Informado" : Model.BancoComprado)</div>
-                    </div>
-
-                    <div class="col-6 col-md-2 info-divider pb-2">
-                        <small class="text-muted d-block info-label mb-1">Nº Contrato Origem</small>
-                        <div class="text-dark font-monospace fw-medium">@(string.IsNullOrEmpty(Model.NumeroContrato) ? "N/A" : Model.NumeroContrato)</div>
-                    </div>
-
-                    <div class="col-6 col-md-2 info-divider pb-2">
-                        <small class="text-muted d-block info-label mb-1">Parcelas Restantes</small>
-                        <div class="text-dark fw-medium">@(Model.ParcelasRestantes?.ToString() ?? "0")</div>
-                    </div>
-
-                    <div class="col-6 col-md-2 info-divider pb-2">
-                        <small class="text-muted d-block info-label mb-1">Valor Parcela Portada</small>
-                        <div class="text-danger fw-bold">@(Model.ValorParcelaPort?.ToString("C") ?? "R$ 0,00")</div>
-                    </div>
-
-                    <div class="col-6 col-md-3 info-divider pb-2">
-                        <small class="text-muted d-block info-label mb-1">Saldo Devedor</small>
-                        <div class="text-danger fw-bold">@(Model.SaldoDevedor?.ToString("C") ?? "R$ 0,00")</div>
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-success border-0 shadow-sm rounded-3 py-2.5 px-3 mb-4 small fw-medium">
-                    <i class="bi bi-file-earmark-text me-2 text-success"></i> Informações do Contrato Padrão
-                </div>
-
-                <div class="row g-3">
-                    <div class="col-6 col-md-3 info-divider pb-2">
-                        <small class="text-muted d-block info-label mb-1">Valor Parcela</small>
-                        <div class="text-dark fw-medium">@(Model.ValorParcela?.ToString("C") ?? "R$ 0,00")</div>
-                    </div>
-
-                    <div class="col-6 col-md-3 info-divider pb-2">
-                        <small class="text-muted d-block info-label mb-1">Valor Contrato</small>
-                        <div class="text-success fw-bold">@(Model.ValorContrato?.ToString("C") ?? "R$ 0,00")</div>
-                    </div>
-
-                    <div class="col-6 col-md-2 info-divider pb-2">
-                        <small class="text-muted d-block info-label mb-1">Nº Parcelas</small>
-                        <div class="text-dark fw-medium">@(Model.NumeroDeParcelas?.ToString() ?? "N/A")</div>
-                    </div>
-
-                    @if (Model.DataPgtoContrato != null)
-                    {
-                        <div class="col-6 col-md-4 info-divider pb-2">
-                            <small class="text-muted d-block info-label mb-1">Data de Pagamento do Contrato</small>
-                            <div class="text-dark fw-medium">@Model.DataPgtoContrato?.ToString("dd/MM/yyyy")</div>
-                        </div>
-                    }
-                </div>
-            }
-
-            @if (Model.ValorComissao != null || Model.DataPgtoComissao != null)
-            {
-                <div class="row g-3 mt-3">
-                    @if (Model.ValorComissao != null)
-                    {
-                        <div class="col-6 col-md-3">
-                            <small class="text-muted d-block info-label mb-1">Valor da Comissão</small>
-                            <div class="text-primary fw-bold fs-6">@Model.ValorComissao?.ToString("C")</div>
-                        </div>
-                    }
-
-                    @if (Model.DataPgtoComissao != null)
-                    {
-                        <div class="col-6 col-md-4">
-                            <small class="text-muted d-block info-label mb-1">Data de Pagamento da Comissão</small>
-                            <div class="text-dark fw-medium">@Model.DataPgtoComissao?.ToString("dd/MM/yyyy")</div>
-                        </div>
-                    }
-                </div>
-            }
-        </div>
-    </div>
-</div>
-
-<div class="mt-4">
-    <a href="javascript:history.back()" class="btn btn-link text-decoration-none text-secondary d-inline-flex align-items-center gap-2 fw-medium p-0 btn-back-hover">
-        <i class="bi bi-arrow-left-short" style="font-size: 1.4rem;"></i> Voltar
-    </a>
-</div>

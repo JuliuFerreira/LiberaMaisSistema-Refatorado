@@ -13,51 +13,19 @@ namespace LiberaMais.Repositorio
             _bancoContext = bancoContext;
         }
 
-        public IQueryable<Receita> GetReceitas()
+
+
+        public List<Financa> BuscarTodos(int usuarioId, int mes, int ano)
         {
-            return _bancoContext.receitas.AsQueryable();
-        }
-
-        public IQueryable<Despesa> GetDespesas()
-        {
-            return _bancoContext.despesas.AsQueryable();
-        }
-
-        public Financa BuscarMesAnoPorId(int id)
-        {
-            var result = _bancoContext.financas
-        .Include(f => f.Receitas)
-        .Include(f => f.Despesas)
-        .FirstOrDefault(x => x.Id == id);
-
-            return result;
-        }
-
-        public List<Financa> ListaFinanca()
-        {
-            var listarFinanca = _bancoContext.financas
-                .Include(f => f.Receitas)
-                .Include(f => f.Despesas)
-                .ToList();
-
-            foreach (var financa in listarFinanca)
-            {
-                financa.TotalReceitas = CalcularTotalReceitas(financa.Id);
-                financa.TotalDespesas = CalcularTotalDespesas(financa.Id);
-            }
-
-            return listarFinanca;
-        }
-
-        public bool ExisteMesEAno(int mes, int ano)
-        {
-            return _bancoContext.financas.Any(f => f.Mes == mes && f.Ano == ano);
+            return _bancoContext.financas
+                .Include(f => f.Promotora)
+                .Where(f => f.UsuarioId == usuarioId && f.Mes == mes && f.Ano == ano)
+                .OrderBy(f => f.Data)
+                .ToList();           
         }
 
         public Financa Adicionar(Financa financa)
         {
-            financa.TotalReceitas = 0;
-            financa.TotalDespesas = 0;
 
             _bancoContext.financas.Add(financa);
             _bancoContext.SaveChanges();
@@ -69,33 +37,44 @@ namespace LiberaMais.Repositorio
             _bancoContext.financas.Update(financa);
             _bancoContext.SaveChanges();
             return financa;
-
-            if (financa == null) throw new System.Exception("Erro ao atualizar o mês/ano!");
         }
 
         public bool Apagar(int id)
         {
-            Financa financa = BuscarMesAnoPorId(id);
+            Financa financa = BuscarPorId(id);
 
-            if (financa == null) throw new System.Exception("Erro ao excluir o mês/ano!");
+            if (financa == null) throw new System.Exception("Erro ao excluir Finança");
 
             _bancoContext.financas.Remove(financa);
             _bancoContext.SaveChanges();
             return true;
         }
 
-        public decimal CalcularTotalReceitas(int financaId)
+        public Financa BuscarPorId(int id)
         {
-            return _bancoContext.receitas
-                .Where(r => r.FinancaId == financaId)
-                .Sum(r => r.ValorRecebido);
+            return _bancoContext.financas
+                .Include(f => f.Promotora)
+            .FirstOrDefault(f => f.Id == id);
         }
 
-        public decimal CalcularTotalDespesas(int financaId)
+        public List<Financa> ListarPorPeriodo(int mes, int ano, int? usuarioId)
         {
-            return _bancoContext.despesas
-                .Where(d => d.FinancaId == financaId)
-                .Sum(d => d.ValorDespesa);
+            // Adicionamos o .Include logo aqui, no início da consulta
+            var query = _bancoContext.financas
+                .Include(f => f.Promotora)
+                .AsQueryable();
+
+            // Filtramos pelo mês e ano
+            query = query.Where(x => x.Mes == mes && x.Ano == ano);
+
+            // Se um usuário foi selecionado, filtramos por ele também
+            if (usuarioId.HasValue)
+            {
+                query = query.Where(x => x.UsuarioId == usuarioId);
+            }
+
+            // Retorna a lista final com os dados da promotora carregados
+            return query.ToList();
         }
     }
 }

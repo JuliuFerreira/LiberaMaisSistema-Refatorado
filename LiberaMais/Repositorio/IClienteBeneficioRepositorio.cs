@@ -17,5 +17,7 @@ namespace LiberaMais.Repositorio
 
         List<ClienteBeneficio> ListarBeneficiosPorCliente(int clienteId);
 
+        public void ApagarPorClienteId(int clienteId);
+
     }
 }

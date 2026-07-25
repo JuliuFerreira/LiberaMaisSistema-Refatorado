@@ -25,5 +25,7 @@ namespace LiberaMais.Repositorio
 
         List<Cliente> BuscarClientesPorUsuarioId(int usuarioId);
 
+        List<Cliente> BuscarPorNomeOuCpfPaginado(string termo, int pagina, int tamanhoCorte, out int totalRegistros);
+
     }
 }

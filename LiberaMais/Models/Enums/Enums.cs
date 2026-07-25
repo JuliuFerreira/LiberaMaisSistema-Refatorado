@@ -78,6 +78,14 @@ namespace LiberaMais.Models.Enums
 
     }
 
+    public enum TipoFinanca : int
+    {
+
+        Receita = 1,
+
+        Despesa = 2
+    }
+
     public enum BeneficioEnum : int
     {
         [Display(Name = "APOSENTADORIA")]
@@ -312,7 +320,7 @@ namespace LiberaMais.Models.Enums
 
     }
 
-    public enum UsuarioEnum : int
+    public enum ContaSocio : int
     {
         [Display(Name = ("JULIO C. FERREIRA"))]
         JULIO = 1,

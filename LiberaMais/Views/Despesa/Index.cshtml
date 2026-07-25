@@ -1,9 +1,9 @@
-﻿@using System.Globalization
+﻿@* @using System.Globalization
 @model IEnumerable<Despesa>
 
 
 @{
-    Layout = "LayoutSistema";
+    Layout = "_LayoutSistema";
 
     decimal totalDespesa = Model.Sum(despesa => despesa.ValorDespesa);
 
@@ -150,3 +150,4 @@
             });
         });
     </script>
+ *@

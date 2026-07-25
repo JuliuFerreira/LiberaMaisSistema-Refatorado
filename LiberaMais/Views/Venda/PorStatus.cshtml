@@ -2,7 +2,7 @@
 @model List<LiberaMais.Models.Venda>
 
 @{
-    Layout = "LayoutSistema";
+    Layout = "_LayoutSistema";
     ViewData["Title"] = $"Vendas - {ViewBag.StatusAtual}";
 
     var listaBancos = ViewBag.Bancos as IEnumerable<dynamic>;
@@ -11,16 +11,16 @@
 
 <div class="container-fluid py-4 inner-system-page">
 
-    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-light-subtle">
         <div>
-            <h2 class="fw-bold text-dark mb-1 text-uppercase tracking-wide" style="font-size: 1.6rem;">
+            <h3 class="fw-bold text-dark mb-1 tracking-tight">
                 Vendas: @ViewBag.StatusAtual
-            </h2>
-            <small class="text-muted">Gerenciamento e controle de contratos com status @ViewBag.StatusAtual</small>
+            </h3>
+            <p class="text-muted small mb-0">Gerenciamento e controle de contratos com status @ViewBag.StatusAtual</p>
         </div>
         <div>
             <a asp-action="Criar" class="btn btn-dark d-flex align-items-center gap-2 px-3 py-2 shadow-sm rounded-3">
-                <i class="bi bi-plus-circle-fill"></i>
+                <i class="bi bi-plus-lg"></i>
                 <span class="fw-semibold small">Nova Venda</span>
             </a>
         </div>
@@ -28,34 +28,71 @@
 
     @if (TempData["MensagemSucesso"] != null)
     {
-        <div id="alertaSucesso" class="alert alert-success shadow-sm border-0 rounded-3 mb-3">
+        <div id="alertaSucesso" class="alert alert-success shadow-sm border-0 rounded-3 mb-3 small">
             <i class="bi bi-check-circle-fill me-2"></i> @TempData["MensagemSucesso"]
         </div>
     }
     @if (TempData["MensagemErro"] != null)
     {
-        <div id="alertaErro" class="alert alert-danger shadow-sm border-0 rounded-3 mb-3">
+        <div id="alertaErro" class="alert alert-danger shadow-sm border-0 rounded-3 mb-3 small">
             <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["MensagemErro"]
         </div>
     }
+
+    <form method="get" asp-action="PorStatus" class="row g-2 mb-4 align-items-end">
+        <input type="hidden" name="status" value="@ViewBag.StatusParametro" />
+        <input type="hidden" name="busca" value="@ViewBag.BuscaAtual" />
+
+        <div class="col-12 col-md-4">
+            <label class="text-muted small fw-semibold d-block mb-1">Buscar por termo:</label>
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white border-end-0 text-muted">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" name="busca" class="form-control border-start-0 ps-0"
+                       placeholder="Buscar nesta lista..." value="@ViewBag.BuscaAtual" />
+                <button type="submit" class="btn btn-dark">Buscar</button>
+                @if (!string.IsNullOrEmpty(ViewBag.BuscaAtual) || ViewBag.UsuarioAtual != null)
+                {
+                    <a asp-action="PorStatus" asp-route-status="@ViewBag.StatusParametro" class="btn btn-outline-secondary">Limpar</a>
+                }
+            </div>
+        </div>
+
+        @if (ViewBag.IsAdmin == true)
+        {
+            <div class="col-12 col-md-3">
+                <label class="text-muted small fw-semibold d-block mb-1">Filtrar por Responsável:</label>
+                <select name="usuarioId" class="form-select form-select-sm filter-dropdown" style="min-width: 180px;" onchange="this.form.submit()">
+                    <!option value="" @(Context.Request.Query["usuarioId"].ToString() == "" && Context.Request.Query.ContainsKey("usuarioId") ? "selected" : "")>Todos os Usuários</!option>
+                    @if (ViewBag.Usuarios != null)
+                    {
+                        foreach (var user in ViewBag.Usuarios)
+                        {
+                            <!option value="@user.Id" @(ViewBag.UsuarioAtual == user.Id ? "selected" : "")>@user.Nome</!option>
+                        }
+                    }
+                </select>
+            </div>
+        }
+    </form>
 
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">
                     <tr>
-                        <th class="ps-4">Data</th>
-                        <th>CPF</th>
-                        <th>Cliente</th>
-                        <th>Operação</th>
-                        <th>Banco</th>
-                        @if (exibirColunaPortabilidade)
-                        {
-                            <th>Banco Origem</th>
-                        }
-                        <th>@(exibirColunaPortabilidade ? "Parcela Portada" : "Parcela")</th>
-                        <th>@(exibirColunaPortabilidade ? "Saldo" : "Valor Contrato")</th>
-                        <th class="text-center pe-4">Ações</th>
+                        <th class="ps-4 text-muted fw-bold">Data</th>
+                        <th class="text-muted fw-bold">CPF</th>
+                        <th class="text-muted fw-bold">Cliente</th>
+                        <th class="text-muted fw-bold">Operação</th>
+                        <th class="text-muted fw-bold">Banco</th>
+                        <th class="text-muted fw-bold">Usuário</th>
+
+                        <th class="text-muted fw-bold">@(exibirColunaPortabilidade ? "Parcela" : "Parcela")</th>
+                        <th class="text-muted fw-bold">@(exibirColunaPortabilidade ? "Valo do contrato / Saldo" : "Valor Contrato")</th>
+                        <th class="text-muted fw-bold">Data de Pagamento</th>
+                        <th class="text-center pe-4 text-muted fw-bold" style="width: 100px;">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,51 +101,58 @@
                         foreach (var venda in Model)
                         {
                             bool ehPortabilidade = venda.Operacao.ToString().ToLower().Contains("portabilidade");
+
                             <tr class="linha-clicavel" data-href="@Url.Action("Detalhe", "Venda", new { id = venda.Id })">
-                                <td class="ps-4 text-muted small">@venda.DataCadastro?.ToString("dd/MM/yyyy")</td>
-                                <td class="fw-medium">@venda.Cliente?.Cpf</td>
-                                <td>@venda.Cliente?.Nome</td>
-                                <td><span class="badge bg-light text-dark border rounded-2">@venda.Operacao</span></td>
+                                <td class="ps-4 text-secondary small">@venda.DataCadastro?.ToString("dd/MM/yyyy")</td>
+                                <td class="fw-semibold text-dark small">@venda.Cliente?.Cpf</td>
+                                <td class="text-dark fw-medium">@venda.Cliente?.Nome</td>
                                 <td>
-                                    <span class="fw-bold">
+                                    <span class="badge bg-light text-dark border border-light-subtle rounded-2 px-2 py-1.5 font-monospace" style="font-size: 0.75rem;">
+                                        @venda.Operacao.GetDisplayName()
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="text-dark fw-semibold small">
                                         @(listaBancos?.FirstOrDefault(b => b.Id == venda.BancoId)?.Nome ?? venda.Banco?.Nome ?? "N/A")
                                     </span>
                                 </td>
-                                @if (exibirColunaPortabilidade)
-                                {
-                                    <td>
-                                        <span class="badge bg-primary-subtle text-primary rounded-2">
-                                            @(string.IsNullOrEmpty(venda.BancoComprado) ? "-" : venda.BancoComprado)
-                                        </span>
-                                    </td>
-                                }
-                                <td class="text-danger fw-bold">@((ehPortabilidade ? venda.ValorParcelaPort : venda.ValorParcela)?.ToString("C"))</td>
-                                <td class="fw-medium">@((ehPortabilidade ? venda.SaldoDevedor : venda.ValorContrato)?.ToString("C"))</td>
+                                <td>
+                                    <span class="text-dark fw-semibold small">
+                                        @venda.Usuario.Nome
+                                    </span>
+                                </td>
+                                <td class="text-danger fw-bold small">@(ehPortabilidade? venda.ValorParcelaPort?.ToString("N2") : venda.ValorParcela?.ToString("N2"))</td>
+                                <td class="fw-bold text-dark small">@(ehPortabilidade ? venda.SaldoDevedor?.ToString("N2") + " (Saldo Devedor)" : venda.ValorContrato?.ToString("N2"))</td>
+                                <td class="ps-4 text-secondary small">@venda.DataPgtoContrato?.ToString("dd/MM/yyyy")</td>
                                 <td class="text-center pe-4 ignorar-clique">
-                                    <button type="button" class="btn btn-outline-danger btn-action-sm d-inline-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#modalExcluir_@venda.Id" title="Excluir Venda">
-                                        <i class="bi bi-trash3-fill"></i>
-                                    </button>
+                                    <div class="d-flex justify-content-center gap-3">
+                                        <a asp-action="Editar" asp-route-id="@venda.Id" class="text-secondary link-icone-acao" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="#" class="text-danger link-icone-acao" data-bs-toggle="modal" data-bs-target="#modalExcluir_@venda.Id" title="Excluir">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
 
-                            <div class="modal fade" id="modalExcluir_@venda.Id" tabindex="-1" aria-hidden="true" onclick="event.stopPropagation();">
-                                <div class="modal-dialog modal-dialog-centered modal-sm">
-                                    <div class="modal-content rounded-4 border-0 shadow-lg">
-                                        <div class="modal-body text-center p-4 pt-5">
-                                            <div class="text-danger mb-3">
-                                                <i class="bi bi-exclamation-circle" style="font-size: 2.5rem;"></i>
-                                            </div>
-                                            <h5 class="fw-bold text-dark mb-2">Excluir Venda?</h5>
-                                            <p class="text-muted small mb-0">
-                                                Deseja realmente remover a venda do cliente <strong class="text-dark">@venda.Cliente?.Nome</strong> do sistema? Esta ação não pode ser desfeita.
-                                            </p>
+                            <div class="modal fade ignorar-clique" id="modalExcluir_@venda.Id" tabindex="-1" aria-hidden="true" onclick="event.stopPropagation();">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow rounded-4">
+                                        <div class="modal-header border-0 pb-0">
+                                            <h5 class="modal-title fw-bold text-dark fs-5">Confirmar Exclusão</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
-                                        <div class="modal-footer border-0 d-flex flex-column w-100 gap-1 p-4 pt-0">
-                                            <form asp-action="Apagar" method="post" class="w-100 m-0">
+                                        <div class="modal-body py-3">
+                                            Deseja realmente remover a venda do cliente <strong>@venda.Cliente?.Nome</strong>?
+                                        </div>
+                                        <div class="modal-footer border-0 d-flex justify-content-end gap-2 pt-0 pb-4 pe-4">
+                                            <button type="button" class="btn btn-secondary border-0 px-3 py-2 rounded-3 text-white small fw-medium" data-bs-dismiss="modal" style="background-color: #6c757d;">Cancelar</button>
+                                            <form asp-action="Apagar" method="post" class="d-inline m-0">
                                                 <input type="hidden" name="id" value="@venda.Id" />
-                                                <button type="submit" class="btn btn-danger w-100 rounded-3 py-2 fw-medium">Confirmar Exclusão</button>
+                                                <button type="submit" class="btn btn-danger border-0 px-3 py-2 rounded-3 small fw-semibold" style="background-color: #dc3545;">Confirmar Exclusão</button>
                                             </form>
-                                            <button type="button" class="btn btn-light border w-100 rounded-3 py-2 text-secondary fw-medium" data-bs-dismiss="modal">Cancelar</button>
                                         </div>
                                     </div>
                                 </div>
@@ -117,38 +161,95 @@
                     }
                     else
                     {
-                        <tr><td colspan="9" class="text-center py-5 text-muted">Nenhuma venda encontrada.</td></tr>
+                        <tr>
+                            <td colspan="@(exibirColunaPortabilidade ? 9 : 8)" class="text-center py-5 text-muted small">
+                                <i class="bi bi-inbox fs-3 d-block mb-2 text-secondary opacity-50"></i>
+                                Nenhuma venda com este status encontrada.
+                            </td>
+                        </tr>
                     }
                 </tbody>
             </table>
+
+            <div class="ms-3 my-2 text-secondary" style="font-size: 0.85rem;">
+                <span>
+                    Total: <strong class="text-dark">@ViewBag.TotalRegistros</strong> vendas encontradas
+                </span>
+            </div>
         </div>
     </div>
 
+    @if (ViewBag.TotalPaginas > 1)
+    {
+        // Identifica se deve mandar o ID atual ou 0 (representando "Todos")
+        var usuarioRota = ViewBag.UsuarioAtual ?? 0;
+
+        <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded-4 shadow-sm border border-light-subtle mb-4">
+            <span class="text-muted small">
+                Página <strong>@ViewBag.PaginaAtual</strong> de <strong>@ViewBag.TotalPaginas</strong>
+            </span>
+            <div class="btn-group gap-1">
+                <a asp-action="PorStatus"
+                   asp-route-status="@ViewBag.StatusParametro"
+                   asp-route-pagina="@(ViewBag.PaginaAtual - 1)"
+                   asp-route-busca="@ViewBag.BuscaAtual"
+                   asp-route-usuarioId="@usuarioRota"
+                   class="btn btn-sm btn-outline-dark rounded-2 px-3 py-1.5 fw-medium @(ViewBag.PaginaAtual == 1 ? "disabled" : "")">
+                    <i class="bi bi-chevron-left me-1"></i> Anterior
+                </a>
+
+                <a asp-action="PorStatus"
+                   asp-route-status="@ViewBag.StatusParametro"
+                   asp-route-pagina="@(ViewBag.PaginaAtual + 1)"
+                   asp-route-busca="@ViewBag.BuscaAtual"
+                   asp-route-usuarioId="@usuarioRota"
+                   class="btn btn-sm btn-dark rounded-2 px-3 py-1.5 fw-medium @(ViewBag.PaginaAtual == ViewBag.TotalPaginas ? "disabled" : "")">
+                    Próximo <i class="bi bi-chevron-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    }
+
     <div class="mt-4">
         <a asp-controller="Venda" asp-action="Index" class="btn btn-link text-decoration-none text-secondary p-0 d-inline-flex align-items-center gap-2 btn-back-hover">
-            <i class="bi bi-arrow-left-short fs-4"></i> Voltar ao painel
+            <i class="bi bi-arrow-left-short fs-4"></i> <span class="fw-medium small">Voltar ao painel</span>
         </a>
     </div>
 </div>
 
 <style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .tracking-tight {
+        letter-spacing: -0.5px;
+    }
+
     .linha-clicavel {
         cursor: pointer;
-        transition: background 0.15s;
+        transition: background-color 0.15s ease;
     }
 
         .linha-clicavel:hover {
-            background-color: #f8f9fa !important;
+            background-color: rgba(0, 0, 0, 0.02) !important;
         }
 
-    .btn-action-sm {
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        transition: all 0.2s ease;
+    .link-icone-acao {
+        text-decoration: none;
+        transition: transform 0.15s ease, opacity 0.15s ease;
+        display: inline-flex;
+        align-items: center;
     }
+
+        .link-icone-acao:hover {
+            transform: scale(1.12);
+            opacity: 0.85;
+        }
+
+        .link-icone-acao.text-secondary:hover {
+            color: #212529 !important;
+        }
 
     .btn-back-hover {
         transition: color 0.2s ease, transform 0.2s ease;
@@ -162,11 +263,18 @@
 
 @section Scripts {
     <script>
-        $(".linha-clicavel").click(function (e) {
-            if (!$(e.target).closest('.ignorar-clique').length) {
-                window.location.href = $(this).data("href");
-            }
+        $(document).ready(function () {
+            // Evento para capturar cliques na linha e redirecionar
+            $(".linha-clicavel").click(function (e) {
+                if (!$(e.target).closest('.ignorar-clique').length) {
+                    window.location.href = $(this).data("href");
+                }
+            });
+
+            // FadeOut automático dos alertas
+            setTimeout(function() {
+                $(".alert").fadeOut("slow");
+            }, 3000);
         });
-        setTimeout(() => { $(".alert").fadeOut("slow"); }, 3000);
     </script>
 }

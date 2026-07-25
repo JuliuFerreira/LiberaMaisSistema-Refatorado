@@ -1,0 +1,169 @@
+﻿@model IEnumerable<LiberaMais.Models.Financa>
+@using LiberaMais.Models.Enums
+
+@{
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Fechamento Mensal";
+
+    var totalReceitas = Model.Where(x => x.Tipo == TipoFinanca.Receita).Sum(x => x.Valor);
+    var totalDespesas = Model.Where(x => x.Tipo == TipoFinanca.Despesa).Sum(x => x.Valor);
+    var saldoTotal = totalReceitas - totalDespesas;
+    var metaPorPessoa = saldoTotal / 2;
+
+    // Detalhado Julio
+    var recJulio = Model.Where(x => x.ContaSocio == ContaSocio.JULIO && x.Tipo == TipoFinanca.Receita).Sum(x => x.Valor);
+    var desJulio = Model.Where(x => x.ContaSocio == ContaSocio.JULIO && x.Tipo == TipoFinanca.Despesa).Sum(x => x.Valor);
+    var saldoJulio = recJulio - desJulio;
+
+    // Detalhado Rafael
+    var recRafael = Model.Where(x => x.ContaSocio == ContaSocio.RAFAEL && x.Tipo == TipoFinanca.Receita).Sum(x => x.Valor);
+    var desRafael = Model.Where(x => x.ContaSocio == ContaSocio.RAFAEL && x.Tipo == TipoFinanca.Despesa).Sum(x => x.Valor);
+    var saldoRafael = recRafael - desRafael;
+}
+
+<div class="container-fluid py-4 inner-system-page">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-light-subtle">
+        <div>
+            @{
+                string[] meses = { "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro" };
+                string nomeMes = (ViewBag.Mes >= 1 && ViewBag.Mes <= 12) ? meses[ViewBag.Mes - 1] : "Mês Inválido";
+            }
+            <h3 class="fw-bold text-dark mb-1 tracking-tight">Fechamento Mensal — @nomeMes de @ViewBag.Ano</h3>
+            <p class="text-muted small mb-0">Demonstrativo de acerto de contas e conciliação de saldos entre os sócios.</p>
+        </div>
+    </div>
+
+    
+
+    <div class="row g-4">
+
+        <div class="col-12 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-light-subtle">
+                    <h5 class="fw-bold text-dark mb-0">Julio</h5>
+                    <span class="badge bg-light text-secondary border px-2 py-1 small fw-normal">Sócio Proprietário</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center my-2.5">
+                    <span class="text-muted small text-uppercase fw-medium">Receitas</span>
+                    <span class="font-monospace text-success fw-semibold">@recJulio.ToString("C")</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center my-2.5">
+                    <span class="text-muted small text-uppercase fw-medium">Despesas</span>
+                    <span class="font-monospace text-danger fw-semibold">@desJulio.ToString("C")</span>
+                </div>
+
+                <hr class="my-3 border-light-subtle" />
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-dark fw-bold small text-uppercase">Saldo Individual</span>
+                    <span class="font-monospace fw-bold fs-5 @(saldoJulio >= 0 ? "text-success" : "text-danger")">@saldoJulio.ToString("C")</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-light-subtle">
+                    <h5 class="fw-bold text-dark mb-0">Rafael</h5>
+                    <span class="badge bg-light text-secondary border px-2 py-1 small fw-normal">Sócio Proprietário</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center my-2.5">
+                    <span class="text-muted small text-uppercase fw-medium">Receitas</span>
+                    <span class="font-monospace text-success fw-semibold">@recRafael.ToString("C")</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center my-2.5">
+                    <span class="text-muted small text-uppercase fw-medium">Despesas</span>
+                    <span class="font-monospace text-danger fw-semibold">@desRafael.ToString("C")</span>
+                </div>
+
+                <hr class="my-3 border-light-subtle" />
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-dark fw-bold small text-uppercase">Saldo Individual</span>
+                    <span class="font-monospace fw-bold fs-5 @(saldoRafael >= 0 ? "text-success" : "text-danger")">@saldoRafael.ToString("C")</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white overflow-hidden">
+                <div class="card-body p-4 text-center bg-light-subtle border-bottom border-light-subtle">
+                    <small class="text-muted text-uppercase fw-bold pb-2 d-block tracking-wider" style="font-size: 0.75rem;">Resultado do Acerto de Contas</small>
+
+                    @if (saldoJulio > metaPorPessoa)
+                    {
+                        <h2 class="fw-bold text-dark tracking-tight mb-2">
+                            Julio deve transferir <span class="text-dark font-monospace">@((saldoJulio - metaPorPessoa).ToString("C"))</span> para Rafael.
+                        </h2>
+                        <p class="text-muted small mb-0">Este valor equilibra a distribuição de lucros líquidos deste período.</p>
+                    }
+                    else if (saldoRafael > metaPorPessoa)
+                    {
+                        <h2 class="fw-bold text-dark tracking-tight mb-2">
+                            Rafael deve transferir <span class="text-dark font-monospace">@((saldoRafael - metaPorPessoa).ToString("C"))</span> para Julio.
+                        </h2>
+                        <p class="text-muted small mb-0">Este valor equilibra a distribuição de lucros líquidos deste período.</p>
+                    }
+                    else
+                    {
+                        <h2 class="fw-bold text-success tracking-tight mb-2">
+                            <i class="bi bi-check2-all me-1"></i> Caixa equilibrado!
+                        </h2>
+                        <p class="text-muted small mb-0">Nenhuma transferência ou ajuste é necessário entre os sócios.</p>
+                    }
+                </div>
+
+                <div class="card-footer bg-white border-0 py-3 px-4">
+                    <div class="row text-center text-md-start g-3">
+                        <div class="col-12 col-md-6 border-end-md border-light-subtle text-md-center">
+                            <small class="text-muted small">Saldo Líquido da Empresa:</small>
+                            <span class="fw-bold text-dark font-monospace ms-1">@saldoTotal.ToString("C")</span>
+                        </div>
+                        <div class="col-12 col-md-6 text-md-center">
+                            <small class="text-muted small">Divisão Igualitária (50/50):</small>
+                            <span class="fw-bold text-dark font-monospace ms-1">@metaPorPessoa.ToString("C")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+    </div>
+    <div class="mt-4">
+        <a asp-controller="Financa" asp-action="Index" class="btn btn-link text-decoration-none text-secondary p-0 d-inline-flex align-items-center gap-2 btn-back-hover">
+            <i class="bi bi-arrow-left-short fs-4"></i> <span class="fw-medium small">Voltar a Finança</span>
+        </a>
+    </div>
+
+</div>
+
+<style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .tracking-tight {
+        letter-spacing: -0.5px;
+    }
+
+    .tracking-wider {
+        letter-spacing: 0.5px;
+    }
+
+    .my-2.5 {
+        margin-top: 0.6rem !important;
+        margin-bottom: 0.6rem !important;
+    }
+
+    @@media (min-width: 768px) {
+        .border-end-md {
+            border-right: 1px solid var(--bs-border-color) !important;
+        }
+    }
+</style>

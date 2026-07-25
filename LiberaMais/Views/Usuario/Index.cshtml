@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<UsuarioModel>
 @{
-    Layout = "LayoutSistema";
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Controle de Usuários";
 }
 
 <div class="container-fluid py-4 inner-system-page">
@@ -20,6 +21,19 @@
             </a>
         </div>
     </div>
+
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-check-circle-fill"></i> @TempData["MensagemSucesso"]
+        </div>
+    }
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["MensagemErro"]
+        </div>
+    }
 
     <div class="card card-table shadow-sm border-0">
         <div class="card-body p-0">
@@ -42,9 +56,7 @@
                         {
                             foreach (var user in Model)
                             {
-                                var editarUrl = Url.Action("Editar", "Usuario", new { id = user.Id });
-
-                                <tr onclick="location.href='@editarUrl'" style="cursor: pointer;" title="Clique para editar">
+                                <tr class="linha-clicavel" onclick="navegarParaEditar(event, '@Url.Action("Editar", "Usuario", new { id = user.Id })')" title="Clique para editar">
                                     <th scope="row" class="ps-4 text-secondary">@user.Id</th>
                                     <td class="fw-bold text-dark">@user.Nome</td>
                                     <td><code class="text-muted bg-light px-2 py-1 rounded small">@user.Login</code></td>
@@ -68,7 +80,7 @@
 
                                     <td class="pe-4" onclick="event.stopPropagation();">
                                         <div class="d-flex justify-content-end gap-2">
-                                            <button type="button" class="btn btn-outline-danger btn-action-sm d-flex align-items-center justify-content-center"
+                                            <button type="button" class="btn btn-sm btn-outline-danger border-0 btn-action-sm d-flex align-items-center justify-content-center"
                                                     data-bs-toggle="modal" data-bs-target="#modalExcluirUsuario_@user.Id" title="Excluir Usuário">
                                                 <i class="bi bi-trash3-fill"></i>
                                             </button>
@@ -76,30 +88,22 @@
                                     </td>
                                 </tr>
 
-                                <div class="modal fade" id="modalExcluirUsuario_@user.Id" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
-                                        <div class="modal-content modal-custom shadow-lg border-0">
-                                            <div class="modal-body text-center p-4">
-                                                <div class="modal-icon-container mb-3 text-danger">
-                                                    <i class="bi bi-trash3-fill fs-3"></i>
-                                                </div>
-
-                                                <h5 class="fw-bold text-dark mb-2">Excluir Usuário?</h5>
-                                                <p class="text-muted small mb-4 px-2">
-                                                    Deseja realmente remover o usuário <strong class="text-dark">@user.Nome</strong> ("@user.Login") do sistema? Esta ação não poderá ser desfeita.
-                                                </p>
-
-                                                <div class="d-flex flex-column gap-2 w-100">
-                                                    <form asp-controller="Usuario" asp-action="Apagar" method="post" class="m-0 p-0 w-100">
-                                                        <input type="hidden" name="id" value="@user.Id" />
-                                                        <button type="submit" class="btn btn-danger w-100 py-2 fw-medium btn-modal-confirm">
-                                                            Confirmar Exclusão
-                                                        </button>
-                                                    </form>
-                                                    <button type="button" class="btn btn-light w-100 py-2 fw-medium btn-modal-cancel border" data-bs-dismiss="modal">
-                                                        Cancelar
-                                                    </button>
-                                                </div>
+                                <div class="modal fade" id="modalExcluirUsuario_@user.Id" tabindex="-1" aria-hidden="true" onclick="event.stopPropagation();">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content border-0 shadow">
+                                            <div class="modal-header border-0">
+                                                <h5 class="modal-title fw-bold text-dark">Confirmar Exclusão</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body text-muted">
+                                                Deseja realmente remover o usuário <strong>@user.Nome</strong> ("@user.Login") do sistema? Esta ação não poderá ser desfeita.
+                                            </div>
+                                            <div class="modal-footer border-0">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-2 fw-medium rounded-2" data-bs-dismiss="modal">Cancelar</button>
+                                                <form asp-controller="Usuario" asp-action="Apagar" method="post" class="d-inline m-0 p-0">
+                                                    <input type="hidden" name="id" value="@user.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-danger px-3 py-2 fw-medium rounded-2">Confirmar Exclusão</button>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
@@ -128,6 +132,35 @@
     </div>
 </div>
 
+<script>
+    function navegarParaEditar(event, url) {
+        // Ignora o clique se o usuário estiver apenas selecionando texto na tabela
+        const selecao = window.getSelection().toString();
+        if (selecao.length > 0) {
+            return;
+        }
+        // Evita navegação acidental ao clicar em botões, modais ou links da linha
+        if (event.target.closest('button') || event.target.closest('.modal') || event.target.closest('a')) {
+            return;
+        }
+        window.location.href = url;
+    }
+
+    // Fade-out automático das mensagens TempData
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            var alertas = [document.getElementById("alertaSucesso"), document.getElementById("alertaErro")];
+            alertas.forEach(function(alerta) {
+                if (alerta) {
+                    alerta.style.transition = "opacity 0.5s ease";
+                    alerta.style.opacity = "0";
+                    setTimeout(function() { alerta.style.display = "none"; }, 500);
+                }
+            });
+        }, 3000);
+    });
+</script>
+
 <style>
     .inner-system-page {
         font-family: 'Segoe UI', system-ui, sans-serif;
@@ -153,26 +186,27 @@
         .table-custom th {
             font-size: 0.82rem;
             font-weight: 700;
-            text-uppercase: true;
+            text-transform: uppercase;
             color: #5c636a;
             padding: 14px 10px;
             letter-spacing: 0.5px;
         }
 
-        .table-custom tbody tr {
-            border-bottom: 1px solid #f1f3f5;
-            transition: background-color 0.15s ease;
+    .linha-clicavel {
+        cursor: pointer;
+        border-bottom: 1px solid #f1f3f5;
+        transition: background-color 0.15s ease;
+    }
+
+        .linha-clicavel:hover {
+            background-color: rgba(0, 0, 0, 0.02) !important;
         }
 
-            .table-custom tbody tr:hover {
-                background-color: #f8f9fa !important;
-            }
-
-        .table-custom tbody td, .table-custom tbody th {
-            padding: 14px 10px;
-            font-size: 0.92rem;
-            color: #495057;
-        }
+    .table-custom tbody td, .table-custom tbody th {
+        padding: 14px 10px;
+        font-size: 0.92rem;
+        color: #495057;
+    }
 
     .badge-profile-admin {
         background-color: #212529 !important;

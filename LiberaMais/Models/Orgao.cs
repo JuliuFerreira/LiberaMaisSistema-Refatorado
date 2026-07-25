@@ -10,5 +10,7 @@ namespace LiberaMais.Models
 
         [Required(ErrorMessage = "É obrigatório o nome do orgão.")]
         public string Nome { get; set; }
+
+        public string? Url { get; set; }
     }
 }

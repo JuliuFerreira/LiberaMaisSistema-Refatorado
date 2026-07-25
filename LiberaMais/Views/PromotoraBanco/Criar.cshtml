@@ -1,175 +1,118 @@
 ﻿@model PromotoraBanco
 
 @{
-    Layout = "LayoutSistema";
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Novo Login";
 }
 
+<div class="container-fluid py-4 inner-system-page">
 
-<div class="row justify-content-center">
-
-    <div class="card shadow border-0 rounded-4 col-10 mt-5">
-
-        <div class="card-header text-white rounded-top-4"
-             style="background-color:green;">
-
-            <h3 class="text-center mb-0">
-                Novo login
-            </h3>
-
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-light-subtle">
+        <div>
+            <h3 class="fw-bold text-dark mb-1 tracking-tight">Novo Login</h3>
+            <p class="text-muted small mb-0">Cadastre credenciais de acesso para um banco vinculado a esta promotora.</p>
         </div>
+    </div>
 
-        @if (TempData["MensagemSucesso"] != null)
-        {
-            <div id="alertaSucesso" class="alert alert-success">
-                @TempData["MensagemSucesso"]
-            </div>
-        }
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["MensagemSucesso"]
+        </div>
+    }
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["MensagemErro"]
+        </div>
+    }
 
-        @if (TempData["MensagemErro"] != null)
-        {
-            <div id="alertaErro" class="alert alert-danger">
-                @TempData["MensagemErro"]
-            </div>
-        }
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <form asp-controller="PromotoraBanco" asp-action="Criar" method="post">
 
+            <input type="hidden" asp-for="PromotoraId" value="@ViewBag.PromotoraId" />
 
-        <div class="card-body p-4">
-
-
-            <form asp-controller="PromotoraBanco"
-                  asp-action="Criar"
-                  method="post">
-                  
-
-                <input type="hidden"
-                       asp-for="PromotoraId"
-                       value="@ViewBag.PromotoraId" />
-
-                <div class="row g-3">
-
-                    <div class="col-md-2">
-
-                        <label class="form-label">
-                            Promotora
-                        </label>
-
-                        <input type="text"
-                               class="form-control"
-                               value="@ViewBag.NomePromotora"
-                               disabled />
-
-                    </div>
-
-                    <div class="col-md-2">
-
-                        <label class="form-label">
-                            Banco
-                        </label>
-
-                        <select asp-for="BancoId"
-                                class="form-select">
-
-                            <option value="">
-                                Selecione
-                            </option>
-
-                            @foreach (var banco in ViewBag.Banco)
-                            {
-                                <option value="@banco.Id">
-                                    @banco.Nome
-                                </option>
-                            }
-
-                        </select>
-
-                        <span asp-validation-for="BancoId"
-                              class="text-danger">
-                        </span>
-
-
-                    </div>
-
-                    <div class="col-md-3">
-                        <label for="login" class="form-label">Usuário</label>
-                        <input type="text" asp-for="Login" class="form-control" id="usuario">
-                        <span asp-validation-for="Login"
-                              class="text-danger">
-                        </span>
-
-                    </div>
-
-                    <div class="col-md-3">
-                        <label for="login" class="form-label">Senha</label>
-                        <input type="text" asp-for="Senha" class="form-control" id="senha">
-                        <span asp-validation-for="Senha"
-                              class="text-danger">
-                        </span>
-
-                    </div>
-
-                    <div class="col-md-2">
-
-                        <label class="form-label">
-                            Usuário responsável
-                        </label>
-
-                        <select asp-for="UsuarioId"
-                                class="form-select">
-
-                            <option value="">
-                                Selecione
-                            </option>
-
-                            @foreach (var user in ViewBag.Usuario)
-                            {
-                                <option value="@user.Id">
-                                    @user.Nome
-                                </option>
-                            }
-
-                        </select>
-
-                        <span asp-validation-for="UsuarioId"
-                              class="text-danger">
-                        </span>
-
-
-                    </div>
-
-
-                    <div class="d-flex justify-content-end gap-2">
-
-                        <button type="submit"
-                                class="btn btn-success">
-
-                            Salvar
-
-                        </button>
-
-                        <a asp-controller="PromotoraBanco"
-                           asp-action="Index"
-                           asp-route-promotoraId="@ViewBag.PromotoraId"
-                           class="btn btn-secondary">
-
-                            Cancelar
-
-                        </a>
-
-                    </div>
+            <div class="row g-3">
+                <div class="col-12 col-md-4 col-lg-3">
+                    <label class="form-label text-muted fw-bold small text-uppercase">Promotora</label>
+                    <input type="text" class="form-control bg-light border-light-subtle rounded-3 small py-2 text-secondary" value="@ViewBag.NomePromotora" disabled />
                 </div>
 
-            </form>
+                <div class="col-12 col-md-4 col-lg-3">
+                    <label asp-for="BancoId" class="form-label text-muted fw-bold small text-uppercase">Banco</label>
+                    <select asp-for="BancoId" class="form-select border-light-subtle rounded-3 small py-2">
+                        <option value="">Selecione...</option>
+                        @foreach (var banco in ViewBag.Banco)
+                        {
+                            <option value="@banco.Id">@banco.Nome</option>
+                        }
+                    </select>
+                    <span asp-validation-for="BancoId" class="text-danger small mt-1 d-block" style="font-size: 0.75rem;"></span>
+                </div>
 
-        </div>
+                <div class="col-12 col-md-4 col-lg-2">
+                    <label asp-for="Login" class="form-label text-muted fw-bold small text-uppercase">Usuário / Login</label>
+                    <input type="text" asp-for="Login" class="form-control border-light-subtle rounded-3 small py-2 font-monospace" placeholder="Ex: master_user" />
+                    <span asp-validation-for="Login" class="text-danger small mt-1 d-block" style="font-size: 0.75rem;"></span>
+                </div>
 
+                <div class="col-12 col-md-6 col-lg-2">
+                    <label asp-for="Senha" class="form-label text-muted fw-bold small text-uppercase">Senha</label>
+                    <input type="text" asp-for="Senha" class="form-control border-light-subtle rounded-3 small py-2 font-monospace" placeholder="Senha de acesso" />
+                    <span asp-validation-for="Senha" class="text-danger small mt-1 d-block" style="font-size: 0.75rem;"></span>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-2">
+                    <label asp-for="UsuarioId" class="form-label text-muted fw-bold small text-uppercase">Usuário Responsável</label>
+                    <select asp-for="UsuarioId" class="form-select border-light-subtle rounded-3 small py-2">
+                        <option value="">Selecione...</option>
+                        @foreach (var user in ViewBag.Usuario)
+                        {
+                            <option value="@user.Id">@user.Nome</option>
+                        }
+                    </select>
+                    <span asp-validation-for="UsuarioId" class="text-danger small mt-1 d-block" style="font-size: 0.75rem;"></span>
+                </div>
+            </div>
+
+            <hr class="my-4 border-light-subtle" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-controller="PromotoraBanco" asp-action="Index" asp-route-promotoraId="@ViewBag.PromotoraId"
+                   class="btn btn-light border rounded-3 px-4 py-2 small fw-medium text-secondary">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-dark border-0 px-4 py-2 rounded-3 small fw-semibold shadow-sm">
+                    Salvar Cadastro
+                </button>
+            </div>
+
+        </form>
     </div>
 </div>
-<script>
-    setTimeout(function () {
 
-        $("#alertaSucesso").fadeOut("slow");
-        $("#alertaErro").fadeOut("slow");
+<style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
 
-    }, 3000);
-</script>
+    .tracking-tight {
+        letter-spacing: -0.5px;
+    }
 
+    .form-control:focus, .form-select:focus {
+        border-color: #dee2e6 !important;
+        box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.05) !important;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // FadeOut automático das mensagens após 3 segundos
+            setTimeout(function() {
+                $(".alert").fadeOut("slow");
+            }, 3000);
+        });
+    </script>
+}

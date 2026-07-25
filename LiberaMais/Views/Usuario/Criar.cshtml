@@ -2,149 +2,162 @@
 @model UsuarioModel
 
 @{
-    Layout = "LayoutSistema";
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Adicionar Usuário";
 }
 
-<body>
-    
+<div class="container-fluid py-4 inner-system-page">
 
-    <form style="border: solid 1px black; padding:10px; border-radius: 10px" id="usuarioForm" asp-controller="Usuario" asp-action="Criar" method="post" class="row g-3">
-        <h2 style="text-align:center; margin-top: 50px; margin-bottom: 50px">CRIAR USUÁRIO</h2>
-
-        <div class="col-md-2">
-            <label for="nome" class="form-label">Nome</label>
-            <input type="text" asp-for="Nome" class="form-control" id="nome">
-            @Html.ValidationMessageFor(x => x.Nome)
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold text-dark mb-1" style="font-size: 1.6rem;">Adicionar Usuário</h2>
+            <small class="text-muted">Cadastre credenciais e defina o perfil de acesso à plataforma</small>
         </div>
+    </div>
 
-        <div class="col-md-2">
-            <label for="email" class="form-label">email</label>
-            <input type="text" asp-for="Email" class="form-control" id="email">
-            @Html.ValidationMessageFor(x => x.Email)
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-check-circle-fill"></i> @TempData["MensagemSucesso"]
         </div>
-
-        <div class="col-md-2">
-            <label for="login" class="form-label">Login</label>
-            <input type="text" asp-for="Login" class="form-control" id="login">
-            @Html.ValidationMessageFor(x => x.Login)
+    }
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["MensagemErro"]
         </div>
-
-        <div class="col-md-2">
-            <label for="perfil" class="form-label">Perfil</label>
-            <select asp-for="Perfil" class="form-control">
-                <option value="">Selecione</option>
-                <option value="@PerfilEnum.Admin">Administrador</option>
-                <option value="@PerfilEnum.Padrao">Padrão</option>
-            </select>
-            @Html.ValidationMessageFor(x => x.Perfil)
-
-        </div>
-
-        <div class="col-md-2">
-            <label for="senha" class="form-label">Senha</label>
-            <input type="password" asp-for="Senha" class="form-control" id="login">
-            @Html.ValidationMessageFor(x => x.Senha)
-        </div>
-
-       
-
-        
-
-        <div class="col-12">
-            <button type="submit" class="btn btn-outline-success" onclick="return validarForm();">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy2-fill" viewBox="0 0 16 16">
-                    <path d="M12 2h-2v3h2z" />
-                    <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v13A1.5 1.5 0 0 0 1.5 16h13a1.5 1.5 0 0 0 1.5-1.5V2.914a1.5 1.5 0 0 0-.44-1.06L14.147.439A1.5 1.5 0 0 0 13.086 0zM4 6a1 1 0 0 1-1-1V1h10v4a1 1 0 0 1-1 1zM3 9h10a1 1 0 0 1 1 1v5H2v-5a1 1 0 0 1 1-1" />
-                </svg>
-                Gravar
-            </button>
-
-            <a type="button" class="btn btn-outline-danger" asp-controller="Usuario" asp-action="Index">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
-                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" />
-                </svg>
-                Cancelar
-            </a>
-        </div>
-    </form>
-
-    <script>
-        function validarForm() {
-            var nomeInput = document.getElementById('nome').value;
-
-            // Verifica se o nome contém um espaço, indicando nome e sobrenome
-            if (nomeInput.indexOf(' ') === -1) {
-                document.getElementById('nomeError').style.display = 'block'; // Exibe a mensagem de erro
-                return false; // Impede o envio do formulário
-            } else {
-                document.getElementById('nomeError').style.display = 'none'; // Oculta a mensagem de erro
-                return true; // Permite o envio do formulário
-            }
-        }
-    </script>
-
-    <script>
-        // Seleciona o campo de entrada
-        var inputNome = document.getElementById('nome');
-
-        // Adiciona um ouvinte de evento de entrada para o campo de entrada
-        inputNome.addEventListener('input', function () {
-            // Converte o valor para maiúsculas
-            this.value = this.value.toUpperCase();
-        });
-    </script>
-
-    <script>
-        function voltar() {
-            window.history.back();
-        }
-    </script>
-
-    @section Scripts {
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-        <script type="text/javascript">
-            $(document).ready(function () {
-                $("form#usuarioForm").submit(function (event) {
-                    event.preventDefault(); // Impede o envio do formulário padrão
-
-                    var form = $(this);
-                    $.ajax({
-                        type: form.attr('method'),
-                        url: form.attr('action'),
-                        data: form.serialize(),
-                        success: function (response) {
-                            if (response.success) {
-                                // Mostra o diálogo de sucesso com SweetAlert2
-                                Swal.fire({
-                                    title: 'Usuário cadastrado com sucesso!',
-                                    text: 'Redirecionando...',
-                                    icon: 'success',
-                                    timer: 3000, // 3 segundos
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    // Redireciona para a view Clientes após 3 segundos
-                                    window.location.href = "@Url.Action("Index", "Usuario")";
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: 'Erro',
-                                    text: response.message,
-                                    icon: 'error'
-                                });
-                            }
-                        },
-                        error: function () {
-                            Swal.fire({
-                                title: 'Erro',
-                                text: 'Ops, ocorreu um erro. Tente novamente.',
-                                icon: 'error'
-                            });
-                        }
-                    });
-                });
-            });
-        </script>
     }
 
-</body>
+    <div class="card card-table shadow-sm border-0 mb-3">
+        <div class="card-body p-4">
+            <form id="usuarioForm" asp-controller="Usuario" asp-action="Criar" method="post" onsubmit="return validarForm();">
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-3">
+                        <label asp-for="Nome" class="form-label fw-semibold text-dark small">Nome Completo</label>
+                        <input type="text" asp-for="Nome" class="form-control form-control-custom" id="nome" placeholder="NOME DO USUÁRIO" required />
+                        <span asp-validation-for="Nome" class="text-danger small mt-1 d-block" id="nomeError"></span>
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                        <label asp-for="Email" class="form-label fw-semibold text-dark small">E-mail</label>
+                        <input type="email" asp-for="Email" class="form-control form-control-custom" id="email" placeholder="exemplo@email.com" required />
+                        <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                    </div>  
+
+                    <div class="col-12 col-md-2">
+                        <label asp-for="Perfil" class="form-label fw-semibold text-dark small">Perfil de Permissão</label>
+                        <select asp-for="Perfil" class="form-select form-control-custom" required>
+                            <option value="">Selecione um perfil...</option>
+                            <option value="@PerfilEnum.Admin">Administrador</option>
+                            <option value="@PerfilEnum.Padrao">Padrão</option>
+                        </select>
+                        <span asp-validation-for="Perfil" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-12 col-md-2">
+                        <label asp-for="Login" class="form-label fw-semibold text-dark small">Login de Acesso</label>
+                        <input type="text" asp-for="Login" class="form-control form-control-custom font-monospace" id="login" placeholder="usuario.login" required />
+                        <span asp-validation-for="Login" class="text-danger small mt-1 d-block"></span>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label asp-for="Senha" class="form-label fw-semibold text-dark small">Senha Provisória</label>
+                        <input type="password" asp-for="Senha" class="form-control form-control-custom" placeholder="••••••••" required />
+                        <span asp-validation-for="Senha" class="text-danger small mt-1 d-block"></span>
+                    </div>
+                </div>
+
+                <hr class="my-4 opacity-50" />
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary px-3 py-2 fw-medium rounded-2 small">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-sm btn-dark px-4 py-2 fw-semibold rounded-2 small shadow-sm">
+                        Salvar Usuário
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <a asp-action="Index" class="text-decoration-none text-muted fw-medium d-flex align-items-center gap-1 small btn-back-hover">
+            <i class="bi bi-arrow-left"></i> Voltar para a listagem
+        </a>
+    </div>
+
+</div>
+
+<script>
+    // Validação nativa de Nome e Sobrenome
+    function validarForm() {
+        var nomeInput = document.getElementById('nome').value;
+        var errorSpan = document.getElementById('nomeError');
+
+        if (nomeInput.trim().indexOf(' ') === -1) {
+            errorSpan.textContent = "Por favor, insira o nome completo (Nome e Sobrenome).";
+            errorSpan.style.display = 'block';
+            return false;
+        } else {
+            errorSpan.style.display = 'none';
+            return true;
+        }
+    }
+
+    // // Caixa alta em tempo real para o Nome e Fade-out dos alertas
+    // window.addEventListener('load', function() {
+    //     var inputNome = document.getElementById('nome');
+    //     if(inputNome) {
+    //         inputNome.addEventListener('input', function () {
+    //             this.value = this.value.toUpperCase();
+    //         });
+    //     }
+
+        setTimeout(function() {
+            var alertas = [document.getElementById("alertaSucesso"), document.getElementById("alertaErro")];
+            alertas.forEach(function(alerta) {
+                if (alerta) {
+                    alerta.style.transition = "opacity 0.5s ease";
+                    alerta.style.opacity = "0";
+                    setTimeout(function() { alerta.style.display = "none"; }, 500);
+                }
+            });
+        }, 3000);
+    });
+</script>
+
+<style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .card-table {
+        border-radius: 14px;
+        border: 1px solid rgba(0,0,0,0.05);
+        background-color: #ffffff;
+    }
+
+    .form-control-custom {
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 0.9rem;
+        border: 1px solid #dee2e6;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .form-control-custom:focus {
+            border-color: #212529;
+            box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.1);
+            outline: 0;
+        }
+
+    .btn-back-hover {
+        transition: color 0.2s ease;
+    }
+
+        .btn-back-hover:hover {
+            color: #212529 !important;
+        }
+</style>

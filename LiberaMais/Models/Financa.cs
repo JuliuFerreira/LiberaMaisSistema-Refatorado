@@ -7,30 +7,34 @@ namespace LiberaMais.Models
     public class Financa
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Selecione o mês.")]
-        public int Mes {  get; set; }
+        public string Descricao { get; set; }
 
-        public MesEnum Mesdescription => (MesEnum)this.Mes;
+        public int? PromotoraId { get; set; }
 
-        [Required(ErrorMessage = "Selecione o ano.")]
+        public Promotora? Promotora { get; set; }
+
+        public decimal Valor { get; set; }
+
+        public DateTime Data { get; set; }
+
+        public TipoFinanca Tipo { get; set; }
+
+        public int Mes { get; set; }
+
         public int Ano { get; set; }
 
-        //public AnoEnum Anodescription => (AnoEnum)this.Ano;
+        public ContaSocio? ContaSocio { get; set; }
 
-        public List<Receita>? Receitas { get; set; }
-        public List<Despesa>? Despesas { get; set; }
+        public int? UsuarioId { get; set; }
 
-        [NotMapped]
-        public decimal TotalReceitas { get; set; }
+        public UsuarioModel? Usuario { get; set; }
 
-        [NotMapped]
-        public decimal TotalDespesas { get; set; }
 
-        [NotMapped]
-        public decimal SaldoTotal => TotalReceitas - TotalDespesas;
+
+
 
     }
+
 }

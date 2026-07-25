@@ -1,179 +1,116 @@
 ﻿@model Promotora
 
 @{
-    Layout = "LayoutSistema";
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Editar Promotora";
 }
 
-<div class="row justify-content-center">
+<div class="container-fluid py-4 inner-system-page">
 
-    <div class="card shadow border-0 rounded-4 col-10 mt-5">
-
-        <div class="card-header text-white rounded-top-4"
-             style="background-color:orange;">
-
-            <h3 class="text-center mb-0">
-                Editar Promotora
-            </h3>
-
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-light-subtle">
+        <div>
+            <h3 class="fw-bold text-dark mb-1 tracking-tight">Editar Promotora</h3>
+            <p class="text-muted small mb-0">Atualize os parâmetros operacionais, credenciais ou links de acesso desta promotora.</p>
         </div>
-
-        @if (TempData["MensagemSucesso"] != null)
-        {
-            <div id="alertaSucesso" class="alert alert-success">
-                @TempData["MensagemSucesso"]
-            </div>
-        }
-
-        @if (TempData["MensagemErro"] != null)
-        {
-            <div id="alertaErro" class="alert alert-danger">
-                @TempData["MensagemErro"]
-            </div>
-        }
-
-
-        <div class="card-body p-4">
-
-            <form id="promotoraForm"
-                  asp-controller="Promotora"
-                  asp-action="Editar"
-                  method="post">
-                <input type="hidden" asp-for="Id" />
-
-                <div class="row g-3">
-
-                    <div class="row">
-                        @if (ViewBag.IsAdmin)
-                        {
-                            <div class="col-md-2 mb-3">
-
-                                <label>Usuário</label>
-
-                                <select asp-for="UsuarioId"
-                                        class="form-select"
-                                        asp-items='@(new SelectList(ViewBag.Usuarios, "Id", "Nome"))'>
-
-                                    <option value="">Selecione</option>
-
-                                </select>
-
-                                <span asp-validation-for="UsuarioId"
-                                      class="text-danger"></span>
-
-                            </div>
-                        }
-                    </div>
-
-
-                    <div class="col-md-3">
-
-                        <label asp-for="Nome"
-                               class="form-label fw-bold">
-                            Nome
-                        </label>
-
-                        <input asp-for="Nome"
-                               class="form-control"
-                               maxlength="100"
-                               />
-
-                        <span asp-validation-for="Nome"
-                              class="text-danger">
-                        </span>
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <label asp-for="Login"
-                               class="form-label fw-bold">
-                            Login
-                        </label>
-
-                        <input asp-for="Login"
-                               class="form-control"
-                               maxlength="100"
-                               placeholder="Login da promotora" />
-
-                        <span asp-validation-for="Login"
-                              class="text-danger">
-                        </span>
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <label asp-for="Senha"
-                               class="form-label fw-bold">
-                            Senha
-                        </label>
-
-                        <input asp-for="Senha"
-                               class="form-control"
-                               maxlength="20"
-                               placeholder="Senha da promotora" />
-
-                        <span asp-validation-for="Senha"
-                              class="text-danger">
-                        </span>
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <label asp-for="Url"
-                               class="form-label fw-bold">
-                            URL
-                        </label>
-
-                        <input asp-for="Url"
-                               class="form-control"
-                               maxlength="255"
-                               placeholder="https://site.com.br" />
-
-                        <span asp-validation-for="Url"
-                              class="text-danger">
-                        </span>
-
-                    </div>
-
-                </div>
-
-                <hr class="my-4" />
-
-                <div class="d-flex justify-content-end gap-2">
-
-                    <a asp-action="Index"
-                       class="btn btn-secondary">
-
-                        Voltar
-
-                    </a>
-
-                    <button type="submit"
-                            class="btn btn-success">
-
-                        Salvar
-
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
     </div>
 
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["MensagemSucesso"]
+        </div>
+    }
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["MensagemErro"]
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <form id="promotoraForm" asp-controller="Promotora" asp-action="Editar" method="post">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="row g-3">
+                @if (ViewBag.IsAdmin ?? false)
+                {
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <label class="form-label text-muted fw-bold small text-uppercase">Usuário Vinculado</label>
+                        <select asp-for="UsuarioId" class="form-select border-light-subtle rounded-3 small py-2"
+                                asp-items='@(new SelectList(ViewBag.Usuarios, "Id", "Nome"))'>
+                            <option value="">Selecione...</option>
+                        </select>
+                        <span asp-validation-for="UsuarioId" class="text-danger small mt-1 d-block" style="font-size: 0.75rem;"></span>
+                    </div>
+                }
+                else
+                {
+                    <input type="hidden" asp-for="UsuarioId" />
+                }
+
+                <div class="col-12 col-md-4 col-lg-3">
+                    <label asp-for="Nome" class="form-label text-muted fw-bold small text-uppercase">Nome da Promotora</label>
+                    <input asp-for="Nome" class="form-control border-light-subtle rounded-3 small py-2" maxlength="100" placeholder="Ex: Promotora Master" />
+                    <span asp-validation-for="Nome" class="text-danger small mt-1 d-block" style="font-size: 0.75rem;"></span>
+                </div>
+
+                <div class="col-12 col-md-4 col-lg-2">
+                    <label asp-for="Login" class="form-label text-muted fw-bold small text-uppercase">Login</label>
+                    <input asp-for="Login" class="form-control border-light-subtle rounded-3 small py-2 font-monospace" maxlength="100" placeholder="Usuário ou e-mail" />
+                    <span asp-validation-for="Login" class="text-danger small mt-1 d-block" style="font-size: 0.75rem;"></span>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-2">
+                    <label asp-for="Senha" class="form-label text-muted fw-bold small text-uppercase">Senha</label>
+                    <input asp-for="Senha" class="form-control border-light-subtle rounded-3 small py-2 font-monospace" maxlength="20" placeholder="Senha de acesso" />
+                    <span asp-validation-for="Senha" class="text-danger small mt-1 d-block" style="font-size: 0.75rem;"></span>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-2">
+                    <label asp-for="Url" class="form-label text-muted fw-bold small text-uppercase">URL / Link</label>
+                    <input asp-for="Url" class="form-control border-light-subtle rounded-3 small py-2" maxlength="255" placeholder="site.com.br" />
+                    <span asp-validation-for="Url" class="text-danger small mt-1 d-block" style="font-size: 0.75rem;"></span>
+                </div>
+            </div>
+
+            <hr class="my-4 border-light-subtle" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-action="Index" class="btn btn-light border rounded-3 px-4 py-2 small fw-medium text-secondary">
+                    Voltar
+                </a>
+                <button type="submit" class="btn btn-dark border-0 px-4 py-2 rounded-3 small fw-semibold shadow-sm">
+                    Salvar Alterações
+                </button>
+            </div>
+
+        </form>
+    </div>
 </div>
 
-<script>
+<style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
 
-    setTimeout(function () {
+    .tracking-tight {
+        letter-spacing: -0.5px;
+    }
 
-        $("#alertaSucesso").fadeOut("slow");
-        $("#alertaErro").fadeOut("slow");
+    /* Customizações extras para inputs focados no padrão limpo */
+    .form-control:focus, .form-select:focus {
+        border-color: #dee2e6 !important;
+        box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.05) !important;
+    }
+</style>
 
-    }, 3000);
-
-</script>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // FadeOut automático das mensagens após 3 segundos
+            setTimeout(function() {
+                $(".alert").fadeOut("slow");
+            }, 3000);
+        });
+    </script>
+}

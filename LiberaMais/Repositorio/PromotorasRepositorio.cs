@@ -74,5 +74,15 @@ namespace LiberaMais.Repositorio
             return _bancoContext.Promotoras
                 .FirstOrDefault(p => p.Nome == nome);
         }
+
+        public void DesvincularFinancas(int promotoraId)
+        {
+            var financas = _bancoContext.financas.Where(f => f.PromotoraId == promotoraId).ToList();
+            foreach (var financa in financas)
+            {
+                financa.PromotoraId = null; // Remove o vínculo
+            }
+            _bancoContext.SaveChanges();
+        }
     }
 }

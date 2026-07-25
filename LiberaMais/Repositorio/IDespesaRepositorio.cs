@@ -1,18 +1,18 @@
-﻿using LiberaMais.Models;
+﻿//using LiberaMais.Models;
 
-namespace LiberaMais.Repositorio
-{
-    public interface IDespesaRepositorio
-    {
-        Despesa BuscarDespesaPorId(int id);
+//namespace LiberaMais.Repositorio
+//{
+//    public interface IDespesaRepositorio
+//    {
+//        Despesa BuscarDespesaPorId(int id);
 
-        List<Despesa> ListarDespesas(int idFinanca);
+//        List<Despesa> ListarDespesas(int idFinanca);
 
-        Despesa Adicionar(Despesa despesa);
+//        Despesa Adicionar(Despesa despesa);
 
-        Despesa Atualizar(Despesa despesa);
+//        Despesa Atualizar(Despesa despesa);
 
-        bool Apagar(int id);
+//        bool Apagar(int id);
 
-    }
-}
+//    }
+//}

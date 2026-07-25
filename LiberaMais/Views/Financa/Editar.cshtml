@@ -1,0 +1,126 @@
+﻿@model LiberaMais.Models.Financa
+@using LiberaMais.Models.Enums
+
+@{
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Editar Lançamento";
+}
+
+<div class="container-fluid py-4 inner-system-page">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-light-subtle">
+        <div>
+            <h3 class="fw-bold text-dark mb-1 tracking-tight">Editar Lançamento</h3>
+            <p class="text-muted small mb-0">Atualize os detalhes, valores ou categorização deste lançamento financeiro.</p>
+        </div>
+    </div>
+
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["MensagemSucesso"]
+        </div>
+    }
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["MensagemErro"]
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <form asp-action="Editar">
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="row g-3">
+                <div class="col-12 col-md-4 col-lg-2">
+                    <label asp-for="Data" class="form-label text-muted fw-bold small text-uppercase">Data *</label>
+                    <input asp-for="Data" class="form-control border-light-subtle rounded-3 small py-2" type="date" />
+                    <span asp-validation-for="Data" class="text-danger small mt-1 d-block" style="font-size: 0.75rem;"></span>
+                </div>
+
+                <div class="col-12 col-md-4 col-lg-2">
+                    <label asp-for="Tipo" class="form-label text-muted fw-bold small text-uppercase">Tipo *</label>
+                    <select asp-for="Tipo" asp-items="Html.GetEnumSelectList<TipoFinanca>()" class="form-select border-light-subtle rounded-3 small py-2">
+                        <option value="">Selecione...</option>
+                    </select>
+                    <span asp-validation-for="Tipo" class="text-danger small mt-1 d-block" style="font-size: 0.75rem;"></span>
+                </div>
+
+                <div class="col-12 col-md-4 col-lg-3">
+                    <label asp-for="ContaSocio" class="form-label text-muted fw-bold small text-uppercase">Conta *</label>
+                    <select asp-for="ContaSocio" asp-items="Html.GetEnumSelectList<ContaSocio>()" class="form-select border-light-subtle rounded-3 small py-2">
+                        <option value="">Selecione...</option>
+                    </select>
+                    <span asp-validation-for="ContaSocio" class="text-danger small mt-1 d-block" style="font-size: 0.75rem;"></span>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label asp-for="PromotoraId" class="form-label text-muted fw-bold small text-uppercase">Promotora</label>
+                    <select asp-for="PromotoraId" class="form-select border-light-subtle rounded-3 small py-2">
+                        <option value="">Selecione uma Promotora...</option>
+                        @foreach (var p in (IEnumerable<dynamic>)ViewBag.Promotoras)
+                        {
+                            <option value="@p.Id">@p.Nome</option>
+                        }
+                    </select>
+                    <span asp-validation-for="PromotoraId" class="text-danger small mt-1 d-block" style="font-size: 0.75rem;"></span>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-2">
+                    <label asp-for="Valor" class="form-label text-muted fw-bold small text-uppercase">Valor *</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-light-subtle rounded-start-3 text-secondary small py-2">R$</span>
+                        <input asp-for="Valor" class="form-control border-light-subtle rounded-end-3 small py-2 font-monospace text-end" placeholder="0,00" />
+                    </div>
+                    <span asp-validation-for="Valor" class="text-danger small mt-1 d-block" style="font-size: 0.75rem;"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Descricao" class="form-label text-muted fw-bold small text-uppercase">Descrição</label>
+                    <input asp-for="Descricao" class="form-control border-light-subtle rounded-3 small py-2" placeholder="Detalhes do lançamento..." />
+                    <span asp-validation-for="Descricao" class="text-danger small mt-1 d-block" style="font-size: 0.75rem;"></span>
+                </div>
+            </div>
+
+            <hr class="my-4 border-light-subtle" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-action="Index" class="btn btn-light border rounded-3 px-4 py-2 small fw-medium text-secondary">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-dark border-0 px-4 py-2 rounded-3 small fw-semibold shadow-sm">
+                    Salvar Alterações
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .tracking-tight {
+        letter-spacing: -0.5px;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #dee2e6 !important;
+        box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.05) !important;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // FadeOut automático padronizado usando jQuery
+            setTimeout(function() {
+                $(".alert").fadeOut("slow");
+            }, 3000);
+        });
+    </script>
+}

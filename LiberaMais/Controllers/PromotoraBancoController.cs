@@ -60,7 +60,7 @@ namespace LiberaMais.Controllers
             }
             var logins = _promotoraBancoRepositorio.ListarPorPromotora(promotoraId); // Busca os Logins por promotora
             ViewBag.PromotoraId = promotoraId;
-            ViewBag.NomePromotora = promotora.Nome;
+            ViewBag.NomePromotora = promotora?.Nome;
 
             return View(logins);
         }

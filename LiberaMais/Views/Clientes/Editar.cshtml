@@ -1,241 +1,280 @@
 ﻿@model ClienteEnderecoViewModel
 
 @{
-    Layout = "LayoutSistema";
+    Layout = "_LayoutSistema";
     ViewData["Title"] = "Editar Cliente";
 }
 
-<div class="row justify-content-center">
+<div class="container-fluid py-4 inner-system-page">
 
-    <div class="justify-content-center align-items-center mb-4 mt-4 mt-5">
-
-        <div class="card-header text-white rounded-top-4"
-             style="background-color:orange;">
-
-            <h3 class="text-center mb-0">
-                Editar Cliente
-            </h3>
-
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold text-dark mb-1" style="font-size: 1.6rem;">Editar Cliente</h2>
+            <small class="text-muted">Altere as informações cadastrais e de endereço do cliente</small>
         </div>
 
     </div>
 
     @if (TempData["MensagemSucesso"] != null)
     {
-        <div id="alertaSucesso" class="alert alert-success">
-            @TempData["MensagemSucesso"]
+        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-check-circle-fill"></i> @TempData["MensagemSucesso"]
         </div>
     }
-
     @if (TempData["MensagemErro"] != null)
     {
-        <div id="alertaErro" class="alert alert-danger">
-            @TempData["MensagemErro"]
+        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["MensagemErro"]
         </div>
     }
 
-
     <form asp-action="Editar" method="post">
-       
+
         <input type="hidden" asp-for="Cliente.Id" />
         <input type="hidden" asp-for="Endereco.Id" />
         <input type="hidden" asp-for="Endereco.ClienteId" />
 
-        <div class="card shadow-sm mb-4">
-
-            <div class="card-header bg-info text-white">
-                Dados do Cliente
+        <div class="card card-custom shadow-sm border-0 mb-4">
+            <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                <span class="text-dark fw-bold fs-5">
+                    <i class="bi bi-person text-secondary me-2"></i> Dados do Cliente
+                </span>
             </div>
 
-            <div class="card-body">
+            <div class="card-body px-4 pt-3 pb-4">
+                <div class="row g-3">
 
-                <div class="row">
-                                    
+                    @if (ViewBag.IsAdmin)
+                    {
+                        <div class="col-12 info-divider pb-2 mb-2">
+                            <label class="text-muted d-block info-label mb-1">Usuário / Responsável</label>
+                            <select asp-for="Cliente.UsuarioId" class="form-select rounded-3" style="max-width: 350px;"
+                                    asp-items='@(new SelectList(ViewBag.Usuarios, "Id", "Nome", Model.Cliente.UsuarioId))'>
+                            </select>
+                            <span asp-validation-for="Cliente.UsuarioId" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    }
 
-                    <div class="row">
-                        @if (ViewBag.IsAdmin)
-                        {
-                            <div class="col-md-4 mb-3">
-
-                                <label>Usuário</label>
-
-                                <select asp-for="Cliente.UsuarioId"
-                                        class="form-select"
-                                        asp-items='@(new SelectList(ViewBag.Usuarios, "Id", "Nome", Model.Cliente.UsuarioId))'>
-                                </select>
-                                <span asp-validation-for="Cliente.UsuarioId"
-                                      class="text-danger"></span>
-
-                            </div>
-                        }
+                    <div class="col-12 col-md-6">
+                        <label class="text-muted d-block info-label mb-1">Nome Completo</label>
+                        <input asp-for="Cliente.Nome" class="form-control rounded-3" />
+                        <span asp-validation-for="Cliente.Nome" class="text-danger small mt-1 d-block"></span>
                     </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label>Nome</label>
-
-                        <input asp-for="Cliente.Nome"
-                               class="form-control" />
-
-                        <span asp-validation-for="Cliente.Nome"
-                              class="text-danger"></span>
+                    <div class="col-6 col-md-3">
+                        <label class="text-muted d-block info-label mb-1">CPF (Somente Leitura)</label>
+                        <input asp-for="Cliente.Cpf" class="form-control rounded-3 bg-light text-muted" readonly />
+                        <span asp-validation-for="Cliente.Cpf" class="text-danger small mt-1 d-block"></span>
                     </div>
 
-                    <div class="col-md-3 mb-3">
-                        <label>CPF</label>
-
-                        <input asp-for="Cliente.Cpf"
-                               class="form-control" readonly/>
-
-                        <span asp-validation-for="Cliente.Cpf"
-                              class="text-danger"></span>
+                    <div class="col-6 col-md-3">
+                        <label class="text-muted d-block info-label mb-1">Telefone</label>
+                        <input asp-for="Cliente.Fone" class="form-control rounded-3" id="telefone" oninput="mascaraTelefone(this)" maxlength="15" />
+                        <span asp-validation-for="Cliente.Fone" class="text-danger small mt-1 d-block"></span>
                     </div>
 
-                    <div class="col-md-3 mb-3">
-                        <label>Telefone</label>
+                    <div class="col-6 col-md-4 mt-3">
+                        <label class="text-muted d-block info-label mb-1">Data de Nascimento (Somente Leitura)</label>
+                        <input asp-for="Cliente.DataNascimento" type="date" class="form-control rounded-3 bg-light text-muted" readonly />
+                    </div>
 
-                        <input asp-for="Cliente.Fone"
-                               class="form-control"
-                               id="telefone" />
+                    <div class="col-6 col-md-8 mt-3">
+                        <label class="text-muted d-block info-label mb-1">E-mail</label>
+                        <input asp-for="Cliente.Email" class="form-control rounded-3" />
+                    </div>
 
-                        <span asp-validation-for="Cliente.Fone"
-                              class="text-danger"></span>
+                    <div class="col-12 mt-3">
+                        <label class="text-muted d-block info-label mb-1">Observações Internas</label>
+                        <textarea asp-for="Cliente.Observacoes" class="form-control rounded-3 font-monospace small" rows="4"></textarea>
                     </div>
 
                 </div>
-
-                <div class="row">
-
-                    <div class="col-md-4 mb-3">
-                        <label>Data Nascimento</label>
-
-                        <input asp-for="Cliente.DataNascimento"
-                               type="date"
-                               class="form-control" readonly />
-                    </div>
-
-                    <div class="col-md-4 mb-3">
-                        <label>Email</label>
-
-                        <input asp-for="Cliente.Email"
-                               class="form-control" />
-                    </div>
-
-                </div>
-
-                <div class="mb-3">
-                    <label>Observações</label>
-
-                    <textarea asp-for="Cliente.Observacoes"
-                              class="form-control"></textarea>
-                </div>
-
             </div>
-
         </div>
 
-        <div class="card shadow-sm mb-4">
-
-            <div class="card-header bg-secondary text-white">
-                Endereço
+        <div class="card card-custom shadow-sm border-0 mb-4">
+            <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                <span class="text-dark fw-bold fs-5">
+                    <i class="bi bi-geo-alt text-secondary me-2"></i> Endereço Residencial
+                </span>
             </div>
 
-            <div class="card-body">
+            <div class="card-body px-4 pt-3 pb-4">
+                <div class="row g-3">
 
-                <div class="row">
-
-                    <div class="col-md-3 mb-3">
-                        <label>CEP</label>
-
-                        <input asp-for="Endereco.Cep"
-                               class="form-control"
-                               id="cep"/>
+                    <div class="col-6 col-md-2">
+                        <label class="text-muted d-block info-label mb-1">CEP</label>
+                        <div class="position-relative">
+                            <input asp-for="Endereco.Cep" class="form-control rounded-3" id="cep" oninput="mascaraCEP(this)" maxlength="9" />
+                            <div id="cepSpinner" class="spinner-border spinner-border-sm text-secondary position-absolute d-none" style="top: 13px; right: 12px;" role="status"></div>
+                        </div>
+                        <span asp-validation-for="Endereco.Cep" class="text-danger small d-block mt-1" id="cepErro"></span>
                     </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label>Rua</label>
-
-                        <input asp-for="Endereco.Rua"
-                               class="form-control"
-                               id="rua"/>
+                    <div class="col-12 col-md-7">
+                        <label class="text-muted d-block info-label mb-1">Logradouro (Rua/Av)</label>
+                        <input asp-for="Endereco.Rua" class="form-control rounded-3" id="rua" />
+                        <span asp-validation-for="Endereco.Rua" class="text-danger small mt-1 d-block"></span>
                     </div>
 
-                    <div class="col-md-3 mb-3">
-                        <label>Número</label>
+                    <div class="col-6 col-md-3">
+                        <label class="text-muted d-block info-label mb-1">Número</label>
+                        <input asp-for="Endereco.Numero" class="form-control rounded-3" id="numero" />
+                        <span asp-validation-for="Endereco.Numero" class="text-danger small mt-1 d-block"></span>
+                    </div>
 
-                        <input asp-for="Endereco.Numero"
-                               class="form-control" />
+                    <div class="col-6 col-md-4 mt-3">
+                        <label class="text-muted d-block info-label mb-1">Bairro</label>
+                        <input asp-for="Endereco.Bairro" class="form-control rounded-3" id="bairro" />
+                        <span asp-validation-for="Endereco.Bairro" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-6 col-md-5 mt-3">
+                        <label class="text-muted d-block info-label mb-1">Cidade</label>
+                        <input asp-for="Endereco.Cidade" class="form-control rounded-3" id="cidade" />
+                        <span asp-validation-for="Endereco.Cidade" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-6 col-md-3 mt-3">
+                        <label class="text-muted d-block info-label mb-1">UF / Estado</label>
+                        <input asp-for="Endereco.Estado" class="form-control rounded-3 text-uppercase" maxlength="2" id="estado" />
+                        <span asp-validation-for="Endereco.Estado" class="text-danger small mt-1 d-block"></span>
                     </div>
 
                 </div>
-
-                <div class="row">
-
-                    <div class="col-md-4 mb-3">
-                        <label>Bairro</label>
-
-                        <input asp-for="Endereco.Bairro"
-                               class="form-control"
-                               id="bairro"/>
-                    </div>
-
-                    <div class="col-md-4 mb-3">
-                        <label>Cidade</label>
-
-                        <input asp-for="Endereco.Cidade"
-                               class="form-control"
-                               id="cidade"/>
-                    </div>
-
-                    <div class="col-md-2 mb-3">
-                        <label>Estado</label>
-
-                        <input asp-for="Endereco.Estado"
-                               class="form-control"
-                               id="estado"/>
-                    </div>
-
-                </div>
-
             </div>
-
         </div>
 
-        <hr class="my-4" />
-
-        <div class="d-flex justify-content-end gap-2">
-
-            <button type="submit"
-                    class="btn btn-success">
-                Salvar
-            </button>
-
-            <a asp-action="Detalhes"
-               asp-route-id="@Model.Cliente.Id"
-               class="btn btn-secondary">
-                <i class="bi bi-arrow-return-left"></i>
-                Voltar
+        <div class="d-flex justify-content-end align-items-center gap-2 mt-4 pb-5">
+            <a asp-action="Detalhes" asp-route-id="@Model.Cliente.Id" class="btn btn-light border px-4 py-2 rounded-3 text-secondary fw-semibold small">
+                Cancelar
             </a>
-
+            <button type="submit" class="btn btn-dark px-4 py-2 rounded-3 fw-semibold small shadow-sm">
+                <i class="bi bi-check-lg me-1"></i> Salvar Alterações
+            </button>
         </div>
 
     </form>
-
 </div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        function mascaraTelefone(input) {
+            let v = input.value.replace(/\D/g, "");
+            v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
+            v = v.replace(/(\dwp?)(\d{4})$/, "$1-$2");
+            v = v.replace(/(\d)(\d{4})$/, "$1-$2");
+            input.value = v;
+        }
+
+        function mascaraCEP(input) {
+            let v = input.value.replace(/\D/g, "");
+            v = v.replace(/^(\d{5})(\d)/, "$1-$2");
+            input.value = v;
+        }
+
+        $(document).ready(function () {
+            // Formata o telefone e CEP logo que a página carrega os dados do banco
+            var telInput = document.getElementById("telefone");
+            var cepInput = document.getElementById("cep");
+            if(telInput && telInput.value) mascaraTelefone(telInput);
+            if(cepInput && cepInput.value) mascaraCEP(cepInput);
+
+            // Remove mensagens de feedback automaticamente após 3 segundos
+            setTimeout(function () {
+                var alertas = [document.getElementById("alertaSucesso"), document.getElementById("alertaErro")];
+                alertas.forEach(function(alerta) {
+                    if (alerta) {
+                        alerta.style.transition = "opacity 0.5s ease";
+                        alerta.style.opacity = "0";
+                        setTimeout(function() { alerta.style.display = "none"; }, 500);
+                    }
+                });
+            }, 3000);
+
+            // --- SCRIPT DE PREENCHIMENTO AUTOMÁTICO DE CEP ---
+            function limpaFormularioCep() {
+                $("#rua").val("");
+                $("#bairro").val("");
+                $("#cidade").val("");
+                $("#estado").val("");
+                $("#cepErro").text("");
+            }
+
+            $("#cep").blur(function () {
+                var cep = $(this).val().replace(/\D/g, '');
+
+                if (cep !== "") {
+                    var validaCep = /^[0-9]{8}$/;
+
+                    if (validaCep.test(cep)) {
+                        $("#cepSpinner").removeClass("d-none");
+                        $("#cepErro").text("");
+
+                        $.getJSON("https://viacep.com.br/ws/" + cep + "/json/?callback=?", function (dados) {
+                            $("#cepSpinner").addClass("d-none");
+
+                            if (!("erro" in dados)) {
+                                $("#rua").val(dados.logradouro);
+                                $("#bairro").val(dados.bairro);
+                                $("#cidade").val(dados.localidade);
+                                $("#estado").val(dados.uf);
+                                $("#numero").focus();
+                            } else {
+                                limpaFormularioCep();
+                                $("#cepErro").text("CEP não encontrado.");
+                            }
+                        }).fail(function() {
+                            $("#cepSpinner").addClass("d-none");
+                            $("#cepErro").text("Erro ao buscar o CEP. Tente digitar manualmente.");
+                        });
+                    } else {
+                        limpaFormularioCep();
+                        $("#cepErro").text("Formato de CEP inválido.");
+                    }
+                } else {
+                    limpaFormularioCep();
+                }
+            });
+        });
+    </script>
 }
 
-<script>
+<style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
 
-    setTimeout(function () {
+    .card-custom {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
 
-        $("#alertaSucesso").fadeOut("slow");
-        $("#alertaErro").fadeOut("slow");
+    .info-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
 
-    }, 3000);
+    .info-divider {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
 
-</script>
+    .form-control, .form-select {
+        border: 1px solid #dee2e6;
+        padding: 0.55rem 0.75rem;
+        font-size: 0.92rem;
+        background-color: #fff;
+    }
 
+        .form-control:focus, .form-select:focus {
+            border-color: #2c3e50;
+            box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.15);
+        }
+</style>

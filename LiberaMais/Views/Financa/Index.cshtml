@@ -1,102 +1,210 @@
-﻿@using System.Globalization
-@model IEnumerable<Financa>
+﻿@model IEnumerable<LiberaMais.Models.Financa>
+@using LiberaMais.Models.Enums
 
 @{
-    Layout = "LayoutSistema";
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Finanças";
+
+    var totalReceitas = Model.Where(x => x.Tipo == TipoFinanca.Receita).Sum(x => x.Valor);
+    var totalDespesas = Model.Where(x => x.Tipo == TipoFinanca.Despesa).Sum(x => x.Valor);
+    var saldoFinal = totalReceitas - totalDespesas;
+
+    string[] nomesMeses = { "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro" };
+    int mesAtual = ViewBag.Mes ?? DateTime.Today.Month;
+    int anoAtual = ViewBag.Ano ?? DateTime.Today.Year;
+    string nomeMesCompetencia = nomesMeses[mesAtual - 1];
 }
 
 <div class="container-fluid py-4 inner-system-page">
 
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 border-bottom pb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2">
         <div>
-            <h2 class="fw-bold text-dark mb-1 text-uppercase tracking-wide" style="font-size: 1.6rem;">
-                Gestão Financeira
-            </h2>
-            <small class="text-muted">Acompanhe o fluxo de caixa, receitas e despesas mensais do LiberaMais</small>
+            <span class="text-uppercase fw-bold text-secondary font-monospace tracking-wider" style="font-size: 0.75rem;">Módulo de Caixa</span>
+            <h2 class="fw-bold text-dark mb-1 tracking-tight">Gestão Financeira</h2>
+            <p class="text-muted small mb-0">Competência de Referência: <strong class="text-dark">@nomeMesCompetencia de @anoAtual</strong></p>
         </div>
-
-        <div class="d-flex gap-2">
-            <a class="btn btn-dark d-flex align-items-center gap-2 px-3 py-2 btn-adicionar shadow-sm"
-               asp-controller="Financa" asp-action="AddMesAno">
-                <i class="bi bi-calendar3" style="font-size: 1.1rem;"></i>
-                <span class="fw-semibold small">Adicionar Mês/Ano</span>
+        <div>
+            <a asp-action="Criar" class="btn btn-dark d-flex align-items-center gap-2 px-3 py-2 shadow-sm rounded-3">
+                <i class="bi bi-plus-lg"></i>
+                <span class="fw-semibold small">Novo Lançamento</span>
             </a>
         </div>
     </div>
 
-    <div class="card card-table shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-custom align-middle mb-0" id="table-financas-normal" style="width: 100%">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="ps-4">Período / Mês de Referência</th>
-                            <th scope="col" class="text-center">Valor em Caixa</th>
-                            <th scope="col" class="text-end pe-4">Ações Financeiras</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model != null && Model.Any())
-                        {
-                            foreach (var financa in Model)
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["MensagemSucesso"]
+        </div>
+    }
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["MensagemErro"]
+        </div>
+    }
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4">
+            <div class="card p-3 shadow-sm border-0 rounded-4 bg-white">
+                <small class="text-muted text-uppercase fw-bold pb-1 d-block" style="font-size: 0.7rem; letter-spacing: 0.5px;">Receitas</small>
+                <span class="fs-4 fw-bold text-success font-monospace">@totalReceitas.ToString("C2")</span>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="card p-3 shadow-sm border-0 rounded-4 bg-white">
+                <small class="text-muted text-uppercase fw-bold pb-1 d-block" style="font-size: 0.7rem; letter-spacing: 0.5px;">Despesas</small>
+                <span class="fs-4 fw-bold text-danger font-monospace">@totalDespesas.ToString("C2")</span>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="card p-3 shadow-sm border-0 rounded-4 bg-dark text-white">
+                <small class="text-white-50 text-uppercase fw-bold pb-1 d-block" style="font-size: 0.7rem; letter-spacing: 0.5px;">Saldo do Mês</small>
+                <span class="fs-4 fw-bold font-monospace @(saldoFinal >= 0 ? "text-success" : "text-danger")">@saldoFinal.ToString("C2")</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 align-items-start">
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+                <div class="table-responsive">
+                    <table class="table table-custom align-middle mb-0 text-nowrap" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="ps-4">Data</th>
+                                <th scope="col">Descrição</th>
+                                <th scope="col">Conta / Sócio</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Promotora</th>
+                                <th scope="col" class="text-end">Valor</th>
+                                <th scope="col" class="text-center pe-4">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var item in Model)
+                                {
+                                    var editarUrl = Url.Action("Editar", new { id = item.Id });
+
+                                    <tr class="linha-tabela-clicavel" data-href="@editarUrl" style="cursor: pointer;" title="Clique para editar">
+                                        <td class="ps-4 text-secondary small font-monospace">@item.Data.ToString("dd/MM/yyyy")</td>
+                                        <td class="fw-bold text-dark">@item.Descricao</td>
+                                        <td class="text-muted small">@item.ContaSocio</td>
+                                        <td>
+                                            <span class="badge @(item.Tipo == TipoFinanca.Receita ? "bg-success-subtle text-success border-success-subtle" : "bg-danger-subtle text-danger border-danger-subtle") border px-2 py-0.5 animate-badge" style="font-size: 0.7rem; font-weight: 600;">
+                                                @item.Tipo
+                                            </span>
+                                        </td>
+                                        <td class="text-secondary small">@(item.Promotora?.Nome ?? "—")</td>
+                                        <td class="text-end fw-bold font-monospace @(item.Tipo == TipoFinanca.Receita ? "text-success" : "text-danger")">
+                                            @item.Valor.ToString("C2")
+                                        </td>
+                                        <td class="text-center pe-4 ignorar-clique">
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <a href="#" class="text-danger link-icone-acao px-1" data-bs-toggle="modal" data-bs-target="#modalExcluir_@item.Id" title="Excluir">
+                                                    <i class="bi bi-trash" style="font-size: 0.85rem;"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <div class="modal fade" id="modalExcluir_@item.Id" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow rounded-4">
+                                                <div class="modal-header border-0 pb-0">
+                                                    <h5 class="modal-title fw-bold text-dark fs-5">Confirmar Exclusão</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body py-3 text-start">
+                                                    Deseja realmente remover o lançamento <strong>@item.Descricao</strong> no valor de <strong class="@(item.Tipo == TipoFinanca.Receita ? "text-success" : "text-danger")">@item.Valor.ToString("C2")</strong>?
+                                                    <p class="text-muted mb-0 mt-1 small" style="font-size: 0.8rem;">Esta ação alterará os saldos consolidados do mês.</p>
+                                                </div>
+                                                <div class="modal-footer border-0 d-flex justify-content-end gap-2 pt-0 pb-4 pe-4">
+                                                    <button type="button" class="btn btn-secondary border-0 px-3 py-2 rounded-3 text-white small fw-medium" data-bs-dismiss="modal" style="background-color: #6c757d;">Cancelar</button>
+                                                    <form asp-action="Apagar" method="post" class="d-inline m-0">
+                                                        <input type="hidden" name="id" value="@item.Id" />
+                                                        <button type="submit" class="btn btn-danger border-0 px-3 py-2 rounded-3 small fw-semibold" style="background-color: #dc3545;">Confirmar Exclusão</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
                             {
                                 <tr>
-                                    <td class="ps-4 fw-semibold text-dark text-uppercase" style="letter-spacing: 0.5px;">
-                                        @financa.Mesdescription de @financa.Ano
-                                    </td>
-
-                                    <td class="text-center fw-bold text-dark">
-                                        <span class="badge bg-light text-dark border px-3 py-2 rounded-2" style="font-size: 0.95rem;">
-                                            @financa.SaldoTotal.ToString("C2", new CultureInfo(1046))
-                                        </span>
-                                    </td>
-
-                                    <td class="pe-4">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <a asp-route-idFinanca="@financa.Id" asp-controller="Receita" asp-action="Index"
-                                               class="btn btn-outline-success btn-action-financeiro d-flex align-items-center gap-1 px-2 py-1 small fw-medium" title="Receitas">
-                                                <i class="bi bi-arrow-up-left-square-fill"></i> Receitas
-                                            </a>
-
-                                            <a asp-route-idFinanca="@financa.Id" asp-controller="Despesa" asp-action="Index"
-                                               class="btn btn-outline-danger btn-action-financeiro d-flex align-items-center gap-1 px-2 py-1 small fw-medium" title="Despesas">
-                                                <i class="bi bi-arrow-down-right-square-fill"></i> Despesas
-                                            </a>
-
-                                            <a asp-route-id="@financa.Id" asp-controller="Financa" asp-action="FechamentoCaixa"
-                                               class="btn btn-dark btn-action-financeiro d-flex align-items-center gap-1 px-2 py-1 small fw-medium" title="Fechamento de Caixa">
-                                                <i class="bi bi-safe2"></i> Fechamento
-                                            </a>
-
-                                            <button type="button" class="btn btn-outline-danger btn-action-sm d-flex align-items-center justify-content-center btn-delete-financa"
-                                                    data-id="@financa.Id" data-mes="@financa.Mesdescription" data-ano="@financa.Ano"
-                                                    data-url="@Url.Action("Apagar", "Financa", new { id = financa.Id })" title="Excluir Período">
-                                                <i class="bi bi-trash3-fill"></i>
-                                            </button>
-                                        </div>
+                                    <td colspan="7" class="text-center py-5 text-muted">
+                                        <i class="bi bi-cash-stack mb-2 d-block text-secondary opacity-50" style="font-size: 2rem;"></i>
+                                        Nenhum lançamento financeiro encontrado para este período.
                                     </td>
                                 </tr>
                             }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="3" class="text-center py-5 text-muted">
-                                    <i class="bi bi-calendar-x mb-2 d-block text-secondary" style="font-size: 2rem;"></i>
-                                    Nenhum período financeiro cadastrado.
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+                <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-light-subtle">
+                    <i class="bi bi-shield-lock text-dark fs-5"></i>
+                    <h5 class="fw-bold text-dark mb-0">Acerto Financeiro</h5>
+                </div>
+
+                <form method="get" id="formCompetencia" class="row g-2 mb-4">
+                    <div class="col-7">
+                        <label class="form-label text-muted small fw-medium mb-1">Mês Operacional</label>
+                        <select name="mes" class="form-select border-light-subtle rounded-3 small py-1.5 fs-7 layout-select" onchange="this.form.submit()">
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                <!option value="@i" @(ViewBag.Mes == i ? "selected" : "")>@nomesMeses[i - 1]</!option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-5">
+                        <label class="form-label text-muted small fw-medium mb-1">Ano</label>
+                        <input type="number" name="ano" class="form-control border-light-subtle rounded-3 small py-1.5 fs-7 layout-select" value="@ViewBag.Ano" onchange="this.form.submit()">
+                    </div>
+                </form>
+
+                <div class="p-3 bg-light rounded-3 border border-light-subtle mb-4">
+                    <small class="text-uppercase fw-bold text-muted d-block font-monospace mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">
+                        Balanço da Competência
+                    </small>
+                    <div class="d-flex justify-content-between align-items-center my-1">
+                        <span class="text-muted small">Total Receitas:</span>
+                        <span class="font-monospace text-success fw-medium">@totalReceitas.ToString("C2")</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center my-1">
+                        <span class="text-muted small">Total Despesas:</span>
+                        <span class="font-monospace text-danger fw-medium">@totalDespesas.ToString("C2")</span>
+                    </div>
+                    <hr class="my-2 border-light-subtle">
+                    <small class="text-uppercase fw-bold text-secondary d-block font-monospace mb-0" style="font-size: 0.65rem;">Líquido Disponível</small>
+                    <h3 class="fw-bold font-monospace mb-0 @(saldoFinal >= 0 ? "text-success" : "text-danger")">@saldoFinal.ToString("C2")</h3>
+                </div>
+
+                <form asp-controller="Financa" asp-action="Fechamento" method="post" id="formEfetuarFechamento">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="mes" value="@ViewBag.Mes" />
+                    <input type="hidden" name="ano" value="@ViewBag.Ano" />
+
+                    <button type="submit" class="btn btn-dark w-100 rounded-3 py-2.5 fw-bold text-uppercase tracking-wider shadow-sm" style="font-size: 0.8rem;">
+                        <i class="bi bi-lock-fill me-1"></i> Fechar Mês de @nomeMesCompetencia
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 
     <div class="mt-4">
-        <a class="btn btn-link text-decoration-none text-secondary d-inline-flex align-items-center gap-2 fw-medium p-0 btn-back-hover"
-           asp-controller="Apps" asp-action="Index">
-            <i class="bi bi-arrow-left-short" style="font-size: 1.4rem;"></i> Voltar ao painel
+        <a asp-controller="Apps" asp-action="Index" class="btn btn-link text-decoration-none text-secondary p-0 d-inline-flex align-items-center gap-2 btn-back-hover">
+            <i class="bi bi-arrow-left-short fs-4"></i> <span class="fw-medium small">Voltar ao Painel</span>
         </a>
     </div>
 
@@ -107,185 +215,88 @@
         font-family: 'Segoe UI', system-ui, sans-serif;
     }
 
-    .card-table {
-        border-radius: 14px;
-        overflow: hidden;
-        background-color: #ffffff;
-        border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    .tracking-tight {
+        letter-spacing: -0.5px;
     }
 
-    .table-custom {
-        width: 100%;
-        border-collapse: collapse;
+    .tracking-wider {
+        letter-spacing: 0.8px;
     }
 
-        .table-custom thead {
-            background-color: #f8f9fa;
-            border-bottom: 2px solid #efefef;
-        }
-
-        .table-custom th {
-            font-size: 0.82rem;
-            font-weight: 700;
-            text-uppercase: true;
-            color: #5c636a;
-            padding: 14px 10px;
-            letter-spacing: 0.5px;
-        }
-
-        .table-custom tbody tr {
-            border-bottom: 1px solid #f1f3f5;
-            transition: background-color 0.15s ease;
-        }
-
-            .table-custom tbody tr:hover {
-                background-color: #f8f9fa !important;
-            }
-
-        .table-custom tbody td {
-            padding: 12px 10px;
-            font-size: 0.92rem;
-            color: #495057;
-        }
-
-    .btn-action-financeiro {
-        font-size: 0.8rem;
+    .layout-select {
+        border-color: #dee2e6 !important;
         border-radius: 6px;
-        transition: all 0.2s;
+        color: #495057;
+        font-size: 0.85rem !important;
     }
 
-    .btn-action-sm {
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        transition: all 0.2s ease;
+    /* Customização Clássica de Tabela Analítica */
+    .table-custom thead {
+        background-color: #fafafa;
+        border-bottom: 1px solid #ededed;
     }
 
-    .btn-adicionar {
-        border-radius: 10px;
-        transition: all 0.2s ease;
+    .table-custom th {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #6c757d;
+        padding: 12px 10px;
+        text-uppercase: true;
+        letter-spacing: 0.5px;
     }
 
-    .btn-back-hover {
-        transition: color 0.2s ease, transform 0.2s ease;
+    .table-custom tbody tr {
+        border-bottom: 1px solid #f6f6f6;
+        transition: background-color 0.15s ease;
     }
 
-        .btn-back-hover:hover {
-            color: #212529 !important;
-            transform: translateX(-2px);
+        .table-custom tbody tr:hover {
+            background-color: #fafafa !important;
         }
 
-    /* Ajustes customizados para o SweetAlert seguir o estilo das suas modais */
-    .swal2-popup-custom {
-        border-radius: 16px !important;
-        font-family: 'Segoe UI', system-ui, sans-serif !important;
-        padding: 1.5rem !important;
+    .bg-success-subtle {
+        background-color: #e8f5e9 !important;
     }
 
-    .swal2-actions-custom {
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100% !important;
-        gap: 6px !important;
-        margin-top: 15px !important;
+    .bg-danger-subtle {
+        background-color: #ffebee !important;
     }
 
-    .swal2-confirm-custom {
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 10px 0 !important;
-        font-size: 0.95rem !important;
-        font-weight: 500 !important;
-        border-radius: 8px !important;
-        background-color: #dc3545 !important;
+    .animate-badge {
+        font-weight: 600;
+        border-radius: 4px;
     }
 
-    .swal2-cancel-custom {
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 10px 0 !important;
-        font-size: 0.95rem !important;
-        font-weight: 500 !important;
-        border-radius: 8px !important;
-        background-color: #f8f9fa !important;
-        color: #6c757d !important;
-        border: 1px solid #dee2e6 !important;
+    .link-icone-acao {
+        text-decoration: none;
+        transition: transform 0.15s ease;
+        display: inline-flex;
+    }
+
+        .link-icone-acao:hover {
+            transform: scale(1.15);
+        }
+
+    .fs-7 {
+        font-size: 0.85rem !important;
     }
 </style>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const deleteButtons = document.querySelectorAll('.btn-delete-financa');
-
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function (event) {
-                event.preventDefault();
-
-                const id = button.getAttribute('data-id');
-                const mes = button.getAttribute('data-mes');
-                const ano = button.getAttribute('data-ano');
-                const url = button.getAttribute('data-url');
-
-                Swal.fire({
-                    title: 'Excluir Período?',
-                    html: `Deseja realmente remover o período de <strong class="text-dark">${mes} de ${ano}</strong> do sistema? Esta ação não pode ser desfeita.`,
-                    icon: 'overflow', // desativa o layout gigante padrão
-                    iconColor: '#dc3545',
-                    showCancelButton: true,
-                    confirmButtonText: 'Confirmar Exclusão',
-                    cancelButtonText: 'Cancelar',
-                    reverseButtons: true,
-                    customClass: {
-                        popup: 'swal2-popup-custom shadow-lg',
-                        actions: 'swal2-actions-custom',
-                        confirmButton: 'swal2-confirm-custom btn btn-danger',
-                        cancelButton: 'swal2-cancel-custom btn btn-light'
-                    },
-                    buttonsStyling: false
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire({
-                                    title: 'Sucesso!',
-                                    text: 'Período excluído com sucesso.',
-                                    icon: 'success',
-                                    showConfirmButton: false,
-                                    timer: 1500
-                                }).then(() => {
-                                    window.location.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: 'Erro!',
-                                    text: data.message || 'Não foi possível excluir o período.',
-                                    icon: 'error',
-                                    confirmButtonText: 'Ok',
-                                    confirmButtonColor: '#212529'
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            Swal.fire({
-                                title: 'Erro!',
-                                text: 'Ocorreu um problema de rede ou no servidor.',
-                                icon: 'error',
-                                confirmButtonText: 'Ok',
-                                confirmButtonColor: '#212529'
-                            });
-                        });
-                    }
-                });
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Redirecionamento inteligente ao clicar na linha (ignorando botões de ação)
+            $(".linha-tabela-clicavel").click(function (e) {
+                var selecaoTexto = window.getSelection().toString();
+                if (!$(e.target).closest('.ignorar-clique').length && !selecaoTexto) {
+                    window.location.href = $(this).data("href");
+                }
             });
+
+            // Ocultação suave dos alertas
+            setTimeout(function () {
+                $(".alert").fadeOut("slow");
+            }, 3000);
         });
-    });
-</script>
+    </script>
+}

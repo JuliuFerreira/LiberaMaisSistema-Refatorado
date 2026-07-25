@@ -20,5 +20,7 @@ namespace LiberaMais.Repositorio
         bool VerificarPromotoraExistente(string nome);
 
         Promotora BuscarPorNome(string nome);
+
+        public void DesvincularFinancas(int promotoraId);
     }
 }

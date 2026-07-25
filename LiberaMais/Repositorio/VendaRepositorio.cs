@@ -103,6 +103,30 @@ namespace LiberaMais.Repositorio
             v.DataPgtoComissao.Value.Year == ano)
             .ToList();  
         }
+
+        public List<Venda> BuscarCompleto(string termo, int pagina, int tamanhoCorte, out int totalRegistros)
+        {
+            var query = _bancoContext.Venda.Include(v => v.Usuario)
+                .Include(v => v.Banco)
+                .Include(v => v.Cliente)
+                .Include(v => v.Promotora)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(termo))
+            {
+                string termoLimpo = termo.Replace(".", "").Replace("-", "").Trim().ToLower();
+                query = query.Where(v => (v.Cliente.Nome != null && v.Cliente.Nome.Contains(termoLimpo)) ||
+                (v.Cliente.Cpf != null && v.Cliente.Cpf.Replace(".", "").Replace("-", "").Contains(termoLimpo)) ||
+                (v.Banco.Nome != null && v.Banco.Nome.ToLower().Contains(termoLimpo)) ||
+                (v.Promotora.Nome != null && v.Promotora.Nome.ToLower().Contains(termoLimpo)));
+            }
+
+            totalRegistros = query.Count();
+            return query.OrderBy(v => v.DataCadastro)
+                .Skip((pagina - 1) * tamanhoCorte)
+                .Take(tamanhoCorte)
+                .ToList();
+        }
     }
 
 }

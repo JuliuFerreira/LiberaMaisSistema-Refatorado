@@ -1,151 +1,159 @@
 ﻿@model IEnumerable<Promotora>
 
 @{
-    Layout = "LayoutSistema";
+    Layout = "_LayoutSistema";
     ViewData["Title"] = "Promotoras e Acesso a Bancos";
     var isAdmin = ViewBag.IsAdmin as bool? ?? false;
 }
 
-<style>
-    /* Elevação ultra suave e transição fluida */
-    .promotora-card {
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+<div class="container-fluid py-4 inner-system-page">
 
-        .promotora-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06) !important;
-        }
-
-    /* Remove os divisores brutos da lista interna para suavizar */
-    .list-group-flush > .list-group-item {
-        border-bottom: 1px dashed rgba(0, 0, 0, 0.05) !important;
-    }
-
-        .list-group-flush > .list-group-item:last-child {
-            border-bottom: none !important;
-        }
-</style>
-
-<div class="container-fluid px-0 mt-4">
-
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom border-light-subtle">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-light-subtle">
         <div>
-            <h3 class="fw-bold text-dark tracking-tight mb-1">Promotoras e Acesso a Bancos</h3>
-            <p class="text-muted small mb-0">Gerencie os acessos, credenciais e links das promotoras.</p>
+            <h3 class="fw-bold text-dark mb-1 tracking-tight">Promotoras e Acesso a Bancos</h3>
+            <p class="text-muted small mb-0">Gerencie os acessos, credenciais e links de acesso das promotoras parceiras.</p>
         </div>
 
         @if (isAdmin)
         {
-            <a asp-action="Criar" class="btn btn-success rounded-3 px-4 d-flex align-items-center gap-2 shadow-sm align-self-start align-self-md-center fw-medium">
-                <i class="bi bi-plus-lg"></i> Nova Promotora
+            <a asp-action="Criar" class="btn btn-dark d-flex align-items-center gap-2 px-3 py-2 shadow-sm rounded-3">
+                <i class="bi bi-plus-lg"></i>
+                <span class="fw-semibold small">Nova Promotora</span>
             </a>
         }
     </div>
 
     @if (TempData["MensagemSucesso"] != null)
     {
-        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 py-3">
-            <i class="bi bi-check-circle-fill me-2 text-success"></i> @TempData["MensagemSucesso"]
+        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["MensagemSucesso"]
         </div>
     }
-
     @if (TempData["MensagemErro"] != null)
     {
-        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 py-3">
-            <i class="bi bi-exclamation-triangle-fill me-2 text-danger"></i> @TempData["MensagemErro"]
+        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["MensagemErro"]
         </div>
     }
 
-    <div class="row g-4">
+    <div class="row g-3">
         @if (Model != null && Model.Any())
         {
             foreach (var pro in Model)
             {
-                <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
-                    <div class="card border-0 shadow-sm rounded-4 h-100 promotora-card bg-white">
+                <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white p-3 h-100 style-card-promotora">
+                        <div class="card-body p-1 d-flex flex-column justify-content-between h-100">
 
-                        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-1">
-                            <div class="d-flex justify-content-between align-items-start">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
                                 <div class="text-truncate me-2">
-                                    <h5 class="fw-bold text-dark mb-0 text-truncate" title="@pro.Nome">@pro.Nome</h5>
-                                    <small class="text-primary fw-semibold" style="font-size: 0.8rem;">@pro.Usuario?.Nome</small>
+                                    <h6 class="fw-bold text-dark mb-0 text-truncate" title="@pro.Nome">
+                                        @pro.Nome
+                                        <span class="badge bg-primary-subtle text-primary rounded-2 px-2 py-0.5 fw-semibold shrink-0" style="font-size: 0.65rem;">
+                                            Parceira
+                                        </span>
+                                    </h6>
+
+                                    <span class="text-muted" style="font-size: 0.7rem;">Por: @pro.Usuario?.Nome</span>
+
                                 </div>
-                                <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1 fw-semibold" style="font-size: 0.75rem;">Promotora</span>
-                            </div>
-                        </div>
-
-                        <div class="card-body px-4 pt-2 pb-3">
-                            <ul class="list-group list-group-flush small">
-                                <li class="list-group-item px-0 py-2.5 d-flex justify-content-between align-items-center bg-transparent">
-                                    <span class="text-muted"><i class="bi bi-person me-1"></i> Login:</span>
-                                    <span class="text-dark text-break fw-medium">@pro.Login</span>
-                                </li>
-                                <li class="list-group-item px-0 py-2.5 d-flex justify-content-between align-items-center bg-transparent">
-                                    <span class="text-muted"><i class="bi bi-shield-lock me-1"></i> Senha:</span>
-                                    <span class="text-secondary bg-light px-2 py-0.5 rounded font-monospace border-0" style="font-size: 0.85rem;">@pro.Senha</span>
-                                </li>
-                                <li class="list-group-item px-0 py-2.5 d-flex justify-content-between align-items-center bg-transparent">
-                                    <span class="text-muted"><i class="bi bi-link-45deg me-1"></i> URL:</span>
-                                    <a href="https://@pro.Url" target="_blank" class="text-decoration-none text-truncate ms-2 fw-medium d-inline-flex align-items-center gap-1" style="max-width: 150px;" title="Acessar link">
-                                        @pro.Url <i class="bi bi-arrow-up-right style=" font-size: 0.7rem;""></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="card-footer bg-transparent border-0 px-4 pb-4 pt-0 mt-auto">
-                            <div class="d-flex flex-column gap-2">
-                                <a asp-controller="PromotoraBanco"
-                                   asp-action="Index"
-                                   asp-route-promotoraId="@pro.Id"
-                                   class="btn btn-light btn-sm rounded-3 fw-semibold py-2 d-flex align-items-center justify-content-center gap-2 border text-secondary hover-primary">
-                                    <i class="bi bi-key"></i> Logins Vinculados
-                                </a>
 
                                 @if (isAdmin)
                                 {
-                                    <div class="d-flex gap-2">
-                                        <a asp-action="Editar"
-                                           asp-route-id="@pro.Id"
-                                           class="btn btn-sm btn-outline-light text-warning border-warning-subtle w-100 rounded-3 d-flex align-items-center justify-content-center fw-medium py-1.5">
-                                            <i class="bi bi-pencil me-1"></i> Editar
+                                    <div class="d-flex align-items-center gap-2 shrink-0">
+                                        <a asp-action="Editar" asp-route-id="@pro.Id" class="text-secondary link-icone-acao px-1" title="Editar">
+                                            <i class="bi bi-pencil" style="font-size: 0.85rem;"></i>
                                         </a>
-
-                                        <button class="btn btn-sm btn-outline-light text-danger border-danger-subtle w-100 rounded-3 d-flex align-items-center justify-content-center fw-medium py-1.5"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#modalExcluir_@pro.Id">
-                                            <i class="bi bi-trash3 me-1"></i> Excluir
-                                        </button>
+                                        <a href="#" class="text-danger link-icone-acao px-1" data-bs-toggle="modal" data-bs-target="#modalExcluir_@pro.Id" title="Excluir">
+                                            <i class="bi bi-trash" style="font-size: 0.85rem;"></i>
+                                        </a>
                                     </div>
                                 }
-                            </div>
-                        </div>
 
+                            </div>
+
+                            @* Linha 1: Login e Senha lado a lado (50% para cada) *@
+                            <div class="row align-items-center g-2 my-1 py-1.5 border-top border-light-subtle">
+                                @* Bloco do Login *@
+                                <div class="col-6 text-truncate">
+                                    <small class="text-muted d-block" style="font-size: 0.65rem;">Login</small>
+                                    <div class="d-flex align-items-center justify-content-between g-1 wrapper-copiar">
+                                        <span class="fw-semibold text-dark small font-monospace text-truncate alvo-copia">@pro.Login</span>
+                                        <button type="button" class="btn p-0 border-0 text-muted btn-copiar-clip" title="Copiar Login">
+                                            <i class="bi bi-copy" style="font-size: 0.75rem;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                @* Bloco da Senha *@
+                                <div class="col-6 text-truncate">
+                                    <small class="text-muted d-block" style="font-size: 0.65rem;">Senha</small>
+                                    <div class="d-flex align-items-center justify-content-between g-1 wrapper-copiar">
+                                        <span class="bg-light text-secondary px-1.5 py-0.5 rounded font-monospace border border-light-subtle text-truncate d-inline-block alvo-copia" style="font-size: 0.7rem;">@pro.Senha</span>
+                                        <button type="button" class="btn p-0 border-0 text-muted btn-copiar-clip" title="Copiar Senha">
+                                            <i class="bi bi-copy" style="font-size: 0.75rem;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @* Linha 2: Botão de Acesso ocupando a largura total *@
+                            <div class="row g-2 mb-1 pb-1.5 border-bottom border-light-subtle">
+                                <div class="col-12">
+                                    @if (!string.IsNullOrEmpty(pro.Url))
+                                    {
+                                        <a class="btn btn-sm btn-secondary w-100 d-inline-flex align-items-center justify-content-center gap-2 py-1.5 rounded-2 fw-semibold btn-acessar-bancos text-white"
+                                           href="@pro.Url"
+                                           target="_blank"
+                                           style="font-size: 0.75rem;">
+                                            <i class="bi bi-globe2" style="font-size: 0.8rem;"></i>
+                                            <span>Acessar Promotora</span>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <div class="text-center w-100 bg-light text-muted py-1.5 rounded-2 border border-light-subtle small" style="font-size: 0.75rem;">
+                                            Link não disponível
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-column gap-2 pt-2">
+
+                                <a asp-controller="PromotoraBanco" asp-action="Index" asp-route-promotoraId="@pro.Id"
+                                   class="btn btn-sm btn-dark w-100 d-flex align-items-center justify-content-center gap-1.5 py-1.5 rounded-3 fw-semibold btn-acessar-bancos text-white">
+                                    <i class="bi bi-bank" style="font-size: 0.8rem;">
+                                        <span style="font-size: 0.75rem;">Acessar Bancos</span>
+                                    </i>
+                                    
+                                </a>
+
+                            </div>
+
+                        </div>
                     </div>
                 </div>
 
                 @if (isAdmin)
                 {
                     <div class="modal fade" id="modalExcluir_@pro.Id" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered modal-sm">
-                            <div class="modal-content rounded-4 border-0 shadow-lg">
-                                <div class="modal-body text-center p-4 pt-5">
-                                    <div class="text-danger mb-3">
-                                        <i class="bi bi-exclamation-circle" style="font-size: 2.5rem;"></i>
-                                    </div>
-                                    <h5 class="fw-bold text-dark mb-2">Excluir Promotora?</h5>
-                                    <p class="text-muted small mb-0">
-                                        Deseja realmente remover <strong class="text-dark">@pro.Nome</strong>?
-                                    </p>
-                                    <p class="text-muted mb-0" style="font-size: 0.75rem;">Os logins associados também serão afetados.</p>
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow rounded-4">
+                                <div class="modal-header border-0 pb-0">
+                                    <h5 class="modal-title fw-bold text-dark fs-5">Confirmar Exclusão</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <div class="modal-footer border-0 d-flex flex-column w-100 gap-1 p-4 pt-0">
-                                    <form asp-action="Apagar" method="post" class="w-100 m-0">
+                                <div class="modal-body py-3 text-start">
+                                    Deseja realmente remover a promotora <strong>@pro.Nome</strong>?
+                                    <p class="text-muted mb-0 mt-1 small" style="font-size: 0.8rem;">Os logins associados a ela também serão permanentemente afetados.</p>
+                                </div>
+                                <div class="modal-footer border-0 d-flex justify-content-end gap-2 pt-0 pb-4 pe-4">
+                                    <button type="button" class="btn btn-secondary border-0 px-3 py-2 rounded-3 text-white small fw-medium" data-bs-dismiss="modal" style="background-color: #6c757d;">Cancelar</button>
+                                    <form asp-action="Apagar" method="post" class="d-inline m-0">
                                         <input type="hidden" name="id" value="@pro.Id" />
-                                        <button type="submit" class="btn btn-danger w-100 rounded-3 py-2 fw-medium">Confirmar Exclusão</button>
+                                        <button type="submit" class="btn btn-danger border-0 px-3 py-2 rounded-3 small fw-semibold" style="background-color: #dc3545;">Confirmar Exclusão</button>
                                     </form>
-                                    <button type="button" class="btn btn-light border w-100 rounded-3 py-2 text-secondary fw-medium" data-bs-dismiss="modal">Cancelar</button>
                                 </div>
                             </div>
                         </div>
@@ -156,29 +164,63 @@
         else
         {
             <div class="col-12 text-center text-muted py-5">
-                <i class="bi bi-folder2-open display-6 d-block mb-3 opacity-50"></i>
-                <p class="mb-0 small">Nenhuma promotora cadastrada no sistema.</p>
+                <i class="bi bi-folder2-open fs-3 d-block mb-2 text-secondary opacity-50"></i>
+                Nenhuma promotora cadastrada no sistema.
             </div>
         }
     </div>
 
-    <!-- RODAPÉ DE AÇÕES -->
     <div class="mt-4">
-        <a class="btn btn-link text-decoration-none text-secondary d-inline-flex align-items-center gap-2 fw-medium p-0 btn-back-hover"
-           asp-controller="Apps" asp-action="Index">
-            <i class="bi bi-arrow-left-short" style="font-size: 1.4rem;"></i> Voltar ao painel
+        <a asp-controller="Apps" asp-action="Index" class="btn btn-link text-decoration-none text-secondary p-0 d-inline-flex align-items-center gap-2 btn-back-hover">
+            <i class="bi bi-arrow-left-short fs-4"></i> <span class="fw-medium small">Voltar ao painel</span>
         </a>
     </div>
 </div>
 
-<script>
-    setTimeout(function () {
-        $("#alertaSucesso").fadeOut("slow");
-        $("#alertaErro").fadeOut("slow");
-    }, 3000);
-</script>
-
 <style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .tracking-tight {
+        letter-spacing: -0.5px;
+    }
+
+    /* Estilização moderna do Card */
+    .style-card-promotora {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .style-card-promotora:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+        }
+
+    /* Botão Acessar Bancos */
+    .btn-acessar-bancos {
+        transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+
+        .btn-acessar-bancos:active {
+            transform: scale(0.98);
+        }
+
+    .link-icone-acao {
+        text-decoration: none;
+        transition: transform 0.15s ease, opacity 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+        .link-icone-acao:hover {
+            transform: scale(1.15);
+            opacity: 0.85;
+        }
+
+        .link-icone-acao.text-secondary:hover {
+            color: #212529 !important;
+        }
+
     .btn-back-hover {
         transition: color 0.2s ease, transform 0.2s ease;
     }
@@ -188,9 +230,18 @@
             transform: translateX(-2px);
         }
 
-    /* ANIMAÇÃO PISCAR ALERTA */
-    .animacao-piscar {
-        animation: pulse-danger 2s infinite;
+    .shrink-0 {
+        flex-shrink: 0;
     }
-
 </style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // FadeOut automático dos alertas após 3 segundos
+            setTimeout(function() {
+                $(".alert").fadeOut("slow");
+            }, 3000);
+        });
+    </script>
+}

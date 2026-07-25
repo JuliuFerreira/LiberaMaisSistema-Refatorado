@@ -19,5 +19,7 @@ namespace LiberaMais.Repositorio
 
         List<Venda> BuscarVendasPagasPorPeriodo(int mes, int ano);
 
+        List<Venda> BuscarCompleto(string termo, int pagina, int tamanhoCorte, out int totalRegistros);
+
     }
 }

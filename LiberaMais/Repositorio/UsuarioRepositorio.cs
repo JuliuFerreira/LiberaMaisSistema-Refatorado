@@ -31,7 +31,7 @@ namespace LiberaMais.Repositorio
 
         public UsuarioModel BuscarPorLogin(string login)
         {
-            return _bancoContext.Usuarios.FirstOrDefault(x => x.Login.ToUpper() == login.ToUpper());
+            return _bancoContext.Usuarios.FirstOrDefault(x => x.Login.Trim().ToLower() == login.Trim().ToLower());
         }
 
         public UsuarioModel BuscarPorEmailELogin(string email, string login)
@@ -103,6 +103,12 @@ namespace LiberaMais.Repositorio
         public List<UsuarioModel> ListarTodosUsuarios()
         {
             return _bancoContext.Usuarios.ToList();
+        }
+
+        public UsuarioModel BuscarPorNome(string nome)
+        {
+            return _bancoContext.Usuarios
+                .FirstOrDefault(u => u.Nome.Trim().ToLower() == nome.Trim().ToLower());
         }
     }
 }

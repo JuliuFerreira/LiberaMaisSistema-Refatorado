@@ -1,99 +1,91 @@
-﻿@model Orgao
+﻿@model LiberaMais.Models.Orgao
 
 @{
-    Layout = "LayoutSistema";
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Cadastrar Órgão";
 }
 
-<div class="row justify-content-center">    
+<div class="container-fluid py-4 inner-system-page">
 
-    <div class="card shadow border-0 rounded-4 col-10 mt-5">
-
-        <div class="card-header text-white rounded-top-4"
-             style="background-color:green;">
-
-            <h3 class="text-center mb-0">
-                Cadastrar orgão
-            </h3>
-
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-light-subtle">
+        <div>
+            <h3 class="fw-bold text-dark mb-1 tracking-tight">Novo Órgão</h3>
+            <p class="text-muted small mb-0">Cadastre um novo órgão público ou instituição no sistema.</p>
         </div>
+    </div>
 
-        @if (TempData["mensagemSucesso"] != null)
-        {
-            <div id="alertaSucesso" class="alert alert-success">
-                @TempData["mensagemSucesso"]
-            </div>
-        }
-
-        @if (TempData["mensagemErro"] != null)
-        {
-            <div id="alertaErro" class="alert alert-danger">
-                @TempData["mensagemErro"]
-            </div>
-        }
-
-
-
+    <div class="card shadow-sm border-0 rounded-4">
         <div class="card-body p-4">
+            <form asp-action="Criar" method="post" autocomplete="off">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
-            <form id="promotoraForm"
-                  asp-controller="Orgao"
-                  asp-action="Criar"
-                  method="post">
-
-                <div class="row g-6">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label asp-for="Nome" class="form-label small fw-bold text-muted">NOME DO ORGÃO</label>
+                        <input asp-for="Nome" class="form-control rounded-3 py-2" placeholder="Ex: Meu INSS" />
+                        <span asp-validation-for="Nome" class="text-danger small"></span>
+                    </div>
 
                     <div class="col-md-6">
-
-                        <label asp-for="Nome"
-                               class="form-label fw-bold">
-                            Nome
-                        </label>
-
-                        <input asp-for="Nome"
-                               class="form-control"
-                               maxlength="100"
-                               placeholder="Nome do orgão" />
-
-                        <span asp-validation-for="Nome"
-                              class="text-danger">
-                        </span>
-
+                        <label asp-for="Url" class="form-label small fw-bold text-muted">ACESSO AO PORTAL</label>
+                        <input asp-for="Url" class="form-control rounded-3 py-2" placeholder="site.com.br" />
                     </div>
                 </div>
 
-                <hr class="my-4" />
-
-                <div class="d-flex justify-content-end gap-2">
-
-                    <a asp-action="Index"
-                       class="btn btn-secondary">
-
-                        Voltar
-
+                <div class="d-flex align-items-center justify-content-end gap-2 pt-2">
+                    <a asp-action="Index" class="btn btn-light border px-4 py-2 rounded-3 small fw-medium text-secondary">
+                        Cancelar
                     </a>
-
-                    <button type="submit"
-                            class="btn btn-success">
-
-                        Salvar
-
+                    <button type="submit" class="btn btn-dark px-4 py-2 rounded-3 small fw-semibold">
+                        Salvar Órgão
                     </button>
-
                 </div>
-
             </form>
-
         </div>
+    </div>
 
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-link text-decoration-none text-secondary p-0 d-inline-flex align-items-center gap-2 btn-back-hover">
+            <i class="bi bi-arrow-left-short fs-4"></i> <span class="fw-medium small">Voltar para a listagem</span>
+        </a>
     </div>
 
 </div>
 
-<script>
-    setTimeout(function () {
+<style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
 
-        $("#alertaSucesso").fadeOut("slow");
-        $("#alertaErro").fadeOut("slow");
+    .tracking-tight {
+        letter-spacing: -0.5px;
+    }
 
-    }, 3000);
-</script>
+    /* Estilização dos inputs para combinar com o padrão SaaS */
+    .form-control {
+        border: 1px solid #dee2e6;
+        font-size: 0.92rem;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+        .form-control:focus {
+            border-color: #212529;
+            box-shadow: 0 0 0 3px rgba(33, 37, 41, 0.1);
+            outline: 0;
+        }
+
+    .btn-back-hover {
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+        .btn-back-hover:hover {
+            color: #212529 !important;
+            transform: translateX(-2px);
+        }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

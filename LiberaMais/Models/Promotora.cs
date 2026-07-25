@@ -16,8 +16,8 @@ namespace LiberaMais.Models
         [Required(ErrorMessage ="O nome é obrigatório")]
         public string Nome { get; set; }
 
-        [RegularExpression(@"^(https?:\/\/)?(www\.)[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+(\.[a-zA-Z]{2,})?$",
-        ErrorMessage = "Por favor, insira uma URL válida (ex: ://site.com ou ://site.com.br)")]
+        //[RegularExpression(@"^(https?:\/\/)?(www\.)[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+(\.[a-zA-Z]{2,})?$",
+        //ErrorMessage = "Por favor, insira uma URL válida (ex: ://site.com ou ://site.com.br)")]
         public string? Url { get; set; }
 
         [Required(ErrorMessage = "O login é obrigatório")]

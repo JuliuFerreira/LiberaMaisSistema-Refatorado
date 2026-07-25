@@ -40,11 +40,19 @@ namespace LiberaMais.Controllers
 
         public IActionResult Index()
         {
-            var clienteBeneficio = _clienteBeneficioRepositorio.ListarTodos();
+            // 1. Busca todos os registros do banco de dados
+            var todosBeneficios = _clienteBeneficioRepositorio.ListarTodos();
 
-            return View(clienteBeneficio);
+            // 2. Filtra para manter apenas 1 registro quando houver o mesmo CPF e mesmo Órgão
+            var clienteBeneficioUnico = todosBeneficios
+                .Where(cb => cb.Cliente != null && cb.Beneficio?.Orgaos != null) // Evita erros de referência nula
+                .GroupBy(cb => new { cb.Cliente.Cpf, cb.Beneficio.Orgaos.Id })  // Agrupa por CPF e pelo ID do Órgão
+                .Select(grupo => grupo.First())                                 // Pega apenas o primeiro registro de cada grupo
+                .ToList();
+
+            // 3. Retorna a lista filtrada para a View
+            return View(clienteBeneficioUnico);
         }
-
         public IActionResult Criar(int clienteId)
         {
             CarregarCombos();

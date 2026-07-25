@@ -1,193 +1,148 @@
 ﻿@model ClienteBeneficio
 
 @{
-    Layout = "LayoutSistema";
-    ViewData["Title"] = "Cadastrar Benefício do Cliente";
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Editar Benefício do Cliente";
 }
 
-<div class="row justify-content-center">
+<div class="container-fluid py-4 inner-system-page">
 
-    <div class="card shadow border-0 rounded-4 col-10 mt-5">
-
-        @if (TempData["MensagemSucesso"] != null)
-        {
-            <div id="alertaSucesso" class="alert alert-success">
-                @TempData["MensagemSucesso"]
-            </div>
-        }
-
-        @if (TempData["MensagemErro"] != null)
-        {
-            <div id="alertaErro" class="alert alert-danger">
-                @TempData["MensagemErro"]
-            </div>
-        }
-
-
-        <div class="card-header bg-warning text-white">
-
-            <h4 class="mb-0">
-                Editar Benefício do Cliente
-            </h4>
-
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold text-dark mb-1" style="font-size: 1.6rem;">Editar Benefício</h2>
+            <small class="text-muted">Altere as informações de identificação ou acesso do benefício selecionado</small>
         </div>
 
-        <div class="card-body p-4">
-
-            <form asp-action="Editar" method="post">
-                <input asp-for="ClienteId" type="hidden" />
-                <input asp-for="Id" type="hidden" />
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-
-                        <div class="alert alert-info">
-                            Cliente:
-                            <strong>@Model.Cliente.Nome</strong>
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="row">
-
-                    <div class="col-md-3">
-
-                        <label class="form-label">
-
-                            Órgão
-
-                        </label>
-
-                        <input class="form-control"
-                               value="@Model.Beneficio.Orgaos.Nome"
-                               readonly />
-
-                    </div>
-
-                    <div class="col-md-4">
-
-                        <label class="form-label">
-
-                            Benefício
-
-                        </label>
-
-                        <input class="form-control"
-                               value="@Model.Beneficio.Descricao"
-                               readonly />
-
-                    </div>
-
-                    <div class="col-md-2">
-
-                        <label class="form-label">
-
-                            Número do Benefício
-
-                        </label>
-
-                        <input asp-for="NumeroBeneficio"
-                               class="form-control" />
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <label class="form-label">
-
-                            Senha do Órgão
-
-                        </label>
-
-                        <input asp-for="SenhaOrgao"
-                               class="form-control" />
-
-                    </div>
-
-                </div>
-
-                <hr class="my-4" />
-
-
-                <div class="d-flex justify-content-end gap-2">
-
-                    <button type="submit"
-                            class="btn btn-success">
-
-                        Salvar
-
-                    </button>
-
-                    <button type="button"
-                            class="btn btn-secondary"
-                            onclick="history.back()">
-
-                        <i class="bi bi-arrow-return-left"></i>
-                        Voltar
-
-                    </button>
-
-                </div>
-
-
-            </form>
-
-        </div>
-
+        <button type="button" onclick="history.back()" class="btn btn-outline-dark d-flex align-items-center gap-2 shadow-sm px-3 py-2 rounded-3">
+            <i class="bi bi-arrow-left"></i> <span class="fw-semibold small">Voltar</span>
+        </button>
     </div>
 
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-12">
+
+            @if (TempData["MensagemSucesso"] != null)
+            {
+                <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+                    <i class="bi bi-check-circle-fill"></i> @TempData["MensagemSucesso"]
+                </div>
+            }
+
+            @if (TempData["MensagemErro"] != null)
+            {
+                <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+                    <i class="bi bi-exclamation-triangle-fill"></i> @TempData["MensagemErro"]
+                </div>
+            }
+
+            <div class="card card-custom shadow-sm border-0 mb-4">
+
+                <div class="px-4 pt-4 pb-2 m-0 bg-light border-bottom d-flex align-items-center gap-3">
+                    <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 42px; height: 42px;">
+                        <i class="bi bi-person fs-5"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block text-uppercase fw-bold tracking-wider" style="font-size: 0.68rem; letter-spacing: 0.5px;">Cliente</small>
+                        <span class="text-dark fw-bold fs-5">@Model.Cliente?.Nome</span>
+                    </div>
+                </div>
+
+                <div class="card-body px-4 pt-4 pb-4">
+                    <form asp-action="Editar" method="post">
+                        <input asp-for="ClienteId" type="hidden" />
+                        <input asp-for="Id" type="hidden" />
+
+                        <div class="row g-3">
+
+                            <div class="col-12 col-md-3">
+                                <label class="text-muted d-block info-label mb-1">Órgão</label>
+                                <input class="form-control rounded-3 bg-light" value="@Model.Beneficio?.Orgaos?.Nome" readonly data-bs-toggle="tooltip" title="O órgão não pode ser alterado" />
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label class="text-muted d-block info-label mb-1">Benefício</label>
+                                <input class="form-control rounded-3 bg-light" value="@Model.Beneficio?.Descricao" readonly data-bs-toggle="tooltip" title="O tipo de benefício não pode ser alterado" />
+                            </div>
+
+                            <div class="col-12 col-md-3">
+                                <label class="text-muted d-block info-label mb-1">Número do Benefício (NB)</label>
+                                <input asp-for="NumeroBeneficio" class="form-control rounded-3" placeholder="Insira o NB" />
+                            </div>
+
+                            <div class="col-12 col-md-2">
+                                <label class="text-muted d-block info-label mb-1">Senha do Órgão</label>
+                                <input asp-for="SenhaOrgao" class="form-control rounded-3" placeholder="Senha de acesso" />
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex justify-content-end align-items-center gap-2 mt-4 pt-3 border-top">
+                            <button type="button" onclick="history.back()" class="btn btn-light border px-4 py-2 rounded-3 text-secondary fw-semibold small">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-dark px-4 py-2 rounded-3 fw-semibold small shadow-sm">
+                                <i class="bi bi-check-lg me-1"></i> Salvar Alterações
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 @section Scripts {
-
     <script>
+        $(document).ready(function () {
+            // Remove as mensagens de feedback automaticamente após 3 segundos
+            setTimeout(function () {
+                $("#alertaSucesso").fadeOut("slow");
+                $("#alertaErro").fadeOut("slow");
+            }, 3000);
 
-        $("#OrgaoId").change(function () {
-
-            var orgaoId = $(this).val();
-
-            $("#BeneficioId").empty();
-
-            $("#BeneficioId").append(
-                '<option value="">Carregando...</option>'
-            );
-
-            $.get('/ClienteBeneficio/BuscarBeneficiosPorOrgao',
-                { orgaoId: orgaoId },
-
-                function (dados) {
-
-                    $("#BeneficioId").empty();
-
-                    $("#BeneficioId").append(
-                        '<option value="">Selecione</option>'
-                    );
-
-                    $.each(dados, function (i, beneficio) {
-
-                        $("#BeneficioId").append(
-                            `<option value="${beneficio.id}">
-                                ${beneficio.codigo} - ${beneficio.descricao}
-                            </option>`
-                        );
-
-                    });
-
-                });
-
+            // Ativa tooltips informativas do Bootstrap para os campos readonly
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
         });
-
     </script>
-
 }
 
-<script>
-    setTimeout(function () {
+<style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
 
-        $("#alertaSucesso").fadeOut("slow");
-        $("#alertaErro").fadeOut("slow");
+    .card-custom {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.06);
+    }
 
-    }, 3000);
-</script>
+    .info-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+
+    .form-control {
+        border: 1px solid #dee2e6;
+        padding: 0.55rem 0.75rem;
+        font-size: 0.92rem;
+        background-color: #fff;
+    }
+
+        .form-control:focus {
+            border-color: #2c3e50;
+            box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.15);
+        }
+
+        .form-control[readonly] {
+            cursor: not-allowed;
+            color: #6c757d;
+        }
+</style>

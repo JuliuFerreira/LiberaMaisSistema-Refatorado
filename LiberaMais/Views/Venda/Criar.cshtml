@@ -2,7 +2,7 @@
 @model Venda
 
 @{
-    Layout = "LayoutSistema";
+    Layout = "_LayoutSistema";
     ViewData["Title"] = "Cadastrar Venda";
 
     var cpf = ViewBag.Cpf as string;
@@ -10,241 +10,317 @@
     var clienteNome = ViewBag.ClienteNome as string;
     var beneficios = ViewBag.Beneficios as List<ClienteBeneficio>;
     var IsAdmin = ViewBag.IsAdmin as bool? ?? false;
+
+    // Captura os dados novos vindos do redirecionamento do Refin
+    var modoRefinPort = ViewBag.ModoRefinPort as bool? ?? false;
+    var valorParcelaAnterior = ViewBag.ValorParcelaAnterior as decimal?;
 }
 
-<div class="row justify-content-center">
-    <div class="card shadow border-0 rounded-4 col-10 mt-5">
-        <div class="card-header bg-success text-white">
-            <h4 class="text-center mb-0">Cadastrar Nova Venda</h4>
+<div class="container-fluid py-4 inner-system-page">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold text-dark mb-1 tracking-tight" style="font-size: 1.5rem;">Cadastrar Nova Venda</h2>
+            <small class="text-muted">Busque o cliente pelo CPF ou Nome e preencha as condições do contrato</small>
         </div>
+    </div>
 
-        @if (TempData["MensagemSucesso"] != null)
-        {
-            <div id="alertaSucesso" class="alert alert-success mt-3 mx-4">@TempData["MensagemSucesso"]</div>
-        }
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["MensagemSucesso"]
+        </div>
+    }
 
-        @if (TempData["MensagemErro"] != null)
-        {
-            <div class="alert alert-danger mt-3 mx-4">@TempData["MensagemErro"]</div>
-        }
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["MensagemErro"]
+        </div>
+    }
 
-        <div class="card-body p-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-12">
 
-            <!-- PRIMEIRA LINHA: Campo de busca do cliente (Formulário Isolado) -->
-            <form asp-action="BuscarCliente" method="post" id="formBuscaCliente">
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Buscar Cliente por CPF</label>
-                        <div class="input-group">
-                            <input name="cpf" class="form-control" value="@cpf" placeholder="Digite o CPF" />
-                            <button type="submit" class="btn btn-primary">Buscar</button>
-                        </div>
-                        @if (TempData["MensagemErroBusca"] != null)
-                        {
-                            <div class="alert alert-danger mt-2">@TempData["MensagemErroBusca"]</div>
-                            <div class="mt-2">
-                                <a asp-controller="Clientes" asp-action="Criar" class="btn btn-success btn-sm">Cadastrar Cliente</a>
-                                <a asp-controller="Venda" asp-action="Criar" class="btn btn-secondary btn-sm">Cancelar</a>
+            <div class="card card-custom shadow-sm border-0 mb-4 form-card-border">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <span class="text-dark fw-bold fs-6">
+                        <i class="bi bi-search text-secondary me-2"></i> Localizar Cadastro
+                    </span>
+                </div>
+                <div class="card-body px-4 pt-3 pb-4">
+                    <div class="row align-items-end g-3">
+                        <div class="col-12 col-md-5">
+                            <label class="text-muted d-block info-label mb-1">Buscar Cliente por CPF ou Nome *</label>
+                            <div class="input-group">
+                                <input type="text" id="campoBuscaCliente" class="form-control rounded-start-3" placeholder="Digite o CPF ou o Nome do cliente..." />
+                                <button type="button" id="btnBuscarClienteAjax" class="btn btn-dark rounded-end-3 px-3">
+                                    <i class="bi bi-search me-1"></i> Buscar
+                                </button>
                             </div>
-                        }
+                        </div>
+                    </div>
+
+                    <div id="containerResultadosBusca" class="mt-3" style="display: none;">
+                        <div id="listaClientesResultados" class="list-group shadow-sm rounded-3 overflow-hidden mb-2" style="max-height: 220px; overflow-y: auto; display: none;">
+                        </div>
+
+                        <div id="alertaClienteNaoCadastrado" class="alert alert-danger border-0 rounded-3 small p-3 mb-0 align-items-center gap-3" style="display: none;">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-exclamation-circle-fill fs-5 text-danger"></i>
+                                <span>Cliente não cadastrado. Deseja realizar o cadastro agora?</span>
+                            </div>
+                            <div class="mt-2 d-flex gap-2">
+                                <a asp-controller="Clientes" asp-action="Criar" class="btn btn-success btn-sm rounded-2 fw-semibold small">Cadastrar Cliente</a>
+                                <button type="button" id="btnFecharAvisoNaoCadastrado" class="btn btn-light border btn-sm rounded-2 text-secondary fw-semibold small">Cancelar</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </form>
+            </div>
 
-            <hr />
-
-            <!-- FORMULÁRIO PRINCIPAL DE CADASTRO -->
             <form asp-action="Criar" method="post" id="formVenda">
-                <input type="hidden" asp-for="ClienteId" value="@clienteId" />
-                <input type="hidden" name="Cpf" value="@cpf" />
+                <input type="hidden" asp-for="ClienteId" id="hddClienteId" value="@clienteId" />
+                <input type="hidden" name="Cpf" id="hddCpfInput" value="@cpf" />
 
-                <!-- SEGUNDA LINHA: Usuário operador -->
-                <div class="row mb-3">
-                    @if (IsAdmin)
-                    {
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Usuário / Operador *</label>
-                            <select asp-for="UsuarioId" class="form-select" asp-items='@(new SelectList(ViewBag.Usuario, "Id", "Nome"))' required>
-                                <option value="">Selecione o Operador</option>
-                            </select>
-                        </div>
-                    }
-                    else
-                    {
-                        <input type="hidden" asp-for="UsuarioId" value="@ViewBag.UsuarioLogadoId" />
-                    }
-                </div>
+                <div class="card card-custom shadow-sm border-0 mb-4">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                        <span class="text-dark fw-bold fs-6">
+                            <i class="bi bi-file-earmark-text text-secondary me-2"></i> Informações do Contrato
+                        </span>
+                    </div>
 
-                <!-- TERCEIRA LINHA: Dados do Cliente e Benefício -->
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Cliente Nome *</label>
-                        <input class="form-control bg-light" value="@clienteNome" readonly placeholder="Nome do Cliente" required />
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Cliente CPF *</label>
-                        <input class="form-control bg-light" value="@cpf" readonly placeholder="CPF do Cliente" />
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Benefício *</label>
-                        <select asp-for="ClienteBeneficioId" class="form-select" required>
-                            <option value="">Selecione o Benefício</option>
-                            @if (beneficios != null)
+                    <div class="card-body px-4 pt-3 pb-4">
+                        <div class="row g-3">
+
+                            @if (IsAdmin)
                             {
-                                foreach (var b in beneficios)
-                                {
-                                    <option value="@b.Id">@b.Beneficio?.Orgaos?.Nome - @b.Beneficio?.Descricao</option>
-                                }
+                                <div class="col-12 col-md-2">
+                                    <label class="text-muted d-block info-label mb-1">Usuário / Operador *</label>
+                                    <select asp-for="UsuarioId" class="form-select rounded-3" asp-items='@(new SelectList(ViewBag.Usuario, "Id", "Nome"))' required>
+                                        <option value="">Selecione o Usuário</option>
+                                    </select>
+                                </div>
                             }
-                        </select>
-                    </div>
-                </div>
-
-                <!-- QUARTA LINHA: Configuração do Contrato -->
-                <div class="row mb-3">
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">Promotora *</label>
-                        <select asp-for="PromotoraId" class="form-select" id="selectPromotora" required>
-                            <option value="">Selecione</option>
-                            @foreach (var p in ViewBag.Promotora ?? new List<Promotora>())
+                            else
                             {
-                                <option value="@p.Id">@p.Nome</option>
+                                <input type="hidden" asp-for="UsuarioId" value="@ViewBag.UsuarioLogadoId" />
                             }
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">Banco *</label>
-                        <select asp-for="BancoId" class="form-select" id="selectBanco" required>
-                            <option value="">Selecione a promotora</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">Operação *</label>
-                        <select asp-for="Operacao" class="form-select" id="selectOperacao" asp-items="Html.GetEnumSelectList<OperacaoEnum>()" required>
-                            <option value="">Selecione</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">Status do Contrato *</label>
-                        <select asp-for="StatusContrato" class="form-select" id="selectStatus" asp-items="Html.GetEnumSelectList<StatusEnum>()" required>
-                            <option value="">Selecione</option>
-                        </select>
-                    </div>
-                </div>
 
-                <!-- QUINTA LINHA: Valores Base Dinâmicos e Data de Pagamento -->
-                <div class="row mb-3">
-
-                    <!-- Seção de Valores de Contratos Comuns -->
-                    <div class="col-md-9" id="secaoValoresNormais">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label class="form-label">Valor da Parcela</label>
-                                <input type="text" asp-for="ValorParcela" value="@Model?.ValorParcela?.ToString("N2")" class="form-control decimal" placeholder="0,00" />
+                            <div class="col-12 col-md-2">
+                                <label class="text-muted d-block info-label mb-1">Data da Venda</label>
+                                <input type="date" id="DataCadastro" asp-for="DataCadastro" class="form-control"
+                                       value="@ViewBag.DataCadastroFormatada" />                                
+                                       <span class="text-danger small d-block mt-1"></span>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Valor do Contrato</label>
-                                <input type="text" asp-for="ValorContrato" value="@Model?.ValorContrato?.ToString("N2")" class="form-control decimal" placeholder="0,00" />
+
+                            <div class="col-12 col-md-2">
+                                <label class="text-muted d-block info-label mb-1">Nome do Cliente</label>
+                                <input id="txtNomeCliente" class="form-control bg-light rounded-3" value="@clienteNome" readonly placeholder="Nome do Cliente" required />
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Quantidade de Parcelas</label>
-                                <input asp-for="NumeroDeParcelas" type="number" class="form-control" placeholder="Ex: 84" />
+
+                            <div class="col-12 col-md-2">
+                                <label class="text-muted d-block info-label mb-1">CPF Vinculado</label>
+                                <input id="txtCpfVinculado" class="form-control bg-light rounded-3" value="@cpf" readonly placeholder="CPF do Cliente" />
+                            </div>
+
+                            <div class="col-12 col-md-3">
+                                <label class="text-muted d-block info-label mb-1">Benefício Selecionado *</label>
+                                <select asp-for="ClienteBeneficioId" id="selectBeneficios" class="form-select rounded-3" required>
+                                    <option value="">Selecione o Benefício</option>
+                                    @if (beneficios != null)
+                                    {
+                                        foreach (var b in beneficios)
+                                        {
+                                            <option value="@b.Id">@b.Beneficio?.Orgaos?.Nome - @b.Beneficio?.Descricao</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-4 mt-md-2">
+                                <label class="text-muted d-block info-label mb-1">Promotora *</label>
+                                <select asp-for="PromotoraId" class="form-select rounded-3" id="selectPromotora" required>
+                                    <option value="">Selecione</option>
+                                    @foreach (var p in ViewBag.Promotora ?? new List<Promotora>())
+                                    {
+                                        <option value="@p.Id">@p.Nome</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-4 mt-md-2">
+                                <label class="text-muted d-block info-label mb-1">Banco *</label>
+                                <select asp-for="BancoId" class="form-select rounded-3" id="selectBanco" required>
+                                    <option value="">Selecione a promotora</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-4 mt-md-2">
+                                <label class="text-muted d-block info-label mb-1">Operação *</label>
+                                <select asp-for="Operacao" class="form-select rounded-3" id="selectOperacao" asp-items="Html.GetEnumSelectList<OperacaoEnum>()" required>
+                                    <option value="">Selecione</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-4 mt-md-2">
+                                <label class="text-muted d-block info-label mb-1">Status do Contrato *</label>
+                                <select asp-for="StatusContrato" class="form-select rounded-3" id="selectStatus" asp-items="Html.GetEnumSelectList<StatusEnum>()" required>
+                                    <option value="">Selecione</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-custom shadow-sm border-0 mb-4">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                        <span class="text-dark fw-bold fs-6">
+                            <i class="bi bi-currency-dollar text-secondary me-2"></i> Condições Financeiras
+                        </span>
+                    </div>
+
+                    <div class="card-body px-4 pt-3 pb-4">
+                        <div class="row g-3">
+
+                            <div class="col-12 col-md-9" id="secaoValoresNormais">
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-4">
+                                        <label class="text-muted d-block info-label mb-1">Valor da Parcela</label>
+                                        <input type="text" asp-for="ValorParcela" value="@Model?.ValorParcela?.ToString("N2")" class="form-control decimal rounded-3 text-end" placeholder="0,00" />
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <label class="text-muted d-block info-label mb-1">Valor do Contrato</label>
+                                        <input type="text" asp-for="ValorContrato" value="@Model?.ValorContrato?.ToString("N2")" class="form-control decimal rounded-3 text-end" placeholder="0,00" />
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <label class="text-muted d-block info-label mb-1">Qtd. Parcelas</label>
+                                        <input asp-for="NumeroDeParcelas" type="number" class="form-control rounded-3" placeholder="Ex: 84" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-3" id="divDataPagamento" style="display: none;">
+                                <label class="text-danger d-block info-label mb-1 fw-bold">Data de Pagamento</label>
+                                <input asp-for="DataPgtoContrato" type="date" class="form-control border-danger-subtle rounded-3" />
+                            </div>
+
+                        </div>
+
+                        <div id="secaoPortabilidade" style="display: none;">
+                            <div class="mt-4 pt-3 border-top">
+                                <span class="text-primary fw-bold small d-block mb-3 text-uppercase tracking-wider">
+                                    <i class="bi bi-arrow-left-right me-2"></i> Atributos Exclusivos de Portabilidade
+                                </span>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-3">
+                                        <label class="text-muted d-block info-label mb-1">Contrato Portado (Nº)</label>
+                                        <input asp-for="NumeroContrato" class="form-control rounded-3" placeholder="Origem" />
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                        <label class="text-muted d-block info-label mb-1">Banco Origem</label>
+                                        <input asp-for="BancoComprado" class="form-control rounded-3" placeholder="Instituição compradora" />
+                                    </div>
+                                    <div class="col-12 col-md-2">
+                                        <label class="text-muted d-block info-label mb-1">Parcela (Origem)</label>
+                                        <input type="text" asp-for="ValorParcelaPort" value="@Model?.ValorParcelaPort?.ToString("N2")" class="form-control decimal rounded-3 text-end" placeholder="0,00" />
+                                    </div>
+                                    <div class="col-12 col-md-2">
+                                        <label class="text-muted d-block info-label mb-1">Saldo Devedor</label>
+                                        <input type="text" asp-for="SaldoDevedor" value="@Model?.SaldoDevedor?.ToString("N2")" class="form-control decimal rounded-3 text-end" placeholder="0,00" />
+                                    </div>
+                                    <div class="col-12 col-md-2">
+                                        <label class="text-muted d-block info-label mb-1">Parcelas Restantes</label>
+                                        <input asp-for="ParcelasRestantes" type="number" class="form-control rounded-3" placeholder="Qtd" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Campo Condicional de Data de Pagamento (Aparece se o status for 'Pago') -->
-                    <div class="col-md-3" id="divDataPagamento" style="display: none;">
-                        <label class="form-label fw-bold text-success">Data de Pagamento</label>
-                        <input asp-for="DataPgtoContrato" type="date" class="form-control border-success" />
                     </div>
                 </div>
 
-                <!-- SEÇÃO EXCLUSIVA: Portabilidade -->
-                <div id="secaoPortabilidade" style="display: none;">
-                    <hr class="text-primary" />
-                    <h5 class="text-primary mb-3"><i class="bi bi-arrow-left-right me-2"></i>Dados da Portabilidade</h5>
-                    <div class="row mb-3">
-                        <div class="col-md-3">
-                            <label class="form-label">Número do Contrato Portado</label>
-                            <input asp-for="NumeroContrato" class="form-control" placeholder="Contrato de origem" />
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Banco de origem</label>
-                            <input asp-for="BancoComprado" class="form-control" placeholder="Contrato o banco de origem" />
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Valor da Parcela (Origem)</label>
-                            <input type="text" asp-for="ValorParcelaPort" value="@Model?.ValorParcelaPort?.ToString("N2")" class="form-control decimal" placeholder="0,00" />
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Saldo Devedor</label>
-                            <input type="text" asp-for="SaldoDevedor" value="@Model?.SaldoDevedor?.ToString("N2")" class="form-control decimal" placeholder="0,00" />
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Parcelas Restantes</label>
-                            <input asp-for="ParcelasRestantes" type="number" class="form-control" placeholder="Qtd" />
-                        </div>
+                <div class="card card-custom shadow-sm border-0 mb-4">
+                    <div class="card-body px-4 py-3">
+                        <label class="text-muted d-block info-label mb-1">Observação Geral da Venda</label>
+                        <textarea asp-for="Observacao" class="form-control rounded-3" rows="2" placeholder="Digite aqui observações ou notas internas sobre esta transação..."></textarea>
                     </div>
                 </div>
 
-                <!-- SEXTA LINHA: Observação Geral -->
-                <div class="row mb-3">
-                    <div class="col-md-12">
-                        <label class="form-label">Observação Geral</label>
-                        <textarea asp-for="Observacao" class="form-control" rows="2" placeholder="Observações importantes..."></textarea>
-                    </div>
-                </div>
+                <div class="d-flex justify-content-end align-items-center gap-2 mt-4 pt-2">
+                    <a asp-action="Index" class="btn btn-light border px-4 py-2 rounded-3 text-secondary fw-semibold small text-decoration-none">
+                        Cancelar
+                    </a>
+                    <button type="submit" id="btnSalvarRefin" name="botaoSalvar" value="refin" class="btn btn-outline-primary px-4 py-2 rounded-3 fw-semibold small shadow-sm">
+                        <i class="bi bi-arrow-repeat me-1"></i> Salvar e Digitar Refin da Port
+                    </button>
 
-                <div class="d-flex justify-content-end gap-2 mt-4">
-                    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
-                    <button type="submit" class="btn btn-success px-4">Salvar Venda</button>
+                    <button type="submit" name="botaoSalvar" value="continuar" class="btn btn-outline-dark px-4 py-2 rounded-3 fw-semibold small shadow-sm">
+                        <i class="bi bi-plus-lg me-1"></i> Salvar e Lançar Outra
+                    </button>
+
+                    <button type="submit" name="botaoSalvar" value="finalizar" class="btn btn-dark px-4 py-2 rounded-3 fw-semibold small shadow-sm">
+                        <i class="bi bi-check-lg me-1"></i> Finalizar Lançamento
+                    </button>
                 </div>
             </form>
+
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
     <script>
         $(document).ready(function () {
 
-            // Alterna dinamicamente os blocks dependendo do tipo de Operação escolhido
-            function alternarCamposPorOperacao() {
-                let operacaoSelecionada = $("#selectOperacao option:selected").text().toLowerCase();
+            // Aplica máscaras nos campos específicos
+            $('.decimal').mask('##0,00', { reverse: true });
 
-                if (operacaoSelecionada.includes("portabilidade")) {
-                    $("#secaoPortabilidade").slideDown();      // Exibe os inputs de portabilidade
-                    $("#secaoValoresNormais").slideUp();       // Oculta os inputs normais
-                } else {
-                    $("#secaoPortabilidade").slideUp();        // Oculta os inputs de portabilidade
-                    $("#secaoValoresNormais").slideDown();     // Exibe os inputs normais
-                }
+            // Esconde feedbacks automáticos
+            setTimeout(function () {
+                $("#alertaSucesso").fadeOut("slow");
+                $("#alertaErro").fadeOut("slow");
+            }, 3000);
+
+            // CORREÇÃO DO FLUXO FINANCEIRO: Refin da Port deve abrir a seção NORMAL!
+        function alternarCamposPorOperacao() {
+            let operacaoSelecionada = $("#selectOperacao option:selected").text().toLowerCase();
+
+            // 1. Controle dos Blocos de Campos (Normais vs Portabilidade)
+            if (operacaoSelecionada.includes("refin da port") || operacaoSelecionada.includes("refinport")) {
+                $("#secaoPortabilidade").slideUp(200);
+                $("#secaoValoresNormais").slideDown(200);
+            }
+            else if (operacaoSelecionada.includes("portabilidade") || operacaoSelecionada.includes("port")) {
+                $("#secaoPortabilidade").slideDown(200);
+                $("#secaoValoresNormais").slideUp(200);
+            }
+            else {
+                $("#secaoPortabilidade").slideUp(200);
+                $("#secaoValoresNormais").slideDown(200);
             }
 
-            // Exibe a Data de Pagamento se o Status for igual a "Pago"
+            // 2. NOVA REGRA: Exibe o botão especial APENAS se a operação selecionada for Portabilidade pura
+            // (Garante que se for Refin da Port, Margem Livre, Novo, etc., o botão suma)
+            if (operacaoSelecionada.includes("portabilidade") && !operacaoSelecionada.includes("refin")) {
+                $("#btnSalvarRefin").fadeIn(200); // Mostra o botão com um efeito suave
+            } else {
+                $("#btnSalvarRefin").fadeOut(200); // Esconde o botão se for qualquer outra operação
+            }
+        }
             function verificarStatusPagamento() {
                 let statusSelecionado = $("#selectStatus option:selected").text().toLowerCase();
-
                 if (statusSelecionado.includes("pago")) {
-                    $("#divDataPagamento").fadeIn();
+                    $("#divDataPagamento").fadeIn(200);
                 } else {
-                    $("#divDataPagamento").fadeOut();
-                    $("#DataPgtoContrato").val(""); // Reseta o valor caso mude o status
+                    $("#divDataPagamento").fadeOut(200);
+                    $("#DataPgtoContrato").val("");
                 }
             }
 
-            // Ativa os gatilhos imediatamente na carga inicial do DOM
-            alternarCamposPorOperacao();
-            verificarStatusPagamento();
-
-            // Ativa os escutadores de mudança nos selects de controle
-            $("#selectOperacao").change(alternarCamposPorOperacao);
-            $("#selectStatus").change(verificarStatusPagamento);
-
-            // AJAX: Busca de bancos vinculados ao selecionar a Promotora
-            $("#selectPromotora").change(function () {
-                let promotoraId = $(this).val();
+            // Função isolada para buscar bancos via AJAX e forçar pré-seleção se necessário
+            function carregarBancos(promotoraId, bancoSelecionadoId = null) {
                 let bancoSelect = $("#selectBanco");
 
                 if (!promotoraId) {
@@ -257,15 +333,145 @@
                     $.each(data, function(i, b) {
                         bancoSelect.append(`<option value="${b.id}">${b.nome}</option>`);
                     });
+
+                    // Força a seleção do banco anterior que veio do Model
+                    if (bancoSelecionadoId) {
+                        bancoSelect.val(bancoSelecionadoId);
+                    }
+                });
+            }
+
+            // Monitor do clique manual da promotora
+            $("#selectPromotora").change(function () {
+                carregarBancos($(this).val());
+            });
+
+            // ==========================================
+            // MECANISMO AUTOMÁTICO E TRAVAS DO MODO REFIN
+            // ==========================================
+            var modoRefinAtivo = '@ViewBag.ModoRefinPort.ToString().ToLower()';
+            if (modoRefinAtivo === 'true') {
+                // 1. Seleciona a operação Refin da Port automaticamente
+                $("#selectOperacao option").each(function () {
+                    let textoOpcao = $(this).text().toLowerCase();
+                    if (textoOpcao.includes("refin da port") || textoOpcao.includes("refinport")) {
+                        $("#selectOperacao").val($(this).val());
+                        return false;
+                    }
+                });
+
+                // 2. Pré-carrega os Bancos baseados na Promotora vinda do Model C#
+                var modelPromotoraId = '@Model?.PromotoraId';
+                var modelBancoId = '@Model?.BancoId';
+                if (modelPromotoraId && modelPromotoraId !== '0') {
+                    carregarBancos(modelPromotoraId, modelBancoId);
+                }
+
+                // 3. TRAVA DE SEGURANÇA MÁXIMA: Congela apenas os campos solicitados (Data ficou de fora!)
+                setTimeout(function() {
+                    $("#UsuarioId, #selectBeneficios, #selectPromotora, #selectBanco, #selectOperacao").css({
+                        "background-color": "#e9ecef",
+                        "pointer-events": "none"
+                    });
+                }, 300);
+            }
+
+            // CORREÇÃO MÁXIMA DO BENEFÍCIO (Sincronização para múltiplos benefícios)
+            var modelBeneficioId = '@Model?.ClienteBeneficioId';
+            if (modelBeneficioId && modelBeneficioId !== '0') {
+                setTimeout(function() {
+                    $("#selectBeneficios").val(modelBeneficioId);
+                }, 50);
+            }
+
+            // Inicializadores da carga da página
+            alternarCamposPorOperacao();
+            verificarStatusPagamento();
+
+            $("#selectOperacao").change(alternarCamposPorOperacao);
+            $("#selectStatus").change(verificarStatusPagamento);
+
+            // ==========================================
+            // BUSCA AJAX DE CLIENTE (Mecanismo Interno)
+            // ==========================================
+            $("#btnBuscarClienteAjax").click(function () {
+                var termo = $("#campoBuscaCliente").val();
+                if (!termo) return;
+
+                $.getJSON('/Venda/BuscarClientesAjax', { termo: termo }, function (data) {
+                    $("#containerResultadosBusca").show();
+                    $("#listaClientesResultados").empty().hide();
+                    $("#alertaClienteNaoCadastrado").hide();
+
+                    if (!data || data.length === 0) {
+                        $("#alertaClienteNaoCadastrado").addClass("d-flex").show();
+                    }
+                    else {
+                        $("#listaClientesResultados").show();
+                        $.each(data, function (index, cliente) {
+                            let beneficiosStr = JSON.stringify(cliente.beneficios);
+
+                            $("#listaClientesResultados").append(
+                                `<button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center item-cliente-ajax-linha"
+                                    data-id="${cliente.id}"
+                                    data-nome="${cliente.nome}"
+                                    data-cpf="${cliente.cpf}"
+                                    data-beneficios='${beneficiosStr}'>
+                                    <span class="fw-semibold text-dark small">${cliente.nome}</span>
+                                    <span class="text-muted small">CPF: ${cliente.cpf}</span>
+                                 </button>`
+                            );
+                        });
+                    }
                 });
             });
 
-            // CORREÇÃO AQUI: Não substitui a vírgula por ponto. Deixa o pt-BR do C# trabalhar!
-            $("#formVenda").on("submit", function (e) {
+            $("#campoBuscaCliente").keypress(function (e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                    $("#btnBuscarClienteAjax").click();
+                }
+            });
+
+            $(document).on('click', '.item-cliente-ajax-linha', function () {
+                // Se o modo Refin estiver ativo, impede a troca acidental do cliente
+                if ('@ViewBag.ModoRefinPort.ToString().ToLower()' === 'true') return;
+
+                var id = $(this).data('id');
+                var nome = $(this).data('nome');
+                var cpf = $(this).data('cpf');
+                var listaBeneficios = $(this).data('beneficios');
+
+                $("#txtNomeCliente").val(nome);
+                $("#txtCpfVinculado").val(cpf);
+                $("#hddClienteId").val(id);
+                $("#hddCpfInput").val(cpf);
+
+                var selectBeneficios = $("#selectBeneficios");
+                selectBeneficios.empty().append('<option value="">Selecione o Benefício</option>');
+
+                if (listaBeneficios && listaBeneficios.length > 0) {
+                    $.each(listaBeneficios, function(i, b) {
+                        selectBeneficios.append(`<option value="${b.id}">${b.orgaoNome} - ${b.descricao}</option>`);
+                    });
+                } else {
+                    selectBeneficios.empty().append('<option value="">Nenhum benefício vinculado ao cliente</option>');
+                }
+
+                $("#containerResultadosBusca").hide();
+                $("#campoBuscaCliente").val('');
+            });
+
+            $("#btnFecharAvisoNaoCadastrado").click(function () {
+                $("#containerResultadosBusca").hide();
+                $("#alertaClienteNaoCadastrado").hide();
+                $("#campoBuscaCliente").val('');
+            });
+
+            $("#formVenda").on("submit", function () {
                 $(".decimal").each(function () {
                     let val = $(this).val();
                     if(val) {
-                        // Apenas remove espaços extras e símbolos se existirem, mas mantém a vírgula intacta
                         val = val.replace("R$", "").trim();
                         $(this).val(val);
                     }
@@ -276,21 +482,51 @@
     </script>
 }
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-<script>
-    $(document).ready(function () {
-        // Sem o ponto no milhar: o usuário digita 1500,25 e o C# entende perfeitamente
-        $('.decimal').mask('##0,00', { reverse: true });
-    });
-</script>
+<style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
 
-<script>
+    .tracking-tight {
+        letter-spacing: -0.5px;
+    }
 
-    setTimeout(function () {
+    .form-card-border {
+        border-left: 3px solid #6c757d !important;
+    }
 
-        $("#alertaSucesso").fadeOut("slow");
-    $("#alertaErro").fadeOut("slow");
+    .card-custom {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.06);
+        background-color: #ffffff;
+    }
 
-    }, 3000);
+    .info-label {
+        font-size: 0.74rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+    }
 
-</script>
+    .form-control, .form-select {
+        border: 1px solid #dee2e6;
+        padding: 0.55rem 0.75rem;
+        font-size: 0.92rem;
+        background-color: #fff;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #212529;
+            box-shadow: 0 0 0 0.2rem rgba(33, 37, 41, 0.1);
+        }
+
+    .item-cliente-ajax-linha {
+        cursor: pointer;
+        transition: background 0.15s ease-in-out;
+    }
+
+        .item-cliente-ajax-linha:hover {
+            background-color: #f8f9fa;
+        }
+</style>

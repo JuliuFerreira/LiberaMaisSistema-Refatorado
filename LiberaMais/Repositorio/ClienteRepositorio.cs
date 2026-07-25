@@ -38,6 +38,7 @@ namespace LiberaMais.Repositorio
             return _bancoContext.Clientes
             .Include(c => c.Endereco)
             .Include (c => c.Usuario)
+            .Include(c => c.ClienteBeneficios)
             .ToList();
         }
 
@@ -59,28 +60,48 @@ namespace LiberaMais.Repositorio
 
         public bool Apagar(int id)
         {
+            // O Include garante que tragamos o endereço e benefícios mapeados para poder excluí-los juntos
+            var clienteDb = _bancoContext.Clientes
+                .Include(c => c.Endereco)
+                .Include(c => c.ClienteBeneficios)
+                .FirstOrDefault(c => c.Id == id);
 
-            Cliente cliente = BuscarClientePorId(id);
-            if(cliente == null)
+            if (clienteDb == null) return false;
+
+            // Remove o endereço vinculado se ele existir
+            if (clienteDb.Endereco != null)
             {
-                return false;
+                _bancoContext.Enderecos.Remove(clienteDb.Endereco);
             }
-            _bancoContext.Clientes.Remove(cliente);
+
+            // Remove a lista de benefícios vinculados se houver
+            if (clienteDb.ClienteBeneficios != null && clienteDb.ClienteBeneficios.Any())
+            {
+                _bancoContext.clienteBeneficio.RemoveRange(clienteDb.ClienteBeneficios);
+            }
+
+            // Por fim, remove o cliente
+            _bancoContext.Clientes.Remove(clienteDb);
+
             _bancoContext.SaveChanges();
             return true;
         }
-
         public List<Cliente> BuscarClientesPorUsuarioId(int usuarioId)
         {
             return _bancoContext.Clientes
                 .Include(c => c.Usuario)
-                .Where(c => c.UsuarioId == usuarioId) 
+                .Include(c => c.ClienteBeneficios)
+                .Include(c => c.Endereco)
+
+                .Where(c => c.UsuarioId == usuarioId)
+
                 .ToList();
         }
 
         public Cliente BuscarCompleto(int id)
         {
          return _bancoContext.Clientes
+        .Include(c => c.Usuario)
         .Include(c => c.Endereco)
         .Include(c => c.ClienteBeneficios)
             .ThenInclude(cb => cb.Beneficio)
@@ -93,6 +114,33 @@ namespace LiberaMais.Repositorio
             return _bancoContext.Clientes
                  .FirstOrDefault(c => c.Cpf == cpf);
         }
+
+        public List<Cliente> BuscarPorNomeOuCpfPaginado(string termo, int pagina, int tamanhoCorte, out int totalRegistros)
+        {
+            // O .Include garante que a tabela de Usuários seja consultada junta (Eager Loading)
+            var query = _bancoContext.Clientes.Include(c => c.Usuario).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(termo))
+            {
+                string termoLimpo = termo.Replace(".", "").Replace("-", "").Trim().ToLower();
+                query = query.Where(c => (c.Nome != null && c.Nome.ToLower().Contains(termoLimpo)) ||
+                                         (c.Cpf != null && c.Cpf.Replace(".", "").Replace("-", "").Contains(termoLimpo)));
+            }
+
+            totalRegistros = query.Count();
+
+            return query.OrderBy(c => c.Nome)
+                        .Skip((pagina - 1) * tamanhoCorte)
+                        .Take(tamanhoCorte)
+                        .ToList();
+        }
+
+        //public Cliente BuscarPorCpfeNome(string cpf, string nome)
+        //{
+        //    return _bancoContext.Clientes
+        //        .FirstOrDefault(c => c.Cpf == cpf)
+
+        //}
 
         //public bool VerificarCpfExistente(string cpf)
         //{

@@ -1,121 +1,101 @@
 ﻿@model Banco
-@{
-    Layout = "LayoutSistema";
 
+@{
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Editar Banco";
 }
 
-<div class="row justify-content-center">
+<div class="container-fluid py-4 inner-system-page">
 
-    <div class="card shadow border-0 rounded-4 col-10 mt-5">
-
-        <div class="card-header text-white rounded-top-4"
-             style="background-color:orange;">
-
-            <h3 class="text-center mb-0">
-                Editar banco
-            </h3>
-
+    <!-- Cabeçalho idêntico -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold text-dark mb-1" style="font-size: 1.6rem;">Editar Banco</h2>
+            <small class="text-muted">Atualize as informações da instituição financeira</small>
         </div>
-
-        @if (TempData["MensagemSucesso"] != null)
-        {
-            <div id="alertaSucesso" class="alert alert-success">
-                @TempData["MensagemSucesso"]
-            </div>
-        }
-
-        @if (TempData["MensagemErro"] != null)
-        {
-            <div id="alertaErro" class="alert alert-danger">
-                @TempData["MensagemErro"]
-            </div>
-        }
-
-
-        <div class="card-body p-4">
-
-            <form id="promotoraForm"
-                  asp-controller="Banco"
-                  asp-action="Editar"
-                  method="post">
-
-                <input type="hidden" asp-for="Id" />
-
-                <div class="row g-3">
-
-                    <div class="col-md-6">
-
-                        <label asp-for="Nome"
-                               class="form-label fw-bold">
-                            Nome
-                        </label>
-
-                        <input asp-for="Nome"
-                               class="form-control"
-                               maxlength="100"
-                               readonly />
-
-                        <span asp-validation-for="Nome"
-                              class="text-danger">
-                        </span>
-
-                    </div>                    
-                                        
-                    <div class="col-md-6">
-
-                        <label asp-for="Url"
-                               class="form-label fw-bold">
-                            URL
-                        </label>
-
-                        <input asp-for="Url"
-                               class="form-control"
-                               maxlength="255"
-                               placeholder="https://site.com.br" />
-
-                        <span asp-validation-for="Url"
-                              class="text-danger">
-                        </span>
-
-                    </div>
-
-                </div>
-
-                <hr class="my-4" />
-
-                <div class="d-flex justify-content-end gap-2">
-
-                    <a asp-action="Index"
-                       class="btn btn-secondary">
-
-                        Voltar
-
-                    </a>
-
-                    <button type="submit"
-                            class="btn btn-success">
-
-                        Salvar
-
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
     </div>
 
+    <!-- Mensagens de Feedback -->
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-check-circle-fill"></i> @TempData["MensagemSucesso"]
+        </div>
+    }
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["MensagemErro"]
+        </div>
+    }
+
+    <!-- Card com largura total (col-12) -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-4">
+
+                    <form asp-controller="Banco" asp-action="Editar" method="post">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label asp-for="Nome" class="form-label small fw-bold text-muted">NOME DO BANCO</label>
+                                <input asp-for="Nome" class="form-control rounded-3 py-2 bg-light" />
+                                <span asp-validation-for="Nome" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Url" class="form-label small fw-bold text-muted">URL DE ACESSO</label>
+                                <input asp-for="Url" class="form-control rounded-3 py-2" placeholder="site.com.br" />
+                                <span asp-validation-for="Url" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4 rounded-3">Voltar</a>
+                            <button type="submit" class="btn btn-dark px-4 rounded-3 shadow-sm">Salvar Alterações</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            var alertas = [document.getElementById("alertaSucesso"), document.getElementById("alertaErro")];
 
-    setTimeout(function () {
+            alertas.forEach(function(alerta) {
+                if (alerta) {
+                    alerta.style.transition = "opacity 0.5s ease";
+                    alerta.style.opacity = "0";
 
-        $("#alertaSucesso").fadeOut("slow");
-        $("#alertaErro").fadeOut("slow");
-
-    }, 3000);
-
+                    // Remove do DOM após a animação
+                    setTimeout(function() {
+                        alerta.style.display = "none";
+                    }, 500);
+                }
+            });
+        }, 3000);
+    });
 </script>
+<style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .form-control {
+        border: 1px solid #dee2e6;
+    }
+
+        .form-control:focus {
+            border-color: #212529;
+            box-shadow: 0 0 0 0.2rem rgba(33, 37, 41, 0.1);
+        }
+</style>

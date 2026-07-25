@@ -37,8 +37,8 @@ namespace LiberaMais
             builder.Services.AddTransient<IBancosRepositorio, BancosRepositorio>();
             builder.Services.AddTransient<IUsuarioRepositorio, UsuarioRepositorio>();
             builder.Services.AddTransient<IFinancaRepositorio, FinancaRepositorio>();
-            builder.Services.AddTransient<IReceitaRepositorio, ReceitaRepositorio>();
-            builder.Services.AddTransient<IDespesaRepositorio, DespesaRepositorio>();
+            //builder.Services.AddTransient<IReceitaRepositorio, ReceitaRepositorio>();
+            //builder.Services.AddTransient<IDespesaRepositorio, DespesaRepositorio>();
             builder.Services.AddTransient<IPromotoraBancoRepositorio, PromotoraBancoRepositorio>();
             builder.Services.AddTransient<ISessao, Sessao>();
             builder.Services.AddTransient<IEmail, Email>();

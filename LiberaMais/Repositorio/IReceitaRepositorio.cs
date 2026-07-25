@@ -1,17 +1,17 @@
-﻿using LiberaMais.Models;
+﻿//using LiberaMais.Models;
 
-namespace LiberaMais.Repositorio
-{
-    public interface IReceitaRepositorio
-    {
-        Receita BuscarReceitaPorId(int id);
+//namespace LiberaMais.Repositorio
+//{
+//    public interface IReceitaRepositorio
+//    {
+//        Receita BuscarReceitaPorId(int id);
 
-        List<Receita> ListarReceitas(int idFinanca);
+//        List<Receita> ListarReceitas(int idFinanca);
 
-        Receita Adicionar(Receita receita);
+//        Receita Adicionar(Receita receita);
 
-        Receita Atualizar(Receita receita);
+//        Receita Atualizar(Receita receita);
 
-        bool Apagar(int id);
-    }
-}
+//        bool Apagar(int id);
+//    }
+//}
