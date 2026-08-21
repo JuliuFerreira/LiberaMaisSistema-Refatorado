@@ -19,5 +19,7 @@ namespace LiberaMais.Repositorio
 
         public void ApagarPorClienteId(int clienteId);
 
+        List<ClienteBeneficio> BuscarPorNomeCpfPaginado(string termo, int pagina, int tamanhoCorte,out int totalregistros);
+
     }
 }

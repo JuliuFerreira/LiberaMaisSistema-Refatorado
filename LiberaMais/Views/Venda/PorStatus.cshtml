@@ -7,6 +7,8 @@
 
     var listaBancos = ViewBag.Bancos as IEnumerable<dynamic>;
     bool exibirColunaPortabilidade = Model != null && Model.Any(v => v.Operacao.ToString().ToLower().Contains("portabilidade"));
+
+    var dataLimite = DateTime.Now.AddDays(-5);
 }
 
 <div class="container-fluid py-4 inner-system-page">
@@ -77,11 +79,13 @@
         }
     </form>
 
+
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">
                     <tr>
+                        <th class="ps-4 text-muted fw-bold">Nosso Número</th>
                         <th class="ps-4 text-muted fw-bold">Data</th>
                         <th class="text-muted fw-bold">CPF</th>
                         <th class="text-muted fw-bold">Cliente</th>
@@ -100,9 +104,15 @@
                     {
                         foreach (var venda in Model)
                         {
+
                             bool ehPortabilidade = venda.Operacao.ToString().ToLower().Contains("portabilidade");
 
-                            <tr class="linha-clicavel" data-href="@Url.Action("Detalhe", "Venda", new { id = venda.Id })">
+                            bool ehComissaoAtrasada = venda.StatusContrato == StatusEnum.Pago &&
+                                                      venda.DataPgtoContrato.HasValue &&
+                                                      venda.DataPgtoContrato.Value < dataLimite;
+
+                            <tr class="linha-clicavel @(ehComissaoAtrasada ? "table-danger fw-semibold" : "")" data-href="@Url.Action("Detalhe", "Venda", new { id = venda.Id })">
+                                <td class="ps-4 text-secondary small">@venda.Id</td>
                                 <td class="ps-4 text-secondary small">@venda.DataCadastro?.ToString("dd/MM/yyyy")</td>
                                 <td class="fw-semibold text-dark small">@venda.Cliente?.Cpf</td>
                                 <td class="text-dark fw-medium">@venda.Cliente?.Nome</td>
@@ -124,7 +134,25 @@
                                 </td>
                                 <td class="text-danger fw-bold small">@(ehPortabilidade? venda.ValorParcelaPort?.ToString("N2") : venda.ValorParcela?.ToString("N2"))</td>
                                 <td class="fw-bold text-dark small">@(ehPortabilidade ? venda.SaldoDevedor?.ToString("N2") + " (Saldo Devedor)" : venda.ValorContrato?.ToString("N2"))</td>
-                                <td class="ps-4 text-secondary small">@venda.DataPgtoContrato?.ToString("dd/MM/yyyy")</td>
+                                
+                                
+                                <td class="ps-4 small">
+                                    @if (ehComissaoAtrasada)
+                                    {
+                                        <span class="text-danger fw-bold">
+                                            <i class="bi bi-exclamation-triangle-fill me-1"></i>@venda.DataPgtoContrato?.ToString("dd/MM/yyyy")
+                                        </span>
+                                    }
+
+                                    else
+                                    {
+                                        <span class="text-secondary">@venda.DataPgtoContrato?.ToString("dd/MM/yyyy")</span>
+                                    
+                                    }
+                                </td>
+                                    
+                                
+                                
                                 <td class="text-center pe-4 ignorar-clique">
                                     <div class="d-flex justify-content-center gap-3">
                                         <a asp-action="Editar" asp-route-id="@venda.Id" class="text-secondary link-icone-acao" title="Editar">

@@ -9,7 +9,7 @@ namespace LiberaMais.Models
         [Key]
         public int Id { get; set; }
 
-        public string Descricao { get; set; }
+        public string? Descricao { get; set; }
 
         public int? PromotoraId { get; set; }
 

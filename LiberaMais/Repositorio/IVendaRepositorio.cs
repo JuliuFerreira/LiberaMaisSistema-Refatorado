@@ -21,5 +21,7 @@ namespace LiberaMais.Repositorio
 
         List<Venda> BuscarCompleto(string termo, int pagina, int tamanhoCorte, out int totalRegistros);
 
+        void SalvarAlteracoes();
+
     }
 }

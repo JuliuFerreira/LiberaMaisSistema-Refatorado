@@ -1,0 +1,435 @@
+﻿@model List<Historico>
+
+@{
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Histórico";
+
+    var acionamento = ViewBag.Acionamento as Acionamento;
+}
+
+<div class="container-fluid py-4">
+
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1 mt-2">
+                Histórico
+            </h2>
+
+            @if (acionamento != null)
+            {
+                <div class="text-muted">
+                    Histórico de contatos realizados
+                </div>
+            }
+        </div>
+
+        @if (acionamento != null)
+        {
+            <a asp-controller="Historico"
+               asp-action="Criar"
+               asp-route-acionamentoId="@acionamento.Id"
+               class="btn btn-primary">
+
+                <i class="bi bi-plus-lg me-1"></i>
+                Adicionar Acionamento
+
+            </a>
+        }
+
+    </div>
+
+
+    <!-- Mensagens -->
+    @if (TempData["mensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso"
+             class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+
+            <i class="bi bi-check-circle-fill me-1"></i>
+            @TempData["mensagemSucesso"]
+
+        </div>
+    }
+
+    @if (TempData["mensagemErro"] != null)
+    {
+        <div id="alertaErro"
+             class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            @TempData["mensagemErro"]
+
+        </div>
+    }
+
+
+    <!-- Dados do Lead -->
+    @if (acionamento != null)
+    {
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <div class="d-flex align-items-center">
+
+                    <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+
+                        <i class="bi bi-person fs-4 text-primary"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h5 class="fw-bold mb-1">
+                            @acionamento.Nome
+                        </h5>
+
+                        <div class="text-muted small mb-2">
+
+                            <i class="bi bi-person-vcard me-1"></i>
+
+                            CPF: @acionamento.Cpf
+
+                        </div>
+                                              
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- Histórico -->
+    @if (Model != null && Model.Any())
+    {
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-body p-0">
+
+                @foreach (var item in Model.OrderByDescending(x => x.Data))
+                {
+                    <div class="p-4 border-bottom">
+
+                        <!-- Cabeçalho do registro -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+
+                            <div>
+
+                                <!-- Data -->
+                                <div class="fw-semibold text-dark">
+
+                                    <i class="bi bi-calendar3 me-1"></i>
+
+                                    @item.Data.ToString("dd/MM/yyyy HH:mm")
+
+                                </div>
+
+
+                                <!-- Telefone -->
+                                @if (!string.IsNullOrWhiteSpace(item.Telefone))
+                                {
+                                    <div class="text-muted small mt-1">
+
+                                        <i class="bi bi-telephone me-1"></i>
+
+                                        @item.Telefone
+
+                                    </div>
+                                }
+
+
+                                <!-- Usuário -->
+                                <div class="text-muted small mt-1">
+
+                                    <i class="bi bi-person me-1"></i>
+
+                                    Registrado por:
+
+                                    <strong class="text-dark">
+                                        @item.Usuario?.Nome
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Status + Excluir -->
+                            <div class="d-flex align-items-center gap-2">
+
+                                <span class="badge rounded-pill bg-light text-dark border px-3 py-2">
+
+                                    @item.StatusEnum.GetDisplayName()
+
+                                </span>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger border-0 rounded-3"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalExcluirHistorico_@item.Id"
+                                        title="Excluir histórico">
+
+                                    <i class="bi bi-trash"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Agendamento -->
+                        @if (item.DataAgendamento.HasValue)
+                        {
+                            <div class="alert alert-info py-2 px-3 mb-3">
+
+                                <i class="bi bi-calendar-event me-2"></i>
+
+                                <strong>
+                                    Agendamento:
+                                </strong>
+
+                                @item.DataAgendamento.Value.ToString("dd/MM/yyyy HH:mm")
+
+                            </div>
+                        }
+
+
+                        <!-- Registro da conversa -->
+                        @if (!string.IsNullOrWhiteSpace(item.RegistroHistorico))
+                        {
+                            <div class="bg-light rounded p-3">
+
+                                <div class="text-muted small fw-semibold mb-2">
+
+                                    <i class="bi bi-chat-left-text me-1"></i>
+
+                                    Registro do contato
+
+                                </div>
+
+                                <div class="text-dark">
+
+                                    @item.RegistroHistorico
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+
+                    <!-- Modal excluir histórico -->
+                    <div class="modal fade"
+                         id="modalExcluirHistorico_@item.Id"
+                         tabindex="-1"
+                         aria-hidden="true">
+
+                        <div class="modal-dialog modal-dialog-centered">
+
+                            <div class="modal-content border-0 shadow">
+
+                                <div class="modal-header">
+
+                                    <h5 class="modal-title fw-bold">
+
+                                        Confirmar exclusão
+
+                                    </h5>
+
+                                    <button type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Fechar">
+                                    </button>
+
+                                </div>
+
+
+                                <div class="modal-body">
+
+                                    <p class="mb-2">
+
+                                        Deseja realmente excluir este registro do histórico?
+
+                                    </p>
+
+                                    <div class="bg-light rounded-3 p-3">
+
+                                        <div class="small text-muted mb-1">
+
+                                            <i class="bi bi-calendar3 me-1"></i>
+
+                                            @item.Data.ToString("dd/MM/yyyy HH:mm")
+
+                                        </div>
+
+                                        <div class="fw-semibold">
+
+                                            @item.StatusEnum.GetDisplayName()
+
+                                        </div>
+
+                                        @if (!string.IsNullOrWhiteSpace(item.RegistroHistorico))
+                                        {
+                                            <div class="text-muted small mt-1">
+
+                                                @item.RegistroHistorico
+
+                                            </div>
+                                        }
+
+                                    </div>
+
+                                    <div class="text-danger small mt-3">
+
+                                        <i class="bi bi-exclamation-triangle me-1"></i>
+
+                                        Essa ação não poderá ser desfeita.
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="modal-footer">
+
+                                    <button type="button"
+                                            class="btn btn-outline-secondary"
+                                            data-bs-dismiss="modal">
+
+                                        Cancelar
+
+                                    </button>
+
+
+                                    <form asp-controller="Historico"
+                                          asp-action="Apagar"
+                                          method="post">
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@item.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-danger">
+
+                                            <i class="bi bi-trash me-1"></i>
+
+                                            Confirmar exclusão
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <!-- Nenhum histórico -->
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-body text-center py-5">
+
+                <i class="bi bi-clock-history fs-1 text-muted"></i>
+
+                <h5 class="fw-semibold mt-3">
+                    Nenhum contato registrado
+                </h5>
+
+                <p class="text-muted mb-4">
+
+                    Ainda não existe nenhum acionamento registrado para este Lead.
+
+                </p>
+
+                @if (acionamento != null)
+                {
+                    <a asp-controller="Historico"
+                       asp-action="Criar"
+                       asp-route-acionamentoId="@acionamento.Id"
+                       class="btn btn-primary">
+
+                        <i class="bi bi-plus-lg me-1"></i>
+
+                        Adicionar primeiro acionamento
+
+                    </a>
+                }
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- Voltar -->
+    <div class="mt-4">
+
+        <a asp-controller="Acionamento"
+           asp-action="Index"
+           class="btn btn-link text-decoration-none text-secondary p-0 d-inline-flex align-items-center gap-2">
+
+            <i class="bi bi-arrow-left-short fs-4"></i>
+
+            <span class="fw-medium small">
+                Voltar para a listagem
+            </span>
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    window.addEventListener('load', function () {
+
+        setTimeout(function () {
+
+            var alertas = [
+                document.getElementById("alertaSucesso"),
+                document.getElementById("alertaErro")
+            ];
+
+            alertas.forEach(function (alerta) {
+
+                if (alerta) {
+
+                    alerta.style.transition = "opacity 0.5s ease";
+                    alerta.style.opacity = "0";
+
+                    setTimeout(function () {
+
+                        alerta.style.display = "none";
+
+                    }, 500);
+                }
+
+            });
+
+        }, 3000);
+
+    });
+
+</script>

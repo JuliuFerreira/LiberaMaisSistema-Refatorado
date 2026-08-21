@@ -3,6 +3,13 @@
 @{
     Layout = "_LayoutSistema";
     ViewData["Title"] = "Painel de Vendas";
+
+    var usuarioLogado = ViewBag.UsuarioAtual ?? 0;
+
+    string[] nomesMeses = {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro" };
+    int mesAtual = ViewBag.Mes ?? DateTime.Today.Month;
+    int anoAtual = ViewBag.Ano ?? DateTime.Today.Year;
+    string nomesMesCompetencia = nomesMeses[mesAtual - 1];
 }
 
 <div class="container-fluid py-4 inner-system-page">
@@ -55,21 +62,66 @@
 
     @if (ViewBag.IsAdmin == true)
     {
-        <form method="get" asp-action="Index" class="row g-2 mb-4">
-            <div class="col-12 col-md-3">
-                <label class="text-muted small fw-semibold d-block mb-1">Filtrar painel por:</label>
-                <select name="usuarioId" class="form-select form-select-sm filter-dropdown" style="min-width: 180px;" onchange="this.form.submit()">
-                    <option value="" selected="@(string.IsNullOrEmpty(Context.Request.Query["usuarioId"]) && Context.Request.Query.ContainsKey("usuarioId"))">Todos os Usuários</option>
-                    @if (ViewBag.Usuarios != null)
-                    {
-                        foreach (var user in ViewBag.Usuarios)
+        <div class="col-12 col-md-4 col-lg-3">
+                <label class="text-muted small fw-semibold d-block mb-1">Filtrar painel por Mês:</label>
+
+            <form id="formFiltroDashboard" method="get" asp-action="Index">
+                <div class="d-flex flex-wrap align-items-center gap-2">
+
+                    <select name="mes" class="form-select form-select-sm shadow-sm border" style="width: auto;" onchange="this.form.submit()">
+                        <option value="1" selected="@(ViewBag.Mes == 1)">Janeiro</option>
+                        <option value="2" selected="@(ViewBag.Mes == 2)">Fevereiro</option>
+                        <option value="3" selected="@(ViewBag.Mes == 3)">Março</option>
+                        <option value="4" selected="@(ViewBag.Mes == 4)">Abril</option>
+                        <option value="5" selected="@(ViewBag.Mes == 5)">Maio</option>
+                        <option value="6" selected="@(ViewBag.Mes == 6)">Junho</option>
+                        <option value="7" selected="@(ViewBag.Mes == 7)">Julho</option>
+                        <option value="8" selected="@(ViewBag.Mes == 8)">Agosto</option>
+                        <option value="9" selected="@(ViewBag.Mes == 9)">Setembro</option>
+                        <option value="10" selected="@(ViewBag.Mes == 10)">Outubro</option>
+                        <option value="11" selected="@(ViewBag.Mes == 11)">Novembro</option>
+                        <option value="12" selected="@(ViewBag.Mes == 12)">Dezembro</option>
+                    </select>
+
+                    <select name="ano" class="form-select form-select-sm shadow-sm border" style="width: auto;" onchange="this.form.submit()">
+                        @for (int a = DateTime.Now.Year - 2; a <= DateTime.Now.Year + 1; a++)
                         {
-                            <option value="@user.Id" selected="@(ViewBag.UsuarioAtual == user.Id)">@user.Nome</option>
+                            <option value="@a" selected="@(ViewBag.Ano == a)">@a</option>
+
                         }
-                    }
-                </select>
-            </div>
-        </form>
+                    </select>
+
+                        <div class="col-12 col-md-3">
+                            <select name="usuarioId" class="form-select form-select-sm filter-dropdown" style="min-width: 180px;" onchange="this.form.submit()">
+                                <option value="" selected="@(string.IsNullOrEmpty(Context.Request.Query["usuarioId"]) && Context.Request.Query.ContainsKey("usuarioId"))">Todos os Usuários</option>
+                                @if (ViewBag.Usuarios != null)
+                                {
+                                    foreach (var user in ViewBag.Usuarios)
+                                    {
+                                        <option value="@user.Id" selected="@(ViewBag.UsuarioAtual == user.Id)">@user.Nome</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="todos"
+                               value="true"
+                               id="todos"
+                               onchange="this.form.submit()"
+                               checked="@(ViewBag.Todos == true)">
+
+                        <label class="form-check-label small fw-semibold d-block mb-1" for="todos">
+                            Mostrar Todos Os Periodos
+                        </label>
+                    </div>
+                                            
+                </div>
+
+            </form>
+        </div>
     }
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-5 g-3">

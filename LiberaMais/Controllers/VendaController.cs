@@ -73,13 +73,21 @@ namespace LiberaMais.Controllers
         }
 
 
-        public IActionResult Index(int? usuarioId)
+        public IActionResult Index(int? usuarioId, int? mes, int? ano, bool todos = false)
         {
+            int mesAtual = mes ?? DateTime.Now.Month;
+            int anoAtual = ano ?? DateTime.Now.Year;
+
             // 1. Busca o usuário logado para sabermos se ele é Admin ou operador comum
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             bool isAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
             ViewBag.IsAdmin = isAdmin;
             ViewBag.UsuarioAtual = isAdmin ? usuarioId : usuarioLogado.Id;
+
+            ViewBag.Mes = mesAtual;
+            ViewBag.Ano = anoAtual;
+            ViewBag.Todos = todos;
+
 
             // 2. Configura a lista de usuários para o dropdown no dashboard (apenas se for Admin)
             if (isAdmin)
@@ -96,8 +104,20 @@ namespace LiberaMais.Controllers
                 ViewBag.UsuarioAtual = usuarioId;
             }
 
+            var dataInicio = new DateTime(anoAtual, mesAtual, 1);
+            var dataFim = dataInicio.AddMonths(1);
+
             // 3. CHAMADA DO REPOSITÓRIO: Buscamos todos os contratos do banco
             var listaContratos = _vendaRepositorio.ListarTodasVendas();
+
+            if (!todos)
+            {
+                listaContratos = listaContratos
+                .Where(c => c.DataCadastro >= dataInicio &&
+                       c.DataCadastro < dataFim)
+                .ToList();
+
+            }
 
             // 4. SEGURANÇA E FILTRAGEM INTELIGENTE:
             if (isAdmin)
@@ -139,9 +159,11 @@ namespace LiberaMais.Controllers
                     c.DataPgtoContrato.HasValue &&
                     c.DataPgtoContrato.Value < dataLimite),
 
-                // Envia a lista filtrada para alimentar a tabela da View
+                // Envia a lista filtrada para alimentar a tabela    da View
                 ListaContratos = listaContratos
             };
+
+
 
             // Retorna a View passando o Dashboard montadinho
             return View(dashboard);
@@ -149,7 +171,9 @@ namespace LiberaMais.Controllers
 
         public IActionResult PorStatus(string status, string busca, int? usuarioId, int pagina = 1)
         {
+
             ViewBag.Banco = _bancosRepositorio.ListarBancos();
+
 
             if (usuarioId == 0)
             {
@@ -176,6 +200,7 @@ namespace LiberaMais.Controllers
 
                 ViewBag.UsuarioAtual = usuarioId;
             }
+
 
             int tamanhoCorte = 10;
             int totalRegistros = 0;
@@ -206,6 +231,7 @@ namespace LiberaMais.Controllers
                 // Se não for admin, vê rigidamente apenas as suas próprias vendas
                 vendas = vendas.Where(v => v.UsuarioId == usuarioLogado.Id).ToList();
             }
+
 
             // 5. Filtragem por Status: Convertemos a string para o Enum
             if (Enum.TryParse(typeof(StatusEnum), status, out var statusEnum))
@@ -564,7 +590,7 @@ namespace LiberaMais.Controllers
                 }
 
                 // Se o valor NÃO foi informado OU for menor/igual a zero
-                if (!venda.ValorComissao.HasValue || venda.ValorComissao.Value <= 0)
+                if (!venda.ValorComissao.HasValue)
                 {
                     ModelState.AddModelError("ValorComissao", "Informe o valor da comissão recebida.");
                 }

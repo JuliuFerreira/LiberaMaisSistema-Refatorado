@@ -23,6 +23,8 @@ namespace LiberaMais.Controllers
         private readonly IClienteBeneficioRepositorio _clienteBeneficioRepositorio;
         private readonly PermissaoService _permissaoService;
         private readonly IVendaRepositorio _vendaRepositorio;
+        private readonly IAciomanentoRepositorio _aciomanentoRepositorio;
+        private readonly IHistoricoRepositorio _historicoRepositorio;
 
         public ClientesController(IClienteRepositorio clienteRepositorio,
                           IEnderecoRepositorio enderecoRepositorio,
@@ -31,7 +33,9 @@ namespace LiberaMais.Controllers
                           IUsuarioRepositorio usuarioRepositorio,
                           PermissaoService permissaoService,
                           IClienteBeneficioRepositorio clienteBeneficioRepositorio,
-                          IVendaRepositorio vendaRepositorio) // <-- Aqui mudou!
+                          IVendaRepositorio vendaRepositorio, 
+                          IAciomanentoRepositorio aciomanentoRepositorio,
+                          IHistoricoRepositorio historicoRepositorio) 
         {
             _clienteRepositorio = clienteRepositorio;
             _enderecoRepositorio = enderecoRepositorio;
@@ -41,6 +45,8 @@ namespace LiberaMais.Controllers
             _permissaoService = permissaoService;
             _clienteBeneficioRepositorio = clienteBeneficioRepositorio; // Agora vai funcionar perfeitamente!
             _vendaRepositorio = vendaRepositorio;
+            _aciomanentoRepositorio = aciomanentoRepositorio;
+            _historicoRepositorio = historicoRepositorio;
         }
 
         public IActionResult Index(string busca, int? usuarioId, int pagina = 1)
@@ -180,6 +186,53 @@ namespace LiberaMais.Controllers
             };
 
             return View(model);
+        }
+
+        public IActionResult CriarDeAcionamento(int acionamentoId)
+        {
+            var acionamento = _aciomanentoRepositorio.BuscarPorId(acionamentoId);
+
+            if (acionamento == null)
+            {
+                TempData["MensagemErro"] = "Beneficiário não localizado.";
+                return RedirectToAction("Index", "Acionamento");
+            }
+
+            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+
+            ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+
+            if (usuarioLogado.Perfil == PerfilEnum.Admin)
+            {
+                ViewBag.Usuarios = _usuarioRepositorio.ListarTodosUsuarios();
+            }
+            else
+            {
+                ViewBag.Usuarios = new List<UsuarioModel>
+        {
+            usuarioLogado
+        };
+            }
+
+            var ultimoHistorico = _historicoRepositorio
+                .ListarPorAcionamento(acionamentoId)
+                .OrderByDescending(x => x.Data)
+                .FirstOrDefault();
+
+            var model = new ClienteEnderecoViewModel
+            {
+                Cliente = new Cliente
+                {
+                    Nome = acionamento.Nome,
+                    Cpf = acionamento.Cpf,
+                    UsuarioId = ultimoHistorico?.UsuarioId ?? usuarioLogado.Id,
+                    Fone = ultimoHistorico?.Telefone
+                },
+
+                Endereco = new Endereco()
+            };
+
+            return View("Criar", model);
         }
 
         [HttpPost]

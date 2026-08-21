@@ -1,0 +1,347 @@
+﻿@using LiberaMais.Models.Enums
+@model Venda
+
+@{
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Registrar Repasse de Comissão";
+}
+
+<div class="container-fluid py-4 inner-system-page">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-light-subtle">
+        <div>
+            <h3 class="fw-bold text-dark mb-1 tracking-tight">
+                Registrar Repasse de Comissão
+            </h3>
+            <p class="text-muted small mb-0">
+                Confira os dados da venda e registre o repasse da comissão ao vendedor.
+            </p>
+        </div>
+    </div>
+
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div class="alert alert-success shadow-sm border-0 rounded-3 mb-3 small">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @TempData["MensagemSucesso"]
+        </div>
+    }
+
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-3 small">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["MensagemErro"]
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 card-custom">
+
+        <form asp-action="RegistrarRepasse" method="post" id="formRepasse">
+
+            <input type="hidden" asp-for="Id" />
+
+            <!-- DADOS DA VENDA -->
+            <div class="card card-custom shadow-sm border-0 mb-4">
+
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <span class="text-dark fw-bold fs-6">
+                        <i class="bi bi-file-earmark-text text-secondary me-2"></i>
+                        Informações da Venda
+                    </span>
+                </div>
+
+                <div class="card-body px-4 pt-3 pb-4">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-2">
+                            <label class="form-label info-label text-muted mb-1">
+                                Nº Venda
+                            </label>
+                            <input class="form-control bg-light rounded-3 small"
+                                   value="@Model.Id"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label info-label text-muted mb-1">
+                                Cliente
+                            </label>
+                            <input class="form-control bg-light rounded-3 small"
+                                   value="@Model.Cliente?.Nome"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label info-label text-muted mb-1">
+                                CPF
+                            </label>
+                            <input class="form-control bg-light rounded-3 small font-monospace"
+                                   value="@Model.Cliente?.Cpf"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label info-label text-muted mb-1">
+                                Promotora
+                            </label>
+                            <input class="form-control bg-light rounded-3 small"
+                                   value="@Model.Promotora?.Nome"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label info-label text-muted mb-1">
+                                Banco
+                            </label>
+                            <input class="form-control bg-light rounded-3 small"
+                                   value="@Model.Banco?.Nome"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label info-label text-muted mb-1">
+                                Status do Contrato
+                            </label>
+                            <input class="form-control bg-light rounded-3 small"
+                                   value="@Model.StatusContrato"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label info-label text-muted mb-1">
+                                Valor do Contrato
+                            </label>
+
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted small">
+                                    R$
+                                </span>
+
+                                <input class="form-control bg-light rounded-end-3 small fw-bold"
+                                       value="@Model.ValorContrato?.ToString("N2")"
+                                       readonly />
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label info-label text-muted mb-1">
+                                Data Digitação
+                            </label>
+                            <input class="form-control bg-light rounded-3 small"
+                                   value="@Model.DataCadastro?.ToString("dd/MM/yyyy")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label info-label text-muted mb-1">
+                                Data Pgto. Comissão
+                            </label>
+                            <input class="form-control bg-light rounded-3 small"
+                                   value="@Model.DataPgtoComissao?.ToString("dd/MM/yyyy")"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label info-label text-muted mb-1">
+                                Comissão Recebida
+                            </label>
+
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted small">
+                                    R$
+                                </span>
+
+                                <input class="form-control bg-light rounded-end-3 small text-success fw-bold"
+                                       value="@Model.ValorComissao?.ToString("N2")"
+                                       readonly />
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- DADOS DO REPASSE -->
+            <div class="mb-4 bg-success-subtle bg-opacity-25 border border-success-subtle rounded-4 p-4">
+
+                <h6 class="text-success fw-bold tracking-tight mb-3">
+                    <i class="bi bi-cash-coin me-1"></i>
+                    Dados do Repasse
+                </h6>
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+
+                        <label asp-for="ValorRepasse"
+                               class="form-label info-label text-muted mb-1">
+                            Valor do Repasse
+                        </label>
+
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted small">
+                                R$
+                            </span>
+
+                            <input asp-for="ValorRepasse"
+                                   class="form-control decimal rounded-end-3 small bg-white text-success fw-bold"
+                                   placeholder="0,00"
+                                   value="@Model.ValorRepasse?.ToString("N2")" />
+                        </div>
+
+                        <span asp-validation-for="ValorRepasse"
+                              class="text-danger small d-block mt-1">
+                        </span>
+
+                    </div>
+
+                    @if(Model.RepasseComissao == StatusRepasseComissaoEnum.Pago)
+                    {
+                        <div class="col-md-4">
+
+                            <label asp-for="RepasseComissao"
+                                   class="form-label info-label text-muted mb-1">
+                                Status do Repasse
+                            </label>
+
+                            <select asp-for="RepasseComissao"
+                                    class="form-select rounded-3 small fw-semibold"
+                                    asp-items="Html.GetEnumSelectList<StatusRepasseComissaoEnum>()">
+
+                                <option value="">Selecione</option>
+
+                            </select>
+
+                            <span asp-validation-for="RepasseComissao"
+                                  class="text-danger small d-block mt-1">
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <label asp-for="DataRepasse"
+                                   class="form-label info-label text-muted mb-1">
+                                Data do Repasse
+                            </label>
+
+                            <input asp-for="DataRepasse"
+                                   type="date"
+                                   class="form-control rounded-3 small bg-white" />
+
+                            <span asp-validation-for="DataRepasse"
+                                  class="text-danger small d-block mt-1">
+                            </span>
+
+                        </div>
+                    }
+
+
+
+                    <div class="col-md-12">
+
+                        <label asp-for="ObservacaoRepasse"
+                               class="form-label info-label text-muted mb-1">
+                            Observação do Repasse
+                        </label>
+
+                        <textarea asp-for="ObservacaoRepasse"
+                                  class="form-control rounded-3 small"
+                                  rows="3"
+                                  placeholder="Ex: Comissão paga via PIX em 08/08/2026..."></textarea>
+
+                        <span asp-validation-for="ObservacaoRepasse"
+                              class="text-danger small d-block mt-1">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- BOTÕES -->
+            <div class="d-flex justify-content-end align-items-center gap-3 pt-3 border-top border-light-subtle">
+
+                <a asp-action="Relatorio"
+                   class="btn btn-light border rounded-3 px-3 py-2 small fw-medium text-secondary">
+                    Cancelar
+                </a>
+
+                <button type="submit"
+                        class="btn btn-success rounded-3 px-4 py-2 small fw-semibold shadow-sm">
+                    <i class="bi bi-check-circle me-1"></i>
+                    Salvar Repasse
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .tracking-tight {
+        letter-spacing: -0.5px;
+    }
+
+    .card-custom {
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .info-label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+    }
+
+</style>
+
+
+@section Scripts {
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+
+            $('.decimal').mask('##0,00', {
+                reverse: true
+            });
+
+            $("#formRepasse").on("submit", function () {
+
+                $(".decimal").each(function () {
+
+                    let val = $(this).val();
+
+                    if (val) {
+                        val = val.replace("R$", "").trim();
+                        $(this).val(val);
+                    }
+
+                });
+
+                return true;
+            });
+
+        });
+
+    </script>
+}

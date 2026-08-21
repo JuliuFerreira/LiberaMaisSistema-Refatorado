@@ -46,6 +46,8 @@ namespace LiberaMais
             builder.Services.AddTransient<IOrgaoRepositorio, OrgaoRepositorio>();
             builder.Services.AddTransient<IBeneficioRepositorio, BeneficioRepositorio>();
             builder.Services.AddTransient<IClienteBeneficioRepositorio, ClienteBeneficioRepositorio>();
+            builder.Services.AddTransient<IAciomanentoRepositorio, AcionamentoRepositorio>();
+            builder.Services.AddTransient<IHistoricoRepositorio, HistoricoRepositorio>();
             builder.Services.AddScoped<PermissaoService>();
 
             builder.Services.AddSession(options =>

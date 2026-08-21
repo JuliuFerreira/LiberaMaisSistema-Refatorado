@@ -50,5 +50,33 @@ namespace LiberaMais.Repositorio
             _bancoContext.SaveChanges();
             return true;
         }
+
+        public List<Util> BuscarPorNome(string nome, int pagina, int tamanhoPagina, out int totalRegistros)
+        {
+            var query = _bancoContext.utils.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(nome))
+            {
+                string nomeLimpo = nome.Trim().ToLower();
+
+                query = query.Where(u =>
+                    u.Nome != null &&
+                    u.Nome.ToLower().Contains(nomeLimpo));
+            }
+
+            var listaAgrupada = query
+                .ToList()
+                .GroupBy(u => u.Nome)
+                .Select(g => g.First())
+                .OrderBy(u => u.Nome)
+                .ToList();
+
+            totalRegistros = listaAgrupada.Count();
+
+            return listaAgrupada
+                .Skip((pagina - 1) * tamanhoPagina)
+                .Take(tamanhoPagina)
+                .ToList();
+        }
     }
 }

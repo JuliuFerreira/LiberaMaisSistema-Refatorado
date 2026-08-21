@@ -13,12 +13,28 @@ namespace LiberaMais.Controllers
             _UtilRepositorio = utilRepositorio;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string nome, int pagina = 1)
         {
-            var util = _UtilRepositorio.ListarTodos();
-            return View(util);
-        }
+            if (pagina < 1)
+            {
+                pagina = 1;
+            }
 
+            const int tamanhoPagina = 10;
+            int totalRegistros;
+
+            var listaUtils = _UtilRepositorio.BuscarPorNome(
+                nome,
+                pagina,
+                tamanhoPagina,
+                out totalRegistros);
+
+            ViewBag.NomeAtual = nome;
+            ViewBag.PaginaAtual = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling((double)totalRegistros / tamanhoPagina);
+
+            return View(listaUtils);
+        }
         public IActionResult Criar()
         {
 

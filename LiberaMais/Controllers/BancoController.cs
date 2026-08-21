@@ -25,6 +25,8 @@ namespace LiberaMais.Controllers
 
         public IActionResult Index()
         {
+            ViewBag.QtdBanco = _bancosRepositorio.ListarBancos().Count();
+
             List<Banco> bancos = _bancosRepositorio.ListarBancos();
             return View(bancos);
         }

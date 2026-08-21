@@ -1,0 +1,409 @@
+﻿@model LiberaMais.Models.Historico
+
+@{
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Novo Acionamento";
+
+    var acionamento = ViewBag.Acionamento as LiberaMais.Models.Acionamento;
+}
+
+<div class="container-fluid py-4 inner-system-page">
+
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-light-subtle">
+
+        <div>
+            <h3 class="fw-bold text-dark mb-1 tracking-tight">
+                Novo Acionamento
+            </h3>
+
+            <p class="text-muted small mb-0">
+                Registre um novo contato realizado com o Lead.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- Mensagens -->
+    @if (TempData["mensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso"
+             class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+
+            <i class="bi bi-check-circle-fill me-1"></i>
+            @TempData["mensagemSucesso"]
+
+        </div>
+    }
+
+    @if (TempData["mensagemErro"] != null)
+    {
+        <div id="alertaErro"
+             class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            @TempData["mensagemErro"]
+
+        </div>
+    }
+
+
+    <!-- Dados do Lead -->
+    @if (acionamento != null)
+    {
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+
+            <div class="card-body p-4">
+
+                <div class="d-flex align-items-center">
+
+                    <div class="lead-icon me-3">
+                        <i class="bi bi-person"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="fw-bold text-dark fs-5">
+                            @acionamento.Nome
+                        </div>
+
+                        <div class="text-muted small">
+                            <i class="bi bi-person-vcard me-1"></i>
+                            CPF: @acionamento.Cpf
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- Formulário -->
+    <div class="card shadow-sm border-0 rounded-4">
+
+        <div class="card-body p-4">
+
+            <form asp-action="Criar"
+                  method="post"
+                  autocomplete="off">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger small mb-3">
+                </div>
+
+
+                <!-- ID do Acionamento -->
+                <input type="hidden" asp-for="AcionamentoId" />
+                <input type="hidden" asp-for="Id" />
+
+
+
+                <div class="row g-4 mb-4">
+
+                    <!-- Data -->
+                    <div class="col-md-3">
+
+                        <label asp-for="Data"
+                               class="form-label small fw-bold text-muted">
+
+                            DATA DO CONTATO
+
+                        </label>
+
+                        <input asp-for="Data"
+                               type="date"
+                               class="form-control rounded-3 py-2" />
+
+                        <span asp-validation-for="Data"
+                              class="text-danger small mt-1 d-block">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Usuário -->
+                    <div class="col-md-4">
+
+                        <label class="form-label small fw-bold text-muted">
+                            USUÁRIO
+                        </label>
+
+                        <select asp-for="UsuarioId"
+                                class="form-select rounded-3 py-2">
+
+                            <option value="">
+                                Selecione um usuário...
+                            </option>
+
+                            @if (ViewBag.Usuarios != null)
+                            {
+                                foreach (var user in ViewBag.Usuarios)
+                                {
+                                    <option value="@user.Id">
+                                        @user.Nome
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                        <span asp-validation-for="UsuarioId"
+                              class="text-danger small d-block mt-1">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Telefone -->
+                    <div class="col-6 col-md-3">
+                        <label class="text-muted d-block info-label mb-1">Telefone</label>
+                        <input asp-for="Telefone" class="form-control rounded-3" id="telefone" oninput="mascaraTelefone(this)" maxlength="15" />
+                        <span asp-validation-for="Telefone" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+
+                    <!-- Status -->
+                    <div class="col-md-5">
+
+                        <label asp-for="StatusEnum"
+                               class="form-label small fw-bold text-muted">
+
+                            STATUS DO CONTATO
+
+                        </label>
+
+                        <select asp-for="StatusEnum"
+                                class="form-select rounded-3 py-2"
+                                id="statusContato">
+
+                            <option value="">
+                                Selecione o status
+                            </option>
+
+                            @foreach (var status in Enum.GetValues<LiberaMais.Models.Enums.StatusHistoricoEnum>())
+                            {
+                                <option value="@((int)status)">
+                                    @status.GetDisplayName()
+                                </option>
+                            }
+
+                        </select>
+
+                        <span asp-validation-for="StatusEnum"
+                              class="text-danger small mt-1 d-block">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Agendamento -->
+                <div class="row g-4 mb-4"
+                     id="campoAgendamento"
+                     style="display: none;">
+
+                    <div class="col-md-5">
+
+                        <label asp-for="DataAgendamento"
+                               class="form-label small fw-bold text-muted">
+
+                            DATA E HORA DO AGENDAMENTO
+
+                        </label>
+
+                        <input asp-for="DataAgendamento"
+                               type="datetime-local"
+                               id="DataAgendamento"
+                               class="form-control rounded-3 py-2" />
+
+                        <span asp-validation-for="DataAgendamento"
+                              class="text-danger small mt-1 d-block">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Registro -->
+                <div class="mb-4">
+
+                    <label asp-for="RegistroHistorico"
+                           class="form-label small fw-bold text-muted">
+
+                        REGISTRO DO CONTATO
+
+                    </label>
+
+                    <textarea asp-for="RegistroHistorico"
+                              class="form-control rounded-3"
+                              rows="6"
+                              placeholder="Descreva o que foi conversado com o Lead..."></textarea>
+
+                    <span asp-validation-for="RegistroHistorico"
+                          class="text-danger small mt-1 d-block">
+                    </span>
+
+                </div>
+
+
+                <!-- Botões -->
+                <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top border-light-subtle">
+
+                    <a asp-controller="Historico"
+                       asp-action="Index"
+                       asp-route-acionamentoId="@Model.AcionamentoId"
+                       class="btn btn-light border px-4 py-2 rounded-3 small fw-medium text-secondary">
+
+                        Cancelar
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-dark px-4 py-2 rounded-3 small fw-semibold">
+
+                        <i class="bi bi-check-lg me-1"></i>
+                        Salvar Acionamento
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- Voltar -->
+    <div class="mt-4">
+
+        <a asp-controller="Historico"
+           asp-action="Index"
+           asp-route-acionamentoId="@Model.AcionamentoId"
+           class="btn btn-link text-decoration-none text-secondary p-0 d-inline-flex align-items-center gap-2 btn-back-hover">
+
+            <i class="bi bi-arrow-left-short fs-4"></i>
+
+            <span class="fw-medium small">
+                Voltar para o histórico
+            </span>
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .tracking-tight {
+        letter-spacing: -0.5px;
+    }
+
+    .lead-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .form-control,
+    .form-select {
+        border: 1px solid #dee2e6;
+        font-size: 0.92rem;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #212529;
+            box-shadow: 0 0 0 3px rgba(33, 37, 41, 0.1);
+            outline: 0;
+        }
+
+    .btn-back-hover {
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+        .btn-back-hover:hover {
+            color: #212529 !important;
+            transform: translateX(-2px);
+        }
+
+</style>
+
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const status = document.getElementById("statusContato");
+            const campoAgendamento = document.getElementById("campoAgendamento");
+            const dataAgendamento = document.getElementById("DataAgendamento");
+
+            function verificarAgendamento() {
+
+                if (!status || !campoAgendamento) {
+                    return;
+                }
+
+                // Agendado = 4 no StatusHistoricoEnum
+                const statusAgendado = "4";
+
+                if (status.value === statusAgendado) {
+
+                    campoAgendamento.style.display = "block";
+
+                    if (dataAgendamento) {
+                        dataAgendamento.setAttribute("required", "required");
+                    }
+
+                }
+                else {
+
+                    campoAgendamento.style.display = "none";
+
+                    if (dataAgendamento) {
+
+                        dataAgendamento.removeAttribute("required");
+
+                        dataAgendamento.value = "";
+                    }
+
+                }
+
+            }
+
+            status?.addEventListener("change", verificarAgendamento);
+
+            // Verifica o status ao carregar a página
+            verificarAgendamento();
+
+        });
+
+    </script>
+}

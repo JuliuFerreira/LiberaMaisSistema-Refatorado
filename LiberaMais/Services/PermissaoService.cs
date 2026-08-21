@@ -67,5 +67,21 @@ namespace LiberaMais.Services
 
             return venda.UsuarioId == usuarioLogado.Id;
         }
+
+        public bool UsuarioTemAcessoAAcionamento(UsuarioModel usuarioLogado, Acionamento acionamento)
+        {
+            if(usuarioLogado.Perfil == PerfilEnum.Admin)
+            {
+                return true;
+            }
+
+            if(acionamento == null)
+            {
+                return false;
+            }
+
+            return acionamento.UsuarioId == usuarioLogado.Id;
+
+        }
     }
 }

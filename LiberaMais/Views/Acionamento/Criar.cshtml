@@ -1,0 +1,124 @@
+﻿@model Acionamento
+
+@{
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Cadastrar Acionamento";
+}
+
+<div class="container-fluid py-4 inner-system-page">
+
+    <!-- Cabeçalho alinhado com a Index -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold text-dark mb-1" style="font-size: 1.6rem;">Novo</h2>
+            <small class="text-muted">Preencha os dados para cadastrar um novo Lead</small>
+        </div>
+    </div>
+
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-check-circle-fill"></i> @TempData["MensagemSucesso"]
+        </div>
+    }
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["MensagemErro"]
+        </div>
+    }
+
+
+    <!-- Container com a largura padronizada -->
+    <div class="row">
+        <div class="col-12 col-lg-12">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-4">
+
+                    <form asp-controller="Acionamento" asp-action="Criar" method="post">
+                        <div class="row g-4">
+
+                            <div class="col-md-4">
+                                <label asp-for="Cpf" class="form-label small fw-bold text-muted">CPF</label>
+                                <input asp-for="Cpf" class="form-control rounded-3 py-2" />
+                                <span asp-validation-for="Cpf" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="Nome" class="form-label small fw-bold text-muted">NOME</label>
+                                <input asp-for="Nome" class="form-control rounded-3 py-2"/>
+                                <span asp-validation-for="Nome" class="text-danger small"></span>
+                            </div>
+
+                            @* <div class="col-md-3">
+                                <label asp-for="Telefone" class="form-label small fw-bold text-muted">TELEFONE</label>
+                                <input asp-for="Telefone" class="form-control rounded-3 py-2" />
+                                <span asp-validation-for="Telefone" class="text-danger small"></span>
+                            </div> *@
+
+                            <div class="col-md-4">
+                                <label class ="form-label small fw-bold text-muted">
+                                    USUÁRIO</label>
+                                <select asp-for="UsuarioId" class="form-select rounded-3 py-2">
+                                    <option value="">Selecione um usuário...</option>
+                                    @if (ViewBag.Usuarios != null)
+                                    {
+                                        foreach (var user in ViewBag.Usuarios)
+                                        {
+                                            <option value="@user.Id">@user.Nome</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="UsuarioId" class="text-danger small d-block mt-1"></span>
+                            </div>
+
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4 rounded-3">Voltar</a>
+                            <button type="submit" class="btn btn-dark px-4 rounded-3 shadow-sm">Salvar</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            var alertas = [document.getElementById("alertaSucesso"), document.getElementById("alertaErro")];
+
+            alertas.forEach(function(alerta) {
+                if (alerta) {
+                    alerta.style.transition = "opacity 0.5s ease";
+                    alerta.style.opacity = "0";
+
+                    // Remove do DOM após a animação
+                    setTimeout(function() {
+                        alerta.style.display = "none";
+                    }, 500);
+                }
+            });
+        }, 3000);
+    });
+</script>
+
+<style>
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .form-control {
+        border: 1px solid #dee2e6;
+    }
+
+        .form-control:focus {
+            border-color: #212529;
+            box-shadow: 0 0 0 0.2rem rgba(33, 37, 41, 0.1);
+        }
+</style>

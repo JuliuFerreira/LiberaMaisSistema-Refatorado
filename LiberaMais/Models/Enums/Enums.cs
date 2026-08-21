@@ -38,6 +38,23 @@ namespace LiberaMais.Models.Enums
 
     }
 
+    public enum StatusHistoricoEnum : int
+    {
+        [Display(Name = ("Tentativa de contato"))]
+        TentativaDeContato =1,
+        Negociando = 2,
+        [Display(Name = ("Cliente sem interesse"))]
+        Desinteressado = 3,
+        Agendado = 4,
+        Fechado = 5
+    }
+
+    public enum StatusRepasseComissaoEnum : int
+    {
+        Aberto = 1,
+        Pago = 2
+    }
+
 
 
     public enum OrgaoEnum : int
@@ -83,7 +100,11 @@ namespace LiberaMais.Models.Enums
 
         Receita = 1,
 
-        Despesa = 2
+        Despesa = 2,
+
+        Salario = 3
+
+
     }
 
     public enum BeneficioEnum : int

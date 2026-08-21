@@ -1,0 +1,654 @@
+﻿@using LiberaMais.Models.Enums
+@model IEnumerable<Acionamento>
+
+@{
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Acionamentos";
+
+    string buscaAtual = ViewBag.BuscaAtual ?? "";
+    int paginaAtual = ViewBag.PaginaAtual ?? 1;
+    int totalPaginas = ViewBag.TotalPaginas ?? 1;
+    int totalRegistros = ViewBag.TotalRegistros ?? 0;
+
+    int? usuarioAtual = ViewBag.UsuarioAtual;
+    bool isAdmin = ViewBag.IsAdmin ?? false;
+}
+
+<div class="container-fluid py-4 inner-system-page">
+
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+
+        <div>
+            <h2 class="fw-bold text-dark mb-1" style="font-size: 1.6rem;">
+                Contatos
+            </h2>
+
+            <small class="text-muted">
+                <strong>@* @ViewBag.QtdBanco *@</strong>
+                Lista de Prospecção.
+            </small>
+        </div>
+
+        <a asp-action="Criar"
+           class="btn btn-dark d-flex align-items-center gap-2 shadow-sm px-3 py-2 rounded-3">
+
+            <i class="bi bi-plus-lg"></i>
+
+            <span class="fw-semibold small">
+                Adicionar
+            </span>
+
+        </a>
+
+
+    </div>
+
+    <form asp-controller="Acionamento"
+          asp-action="Index"
+          method="get"
+          class="d-flex gap-2">
+
+        <div class="col-md-2">
+
+
+            <input type="text"
+                   name="busca"
+                   value="@buscaAtual"
+                   class="form-control form-control-sm"
+                   placeholder="Nome, CPF ou telefone..."
+                   style="min-width: 250px;" />
+        </div>
+
+
+        @if (isAdmin)
+        {
+            <div class="col-md-2">
+
+                <select name="usuarioId"
+                        class="form-select form-select-sm"
+                        style="min-width: 180px;">
+
+                    <option value="">Todos os Usuários</option>
+
+                    @if (ViewBag.Usuarios != null)
+                    {
+                        foreach (var usuario in ViewBag.Usuarios)
+                        {
+                            <option value="@usuario.Id"
+                                    selected="@(usuarioAtual == usuario.Id)">
+                                @usuario.Nome
+                            </option>
+                        }
+                    }
+
+                </select>
+            </div>
+
+        }
+
+        <button type="submit"
+                class="btn btn-dark btn-sm px-3">
+            <i class="bi bi-search"></i>
+            Buscar
+        </button>
+
+    </form>
+
+
+
+
+    <!-- Mensagens -->
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso"
+             class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+
+            <i class="bi bi-check-circle-fill"></i>
+            @TempData["MensagemSucesso"]
+
+        </div>
+    }
+
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro"
+             class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            @TempData["MensagemErro"]
+
+        </div>
+    }
+
+
+    <!-- Tabela -->
+    <div class="card card-table shadow-sm border-0 mb-3">
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-custom align-middle mb-0">
+
+                    <thead>
+
+                        <tr>
+                            <th class="ps-4">
+                                Tornar Cliente
+                            </th>
+
+                            <th class="ps-6">
+                                Data de Cadastro
+                            </th>
+
+                            <th class="ps-4">
+                                CPF
+                            </th>
+
+                            <th class="ps-4">
+                                Nome
+                            </th>
+
+                            <th class="ps-4">
+                                Usuário
+                            </th>
+
+                            <th class="ps-4">
+                                Telefone de Contato
+                            </th>
+
+                            <th class="ps-4">
+                                Agendamento
+                            </th>
+
+                            <th class="ps-4">
+                                Último Status
+                            </th>
+
+                            <th class="text-center pe-4">
+                                Ações
+                            </th>
+
+                            <th class="text-center pe-4">
+                                Ações
+                            </th>
+
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+
+                            foreach (var ac in Model)
+                            {
+
+                                var ultimoHistorico = ac.Historicos?
+                                .OrderByDescending(h => h.Data)
+                                .FirstOrDefault();
+
+
+                                <tr>
+                                    <td class="ps-4">
+                                        <a asp-controller="Clientes"
+                                           asp-action="CriarDeAcionamento"
+                                           asp-route-acionamentoId="@ac.Id"
+                                           class="btn btn-success">
+
+                                            <i class="bi bi-person-check me-1"></i>
+
+                                            <span class="fw-semibold small">
+
+                                            </span>
+
+                                        </a>
+                                    </td>
+
+                                    <td class="ps-4">
+
+                                        <span class="fw-bold text-dark">
+                                            @ac.DataCadastro?.ToString("dd/MM/yyy")
+                                        </span>
+
+                                    </td>
+
+                                    <!-- CPF -->
+                                    <td class="ps-4">
+
+                                        <span class="fw-bold text-dark">
+                                            @ac.Cpf
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- Nome -->
+                                    <td class="ps-4">
+
+                                        <span class="fw-bold text-dark">
+                                            @ac.Nome
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- Usuário -->
+                                    <td class="ps-4">
+
+                                        <span class="text-dark">
+                                            @ac.Usuario?.Nome
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- Telefone -->
+                                    <td class="ps-4">
+
+                                        @if (!string.IsNullOrWhiteSpace(ultimoHistorico?.Telefone))
+                                        {
+                                            <span class="text-dark">
+
+                                                <i class="bi bi-telephone me-1 text-muted"></i>
+
+                                                @ultimoHistorico.Telefone
+
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">
+                                                Não informado
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- Agendamento -->
+                                    <td class="ps-4">
+
+                                        @if (ultimoHistorico?.DataAgendamento != null)
+                                        {
+                                            <span class="badge rounded-pill px-3 py-2"
+                                                  style="
+                                                                                            background-color: #fff3cd;
+                                                                                            color: #856404;
+                                                                                            border: 1px solid #ffe69c;
+                                                                                          ">
+
+                                                <i class="bi bi-calendar-event me-1"></i>
+
+                                                @ultimoHistorico.DataAgendamento.Value.ToString("dd/MM/yyyy HH:mm")
+
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge rounded-pill px-3 py-2"
+                                                  style="
+                                                                                            background-color: #d1e7dd;
+                                                                                            color: #0f5132;
+                                                                                            border: 1px solid #a3cfbb;
+                                                                                          ">
+
+                                                <i class="bi bi-calendar-check me-1"></i>
+
+                                                Nada agendado
+
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- Último Status -->
+                                    <td class="ps-4">
+
+                                        @if (ultimoHistorico != null)
+                                        {
+                                            <span class="badge rounded-pill bg-light text-dark border px-3 py-2">
+
+                                                @ultimoHistorico.StatusEnum.GetDisplayName()
+
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge rounded-pill bg-secondary px-3 py-2">
+
+                                                Sem Histórico
+
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <!-- Histórico / Tornar Cliente -->
+                                    <td class="text-center py-4">
+
+                                        <a asp-controller="Historico"
+                                           asp-action="Index"
+                                           asp-route-acionamentoId="@ac.Id"
+                                           class="btn btn-primary">
+
+                                            <i class="bi bi-chat-square-text me-1"></i>
+
+                                            <span class="fw-semibold small">
+                                                Ver Histórico
+                                            </span>
+
+                                        </a>
+
+                                    </td>
+
+
+                                    <!-- Editar / Excluir -->
+                                    <td class="text-center py-4">
+
+                                        <a asp-controller="Acionamento"
+                                           asp-action="Editar"
+                                           asp-route-id="@ac.Id"
+                                           class="btn btn-sm btn-outline-warning border-0"
+                                           title="Editar">
+
+                                            <i class="bi bi-pencil-square"></i>
+
+                                        </a>
+
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger border-0"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalExcluir_@ac.Id"
+                                                title="Excluir">
+
+                                            <i class="bi bi-trash"></i>
+
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+
+
+                                <!-- Modal de Exclusão -->
+                                <div class="modal fade"
+                                     id="modalExcluir_@ac.Id"
+                                     tabindex="-1"
+                                     aria-hidden="true">
+
+                                    <div class="modal-dialog modal-dialog-centered">
+
+                                        <div class="modal-content border-0 shadow">
+
+
+                                            <div class="modal-header">
+
+                                                <h5 class="modal-title fw-bold">
+                                                    Confirmar Exclusão
+                                                </h5>
+
+                                                <button type="button"
+                                                        class="btn-close"
+                                                        data-bs-dismiss="modal"
+                                                        aria-label="Close">
+                                                </button>
+
+                                            </div>
+
+
+                                            <div class="modal-body">
+
+                                                Deseja realmente remover o Lead
+
+                                                <strong>
+                                                    @ac.Nome
+                                                </strong>?
+
+                                                <div class="text-muted small mt-2">
+
+                                                    Essa ação não poderá ser desfeita.
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <div class="modal-footer">
+
+                                                <button type="button"
+                                                        class="btn btn-outline-secondary"
+                                                        data-bs-dismiss="modal">
+
+                                                    Cancelar
+
+                                                </button>
+
+
+                                                <form asp-controller="Acionamento"
+                                                      asp-action="Apagar"
+                                                      method="post"
+                                                      class="d-inline">
+
+                                                    <input type="hidden"
+                                                           name="id"
+                                                           value="@ac.Id" />
+
+
+                                                    <button type="submit"
+                                                            class="btn btn-danger">
+
+                                                        <i class="bi bi-trash me-1"></i>
+
+                                                        Confirmar Exclusão
+
+                                                    </button>
+
+                                                </form>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            }
+
+                        }
+                        else
+                        {
+
+                            <tr>
+
+                                <td colspan="8"
+                                    class="text-center py-5">
+
+                                    <div class="text-muted">
+
+                                        <i class="bi bi-person-lines-fill fs-1 d-block mb-3"></i>
+
+                                        <h6 class="fw-semibold">
+                                            Nenhum acionamento encontrado
+                                        </h6>
+
+                                        <span class="small">
+                                            Não existem leads cadastrados para exibição.
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    </tbody>
+
+                </table>
+                <div class="ms-4 my-2 text-secondary" style="font-size: 0.85rem;">
+                    <span>
+                        Total: <strong class="text-dark">@ViewBag.TotalRegistros</strong> clientes cadastrados
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    @if (ViewBag.TotalPaginas > 1)
+    {
+        // Identifica se deve mandar o ID atual ou 0 (representando "Todos")
+        var usuarioRota = ViewBag.UsuarioAtual;
+
+        <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded-4 shadow-sm border border-light-subtle mb-4">
+            @* Lado Esquerdo: Página Atual + Total de Clientes Cadastrados *@
+            <div class="d-flex flex-column flex-sm-row gap-sm-3 text-muted small">
+                <span>
+                    Página <strong>@ViewBag.PaginaAtual</strong> de <strong>@ViewBag.TotalPaginas</strong>
+                </span>
+            </div>
+
+            @* Lado Direito: Botões de Navegação *@
+            <div class="btn-group gap-1">
+                <a asp-action="Index"
+                   asp-route-pagina="@(ViewBag.PaginaAtual - 1)"
+                   asp-route-busca="@ViewBag.BuscaAtual"
+                   asp-route-usuarioId="@usuarioRota"
+                   class="btn btn-sm btn-outline-dark rounded-2 px-3 py-1.5 fw-medium @(ViewBag.PaginaAtual == 1 ? "disabled" : "")">
+                    <i class="bi bi-chevron-left me-1"></i> Anterior
+                </a>
+
+                <a asp-action="Index"
+                   asp-route-pagina="@(ViewBag.PaginaAtual + 1)"
+                   asp-route-busca="@ViewBag.BuscaAtual"
+                   asp-route-usuarioId="@usuarioRota"
+                   class="btn btn-sm btn-dark rounded-2 px-3 py-1.5 fw-medium @(ViewBag.PaginaAtual == ViewBag.TotalPaginas ? "disabled" : "")">
+                    Próximo <i class="bi bi-chevron-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    }
+
+
+    <!-- Voltar -->
+    <div class="mt-4">
+
+        <a asp-controller="Apps"
+           asp-action="Index"
+           class="text-decoration-none text-muted fw-medium d-flex align-items-center gap-1">
+
+            <i class="bi bi-arrow-left"></i>
+
+            Voltar
+
+        </a>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script>
+
+        window.addEventListener('load', function () {
+
+            setTimeout(function () {
+
+                var alertas = [
+                    document.getElementById("alertaSucesso"),
+                    document.getElementById("alertaErro")
+                ];
+
+
+                alertas.forEach(function (alerta) {
+
+                    if (alerta) {
+
+                        alerta.style.transition =
+                            "opacity 0.5s ease";
+
+                        alerta.style.opacity = "0";
+
+
+                        setTimeout(function () {
+
+                            alerta.style.display = "none";
+
+                        }, 500);
+
+                    }
+
+                });
+
+            }, 3000);
+
+        });
+
+    </script>
+
+}
+
+
+<style>
+
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+
+    .card-table {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+
+    .table-custom th {
+        font-size: 0.82rem;
+        color: #5c636a;
+        padding: 14px 10px;
+        text-transform: uppercase;
+    }
+
+
+    .table-custom td {
+        padding: 14px 10px;
+        font-size: 0.92rem;
+    }
+
+
+    .btn-outline-secondary {
+        color: #6c757d;
+    }
+
+
+        .btn-outline-secondary:hover {
+            background-color: #f1f3f5;
+            color: #212529;
+        }
+
+
+    .linha-clicavel {
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+    }
+
+
+        .linha-clicavel:hover {
+            background-color: rgba(0, 0, 0, 0.02) !important;
+        }
+
+</style>

@@ -1,0 +1,341 @@
+﻿@using LiberaMais.Models.Enums
+@using System.Globalization
+@model List<LiberaMais.Models.ComissaoRelatorioViewModel>
+
+@{
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Relatório de Pagamento";
+
+    decimal totalContrato = Model?
+        .Sum(x => x.Venda?.ValorContrato ?? x.Venda?.SaldoDevedor ?? 0m) ?? 0m;
+    decimal totalRepasse = Model?
+        .Sum(x => x.Venda?.ValorRepasse ?? 0m) ?? 0m;
+}
+
+<div class="container-fluid py-4 inner-system-page">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+
+        <div>
+
+            <span class="text-uppercase fw-bold text-secondary font-monospace"
+                  style="font-size: 0.75rem;">
+                Módulo Financeiro
+            </span>
+
+            <h2 class="fw-bold text-dark mb-1">
+                Relatório de Pagamento
+            </h2>
+
+            <p class="text-muted small mb-0">
+                Contratos selecionados para pagamento de comissão
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div class="alert alert-danger border-0 shadow-sm rounded-3">
+
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+            @TempData["MensagemErro"]
+
+        </div>
+    }
+
+
+    @if (Model != null && Model.Any())
+    {
+
+        <!-- RESUMO -->
+
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-4">
+
+                <div class="card border-0 shadow-sm rounded-4">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Contratos selecionados
+                        </small>
+
+                        <h3 class="fw-bold mb-0">
+                            @Model.Count
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="card border-0 shadow-sm rounded-4">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Valor de Contrato
+                        </small>
+
+                        <h3 class="fw-bold mb-0">
+                            @totalContrato.ToString("C2")
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="card border-0 shadow-sm rounded-4">
+
+                    <div class="card-body">
+
+                        <small class="text-muted">
+                            Comissão Devida
+                        </small>
+
+                        <h3 class="fw-bold text-success mb-0">
+                            @totalRepasse.ToString("C2")
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TABELA -->
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+            <div class="table-responsive">
+
+                <table class="table align-middle mb-0">
+
+                    <thead class="bg-light">
+
+                        <tr>
+
+                            <th>Contrato</th>
+
+                            <th>Cliente</th>
+
+                            <th>Usuário</th>
+
+                            <th>Data Comissão</th>
+
+                            <th class="text-end">
+                                Valor do Contrato
+                            </th>
+
+                            <th class="text-end">
+                                Comissão à Repassar
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+
+                            <tr>
+
+                                <td>
+                                    <strong>
+                                        #@item.Venda?.Id
+                                    </strong>
+                                </td>
+
+
+                                <td>
+
+                                    <div class="fw-semibold">
+
+                                        @item.Venda?.Cliente?.Nome
+
+                                    </div>
+
+                                    <small class="text-muted">
+
+                                        @item.Venda?.Cliente?.Cpf
+
+                                    </small>
+
+                                </td>
+
+
+                                <td>
+
+                                    @item.Venda?.Usuario?.Nome
+
+                                </td>
+
+
+                                <td>
+
+                                    @item.Venda?.DataPgtoComissao?.ToString("dd/MM/yyyy")
+
+                                </td>
+
+
+                                <td class="text-end">
+
+                                    @item.Venda?.ValorContrato?.ToString("C2") @item.Venda?.SaldoDevedor?.ToString("C2")
+
+                                </td>
+
+
+                                <td class="text-end fw-bold text-success">
+
+                                    @item.Venda?.ValorRepasse?.ToString("C2")
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    </tbody>
+
+
+                    <tfoot class="table-light">
+
+                        <tr>
+
+                            <td colspan="4"
+                                class="text-end fw-bold">
+
+                                TOTAL:
+
+                            </td>
+
+                            <td class="text-end fw-bold">
+
+                                @totalContrato.ToString("C2")
+
+                            </td>
+
+                            <td class="text-end fw-bold text-success">
+
+                                @totalRepasse.ToString("C2")
+
+                            </td>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- AÇÕES -->
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+
+@*             <button type="button"
+                    onclick="window.print()"
+                    class="btn btn-outline-dark rounded-3">
+
+                <i class="bi bi-printer me-1"></i>
+
+                Imprimir
+
+            </button>
+ *@
+
+            <form asp-controller="Comissao"
+                  asp-action="EfetivarPagamento"
+                  method="post">
+              
+                @foreach(var item in Model)
+                {
+                    <input type="hidden"
+                            name="vendasSelecionadas"
+                            value="@item.Venda.Id"/>
+                }
+
+                <button type="submit"
+                    class="btn btn-success rounded-3 px-4">
+                
+                <i class="bi bi-cash-coin me-1"></i>
+
+                Efetivar Pagamento
+
+                </button>
+
+              </form>
+
+        </div>
+
+        <div class="mt-0">
+
+    <a asp-controller="Comissao"
+       asp-action="Relatorio"
+       class="btn btn-link text-decoration-none text-secondary p-0 d-inline-flex align-items-center gap-2 btn-back-hover">
+
+        <i class="bi bi-arrow-left-short fs-4"></i>
+
+        <span class="fw-medium small">
+
+            Voltar a Relatório
+
+        </span>
+
+    </a>
+
+</div>
+
+    }
+    else
+    {
+
+        <div class="card border-0 shadow-sm rounded-4">
+
+            <div class="card-body text-center py-5">
+
+                <i class="bi bi-receipt text-muted"
+                   style="font-size: 2rem;">
+                </i>
+
+                <h5 class="mt-3">
+                    Nenhum contrato selecionado
+                </h5>
+
+                <p class="text-muted">
+                    Volte ao relatório de comissões e selecione
+                    os contratos que deseja incluir no pagamento.
+                </p>
+
+            </div>
+
+        </div>
+
+    }
+
+</div>
+
+

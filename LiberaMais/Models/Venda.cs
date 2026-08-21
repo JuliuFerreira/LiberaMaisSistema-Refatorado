@@ -39,5 +39,13 @@ namespace LiberaMais.Models
         public DateTime? DataPgtoComissao { get; set; }
         public DateTime? DataPgtoContrato { get; set; }
 
+        public decimal? ValorRepasse { get; set; }
+
+        public DateTime? DataRepasse { get; set; }
+
+        public StatusRepasseComissaoEnum? RepasseComissao { get; set; }
+
+        public string? ObservacaoRepasse { get; set; }
+
     }
 }

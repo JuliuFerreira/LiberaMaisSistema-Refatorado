@@ -13,5 +13,7 @@ namespace LiberaMais.Repositorio
         public Util Atualizar(Util util);
 
         public bool Apagar (int id);
+
+        public List<Util> BuscarPorNome(string nome, int pagina, int tamanhoCorte, out int totalRegistros);
     }
 }

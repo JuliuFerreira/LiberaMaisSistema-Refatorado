@@ -31,7 +31,12 @@
         </div>
         <div class="card-body px-4 pt-2 pb-4">
             <div class="row g-3">
-                <div class="col-6 col-md-6 info-divider pb-2">
+                <div class="col-6 col-md-2 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">Nosso Número</small>
+                    <div class="text-dark fw-semibold small">@(Model.Id)</div>
+                </div>
+
+                <div class="col-6 col-md-4 info-divider pb-2">
                     <small class="text-muted d-block info-label mb-1">Data do Cadastro</small>
                     <div class="text-dark fw-semibold small">@(Model.DataCadastro?.ToString("dd/MM/yyyy"))</div>
                 </div>
@@ -40,6 +45,7 @@
                     <small class="text-muted d-block info-label mb-1">Usuário Digitador</small>
                     <div class="text-dark fw-semibold small">@(Model.Usuario.Nome)</div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -58,6 +64,13 @@
                     <small class="text-muted d-block info-label mb-1">Nome do Cliente</small>
                     <div class="text-dark fw-semibold small">@(Model.Cliente?.Nome ?? "Não Informado")</div>
                 </div>
+
+                <div class="col-12 col-md-6 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">Cpf do Cliente</small>
+                    <div class="text-dark fw-semibold small">@(Model.Cliente?.Cpf ?? "Não Informado")</div>
+                </div>
+
+
 
                 <div class="col-12 col-md-6 info-divider pb-2">
                     <small class="text-muted d-block info-label mb-1">Benefício Vinculado</small>
@@ -93,6 +106,23 @@
                     <small class="text-muted d-block info-label mb-1">Banco de Destino (Digitado)</small>
                     <div class="text-dark fw-semibold small">@(Model.Banco?.Nome ?? "Não Carregado")</div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 mb-4 card">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+            <span class="text-dark fw-bold fs-5 tracking-tight">
+                <i class="bi bi-calendar3 text-secondary me-2"></i> Observações do Contrato
+            </span>
+        </div>
+        <div class="card-body px-4 pt-2 pb-4">
+            <div class="row g-3">
+                <div class="col-6 col-md-6 info-divider pb-2">
+                    <small class="text-muted d-block info-label mb-1">Informações</small>
+                    <div class="text-dark fw-semibold small">@(Model.Observacao ?? "Nenhuma Informação Adicional.")</div>
+                </div>
+
             </div>
         </div>
     </div>

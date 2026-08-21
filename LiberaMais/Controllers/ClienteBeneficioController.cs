@@ -1,6 +1,7 @@
 ﻿using LiberaMais.Models;
 using LiberaMais.Repositorio;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace LiberaMais.Controllers
 {
@@ -38,19 +39,21 @@ namespace LiberaMais.Controllers
             return Json(beneficios);
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string busca, int pagina = 1) // Mudamos de 'termo' para 'busca'
         {
-            // 1. Busca todos os registros do banco de dados
-            var todosBeneficios = _clienteBeneficioRepositorio.ListarTodos();
+            if (pagina < 1) pagina = 1;
 
-            // 2. Filtra para manter apenas 1 registro quando houver o mesmo CPF e mesmo Órgão
-            var clienteBeneficioUnico = todosBeneficios
-                .Where(cb => cb.Cliente != null && cb.Beneficio?.Orgaos != null) // Evita erros de referência nula
-                .GroupBy(cb => new { cb.Cliente.Cpf, cb.Beneficio.Orgaos.Id })  // Agrupa por CPF e pelo ID do Órgão
-                .Select(grupo => grupo.First())                                 // Pega apenas o primeiro registro de cada grupo
-                .ToList();
+            int tamanhoCorte = 10;
+            int totalRegistros = 0;
 
-            // 3. Retorna a lista filtrada para a View
+            // Passamos o parâmetro 'busca' para o repositório
+            var clienteBeneficioUnico = _clienteBeneficioRepositorio.BuscarPorNomeCpfPaginado(busca, pagina, tamanhoCorte, out totalRegistros);
+
+            // PADRÃO DE VOCÊS: Nomeando as ViewBags igual ao ecossistema do sistema
+            ViewBag.BuscaAtual = busca;
+            ViewBag.PaginaAtual = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling((double)totalRegistros / tamanhoCorte);
+
             return View(clienteBeneficioUnico);
         }
         public IActionResult Criar(int clienteId)

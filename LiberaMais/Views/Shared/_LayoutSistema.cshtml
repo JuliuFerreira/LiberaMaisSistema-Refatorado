@@ -1,34 +1,46 @@
 ﻿<html lang="pt-br">
 <head>
     <meta charset="utf-8" />
+
     <title>@ViewData["Title"] - LiberaMais</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+
     <style>
+
         :root {
             --sidebar-width: 260px;
             --primary-dark: #2c3e50;
         }
 
-        /* Garante que o container do componente ocupe 100% da largura sem sobras */
+
+        /* SIDEBAR COMPONENT */
+
         .sidebar-component-wrapper {
             width: 100%;
             display: flex;
-            justify-content: center; /* Força o alinhamento horizontal ao centro */
+            justify-content: center;
             padding: 0 !important;
             margin: 0 !important;
         }
 
-            /* ZERA ABSOLUTAMENTE tudo o que o View Component gera de tabelas, listas ou divs internas */
             .sidebar-component-wrapper ul,
             .sidebar-component-wrapper li,
             .sidebar-component-wrapper div,
             .sidebar-component-wrapper nav {
                 list-style: none !important;
                 padding: 0 !important;
-                margin: 0 auto !important; /* Reseta margens e centraliza o bloco */
-                float: none !important; /* Previne desalinhamentos antigos */
+                margin: 0 auto !important;
+                float: none !important;
             }
+
+
+        /* BODY */
 
         body {
             margin: 0;
@@ -36,7 +48,9 @@
             background: #f4f7f6;
         }
 
-        /* SIDEBAR AJUSTADA COMO FLEXBOX VERTICAL */
+
+        /* SIDEBAR */
+
         .sidebar {
             width: var(--sidebar-width);
             height: 100vh;
@@ -46,9 +60,10 @@
             left: 0;
             color: #fff;
             padding: 25px 20px;
-            display: flex; /* Habilita o Flexbox */
-            flex-direction: column; /* Empilha os elementos verticalmente (Corrigido) */
+            display: flex;
+            flex-direction: column;
         }
+
 
             .sidebar .brand {
                 font-weight: bold;
@@ -58,7 +73,9 @@
                 color: #fff;
             }
 
-        /* MENU LINKS */
+
+        /* MENU */
+
         .menu-item {
             display: flex;
             align-items: center;
@@ -70,7 +87,8 @@
             transition: 0.3s;
         }
 
-            .menu-item:hover, .menu-item.active {
+            .menu-item:hover,
+            .menu-item.active {
                 background: #34495e;
                 color: #fff;
             }
@@ -80,46 +98,578 @@
                 font-size: 1.2rem;
             }
 
+
         /* CONTEÚDO */
+
         .main-content {
             margin-left: var(--sidebar-width);
             padding: 40px;
         }
+
+
+        /* INDICADOR DO MENU */
+
+        .menu-item[aria-expanded="false"] .menu-indicador::before {
+            content: "+";
+            font-size: 1.1rem;
+        }
+
+        .menu-item[aria-expanded="true"] .menu-indicador::before {
+            content: "-";
+            font-size: 1.1rem;
+        }
+
+
+        /* SUBMENU */
+
+        .submenu-wrapper {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .submenu-item {
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            display: block;
+            color: #adb5bd !important;
+            transition: background-color 0.15s, color 0.15s;
+        }
+
+            .submenu-item:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                color: #ffffff !important;
+            }
+
+
+        /* ÁREA GLOBAL DE ALERTAS */
+
+        #areaAlertaAgendamento {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 420px;
+            max-width: calc(100vw - 40px);
+            z-index: 9999;
+        }
+
+
+        /* ANIMAÇÃO DO ALERTA */
+
+        .alerta-agendamento {
+            animation: aparecerAlerta 0.4s ease-out;
+        }
+
+        @@keyframes aparecerAlerta {
+
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
     </style>
+
 </head>
+
+
 <body>
 
+
+    <!-- ====================================== -->
+    <!-- SIDEBAR -->
+    <!-- ====================================== -->
+
     <aside class="sidebar">
+
         <div class="sidebar-top w-100 text-center">
-            <a href="/" class="brand text-decoration-none mb-3 d-block">LIBERA<span class="text-warning">MAIS</span></a>
+
+            <a href="/"
+               class="brand text-decoration-none mb-3 d-block">
+
+                LIBERA<span class="text-warning">MAIS</span>
+
+            </a>
+
 
             <nav class="sidebar-component-wrapper w-100">
+
                 @await Component.InvokeAsync("Menu")
+
             </nav>
+
         </div>
+
 
         <div class="d-flex flex-column mt-4 w-100 px-1">
-            <a asp-controller="Apps" asp-action="Index" class="menu-item"><i class="bi bi-house-door"></i> Painel</a>
-            <a asp-controller="Clientes" asp-action="Index" class="menu-item"><i class="bi bi-people"></i> Clientes</a>
-            <a asp-controller="Venda" asp-action="Index" class="menu-item"><i class="bi bi-currency-dollar"></i> Vendas</a>
-            <a asp-controller="Promotora" asp-action="Index" class="menu-item"><i class="bi bi-building"></i> Promotoras</a>
-            <a asp-controller="Comissao" asp-action="Relatorio" class="menu-item"><i class="bi bi-coin"></i> Comissões</a>
-            <a asp-controller="Financa" asp-action="Index" class="menu-item"><i class="bi bi-wallet2"></i> Finança</a>
-            <a asp-controller="ClienteBeneficio" asp-action="Index" class="menu-item"><i class="bi bi-lock-fill"></i> Senha Portal Cliente</a>
-            <a asp-controller="Util" asp-action="Index" class="menu-item"><i class="bi bi-link-45deg"></i> Links úteis</a>
-            <a asp-controller="Setup" asp-action="Index" class="menu-item"><i class="bi bi-gear-fill"></i> Configurações</a>
+
+            <a asp-controller="Apps"
+               asp-action="Index"
+               class="menu-item">
+
+                <i class="bi bi-house-door"></i>
+                Painel
+
+            </a>
+
+
+            <a asp-controller="Clientes"
+               asp-action="Index"
+               class="menu-item">
+
+                <i class="bi bi-people"></i>
+                Clientes
+
+            </a>
+
+
+            <a asp-controller="Venda"
+               asp-action="Index"
+               class="menu-item">
+
+                <i class="bi bi-currency-dollar"></i>
+                Vendas
+
+            </a>
+
+
+            <a asp-controller="Promotora"
+               asp-action="Index"
+               class="menu-item">
+
+                <i class="bi bi-building"></i>
+                Promotoras
+
+            </a>
+
+
+            <a asp-controller="ClienteBeneficio"
+               asp-action="Index"
+               class="menu-item">
+
+                <i class="bi bi-lock-fill"></i>
+                Senha Portal Cliente
+
+            </a>
+
+
+            <a asp-controller="Util"
+               asp-action="Index"
+               class="menu-item">
+
+                <i class="bi bi-link-45deg"></i>
+                Links úteis
+
+            </a>
+
+
+            <a asp-controller="Acionamento"
+               asp-action="Index"
+               class="menu-item">
+
+                <i class="bi bi-card-text"></i>
+                Prospecção
+
+            </a>
+
+
+            <a asp-controller="Comissao"
+               asp-action="Relatorio"
+               class="menu-item">
+
+                <i class="bi bi-coin"></i>
+                Comissões
+
+            </a>
+
+
+            <a asp-controller="Financa"
+               asp-action="Index"
+               class="menu-item">
+
+                <i class="bi bi-wallet2"></i>
+                Finança
+
+            </a>
+
+
+            <!-- CONFIGURAÇÕES -->
+
+            <a class="menu-item d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse"
+               href="#submenuSetup"
+               role="button"
+               aria-expanded="false"
+               aria-controls="submenuSetup">
+
+                <span>
+
+                    <i class="bi bi-gear-fill"></i>
+                    Configurações
+
+                </span>
+
+                <span class="menu-indicador fw-bold"></span>
+
+            </a>
+
+
+            <div class="collapse submenu-wrapper"
+                 id="submenuSetup">
+
+                <div class="d-flex flex-column ps-4 row-gap-1 py-1">
+
+
+                    <a asp-controller="Usuario"
+                       asp-action="Index"
+                       class="submenu-item small text-decoration-none text-muted">
+
+                        <i class="bi bi-person-gear"></i>
+                        Usuários
+
+                    </a>
+
+
+                    <a asp-controller="Banco"
+                       asp-action="Index"
+                       class="submenu-item small text-decoration-none text-muted">
+
+                        <i class="bi bi-bank"></i>
+                        Bancos
+
+                    </a>
+
+
+                    <a asp-controller="Orgao"
+                       asp-action="Index"
+                       class="submenu-item small text-decoration-none text-muted">
+
+                        <i class="bi bi-building"></i>
+                        Orgãos
+
+                    </a>
+
+
+                    <a asp-controller="Beneficio"
+                       asp-action="Index"
+                       class="submenu-item small text-decoration-none text-muted">
+
+                        <i class="bi bi-card-checklist"></i>
+                        Beneficios
+
+                    </a>
+
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="sidebar-bottom" style="height: 40px;"></div>
+
+        <div class="sidebar-bottom"
+             style="height: 40px;">
+        </div>
+
     </aside>
 
+
+
+    <!-- ====================================== -->
+    <!-- CONTEÚDO -->
+    <!-- ====================================== -->
+
     <main class="main-content">
+
         @RenderBody()
+
     </main>
+
+
+
+    <!-- ====================================== -->
+    <!-- ÁREA GLOBAL DE ALERTAS -->
+    <!-- ====================================== -->
+
+    <div id="areaAlertaAgendamento"></div>
+
+
+
+    <!-- ====================================== -->
+    <!-- SCRIPTS -->
+    <!-- ====================================== -->
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+    <!-- ====================================== -->
+    <!-- SISTEMA GLOBAL DE AGENDAMENTOS -->
+    <!-- ====================================== -->
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            console.log("Sistema global de agendamentos iniciado.");
+
+            // Verifica imediatamente ao abrir qualquer página
+            verificarAgendamentos();
+
+            // Verifica novamente a cada 5 minutos
+            setInterval(verificarAgendamentos, 300000);
+
+        });
+
+
+        function verificarAgendamentos() {
+
+            console.log("Verificando agendamentos...");
+
+
+            fetch('/Acionamento/Agendamentos')
+
+                .then(response => {
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            "Erro ao consultar os agendamentos."
+                        );
+
+                    }
+
+                    return response.json();
+
+                })
+
+                .then(agendamentos => {
+
+                    console.log(
+                        "Agendamentos encontrados:",
+                        agendamentos
+                    );
+
+
+                    const agora = new Date();
+
+
+                    agendamentos.forEach(function (agendamento) {
+
+                        if (!agendamento.dataAgendamento) {
+                            return;
+                        }
+
+
+                        const dataAgendamento =
+                            new Date(
+                                agendamento.dataAgendamento
+                            );
+
+
+                        /*
+                         * Só mostra se o horário já chegou.
+                         */
+
+                        if (dataAgendamento <= agora) {
+
+                            mostrarAlertaAgendamento(
+                                agendamento
+                            );
+
+                        }
+
+                    });
+
+                })
+
+                .catch(error => {
+
+                    console.error(
+                        "Erro ao verificar agendamentos:",
+                        error
+                    );
+
+                });
+
+        }
+
+
+        function mostrarAlertaAgendamento(agendamento) {
+
+            const area =
+                document.getElementById(
+                    "areaAlertaAgendamento"
+                );
+
+
+            if (!area) {
+                return;
+            }
+
+
+            /*
+             * Não utiliza mais sessionStorage.
+             *
+             * Portanto, se o agendamento continuar válido,
+             * ele poderá aparecer novamente na próxima
+             * verificação de 5 minutos.
+             */
+
+
+            const data =
+                new Date(
+                    agendamento.dataAgendamento
+                );
+
+
+            const dataFormatada =
+                data.toLocaleDateString(
+                    "pt-BR"
+                )
+                +
+                " às "
+                +
+                data.toLocaleTimeString(
+                    "pt-BR",
+                    {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    }
+                );
+
+
+            /*
+             * Evita duplicar o mesmo alerta dentro
+             * da mesma verificação.
+             */
+
+            const idAlerta =
+                "alerta_agendamento_" + agendamento.id;
+
+
+            const alertaExistente =
+                document.getElementById(idAlerta);
+
+
+            if (alertaExistente) {
+
+                return;
+
+            }
+
+
+            const alerta =
+                document.createElement("div");
+
+
+            alerta.id = idAlerta;
+
+
+            alerta.className =
+                "alert alert-warning shadow-lg border-0 rounded-4 mb-3 alerta-agendamento";
+
+
+            alerta.style.borderLeft =
+                "5px solid #ffc107";
+
+
+            alerta.innerHTML = `
+
+                <div class="d-flex align-items-start">
+
+
+                    <div class="me-3">
+
+                        <div style="
+                            width: 45px;
+                            height: 45px;
+                            border-radius: 50%;
+                            background: #ffe69c;
+                            color: #856404;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 1.2rem;
+                        ">
+
+                            <i class="bi bi-bell-fill"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="flex-grow-1">
+
+
+                        <div class="fw-bold text-dark mb-1">
+
+                            Agendamento
+
+                        </div>
+
+
+                        <div class="small text-dark">
+
+                            É hora de entrar em contato com
+
+                            <strong>
+                                ${agendamento.nome}
+                            </strong>.
+
+                        </div>
+
+
+                        <div class="text-muted small mt-1 mb-3">
+
+                            <i class="bi bi-calendar-event me-1"></i>
+
+                            ${dataFormatada}
+
+                        </div>
+
+
+                        <a href="/Historico/Index?acionamentoId=${agendamento.acionamentoId}"
+                           class="btn btn-dark btn-sm rounded-3 px-3">
+
+                            <i class="bi bi-chat-square-text me-1"></i>
+
+                            Ver Histórico
+
+                        </a>
+
+
+                    </div>
+
+
+                    <button type="button"
+                            class="btn-close ms-2"
+                            aria-label="Fechar"
+                            onclick="this.closest('.alert').remove();">
+
+                    </button>
+
+
+                </div>
+
+            `;
+
+
+            area.appendChild(alerta);
+
+        }
+
+    </script>
+
+
     @await RenderSectionAsync("Scripts", required: false)
+
+
 </body>
 </html>

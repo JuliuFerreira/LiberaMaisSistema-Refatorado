@@ -12,7 +12,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
         <div>
             <h2 class="fw-bold text-dark mb-1" style="font-size: 1.6rem;">Bancos</h2>
-            <small class="text-muted">Gerencie as instituições bancárias integradas</small>
+            <small class="text-muted"><strong>@ViewBag.QtdBanco </strong> Bancos Cadastrados.</small>
         </div>
 
         <a asp-action="Criar" class="btn btn-dark d-flex align-items-center gap-2 shadow-sm px-3 py-2 rounded-3">
@@ -20,18 +20,18 @@
         </a>
     </div>
 
-    @if (TempData["MensagemSucesso"] != null)
-    {
+@if (TempData["MensagemSucesso"] != null)
+{
         <div id="alertaSucesso" class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
             <i class="bi bi-check-circle-fill"></i> @TempData["MensagemSucesso"]
         </div>
-    }
-    @if (TempData["MensagemErro"] != null)
-    {
+}
+@if (TempData["MensagemErro"] != null)
+{
         <div id="alertaErro" class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
             <i class="bi bi-exclamation-triangle-fill"></i> @TempData["MensagemErro"]
         </div>
-    }
+}
 
     <!-- Tabela -->
     <div class="card card-table shadow-sm border-0 mb-3">
@@ -104,82 +104,82 @@
                 </table>
             </div>
         </div>
+        </d>
+
+        <div class="mt-4">
+            <a asp-controller="Setup" asp-action="Index" class="text-decoration-none text-muted fw-medium d-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left"></i> Voltar a configuração
+            </a>
+        </div>
     </div>
 
-    <div class="mt-4">
-        <a asp-controller="Setup" asp-action="Index" class="text-decoration-none text-muted fw-medium d-flex align-items-center gap-1">
-            <i class="bi bi-arrow-left"></i> Voltar a configuração
-        </a>
-    </div>
-</div>
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                var alertas = [document.getElementById("alertaSucesso"), document.getElementById("alertaErro")];
+                alertas.forEach(function(alerta) {
+                    if (alerta) {
+                        alerta.style.transition = "opacity 0.5s ease";
+                        alerta.style.opacity = "0";
+                        setTimeout(function() { alerta.style.display = "none"; }, 500);
+                    }
+                });
+            }, 3000);
+        });
 
-<script>
-    window.addEventListener('load', function() {
-        setTimeout(function() {
-            var alertas = [document.getElementById("alertaSucesso"), document.getElementById("alertaErro")];
-            alertas.forEach(function(alerta) {
-                if (alerta) {
-                    alerta.style.transition = "opacity 0.5s ease";
-                    alerta.style.opacity = "0";
-                    setTimeout(function() { alerta.style.display = "none"; }, 500);
-                }
-            });
-        }, 3000);
-    });
-
-    function navegarParaEditar(event, url) {
-        // Evita navegar se o usuário estiver apenas selecionando texto
-        const selecao = window.getSelection().toString();
-        if (selecao.length > 0) {
-            return;
-        }
-        // Evita navegar se clicar em modais ou botões internos
-        if (event.target.closest('.modal') || event.target.closest('button') || event.target.closest('a')) {
-            return;
-        }
-        window.location.href = url;
-    }
-
-</script>
-
-<style>
-    .inner-system-page {
-        font-family: 'Segoe UI', system-ui, sans-serif;
-    }
-
-    .card-table {
-        border-radius: 14px;
-        overflow: hidden;
-        border: 1px solid rgba(0,0,0,0.05);
-    }
-
-    .table-custom th {
-        font-size: 0.82rem;
-        color: #5c636a;
-        padding: 14px 10px;
-        text-transform: uppercase;
-    }
-
-    .table-custom td {
-        padding: 14px 10px;
-        font-size: 0.92rem;
-    }
-
-    .btn-outline-secondary {
-        color: #6c757d;
-    }
-
-        .btn-outline-secondary:hover {
-            background-color: #f1f3f5;
-            color: #212529;
+        function navegarParaEditar(event, url) {
+            // Evita navegar se o usuário estiver apenas selecionando texto
+            const selecao = window.getSelection().toString();
+            if (selecao.length > 0) {
+                return;
+            }
+            // Evita navegar se clicar em modais ou botões internos
+            if (event.target.closest('.modal') || event.target.closest('button') || event.target.closest('a')) {
+                return;
+            }
+            window.location.href = url;
         }
 
-    .linha-clicavel {
-        cursor: pointer;
-        transition: background-color 0.15s ease;
-    }
+    </script>
 
-        .linha-clicavel:hover {
-            background-color: rgba(0, 0, 0, 0.02) !important;
+    <style>
+        .inner-system-page {
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
-</style>
+
+        .card-table {
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .table-custom th {
+            font-size: 0.82rem;
+            color: #5c636a;
+            padding: 14px 10px;
+            text-transform: uppercase;
+        }
+
+        .table-custom td {
+            padding: 14px 10px;
+            font-size: 0.92rem;
+        }
+
+        .btn-outline-secondary {
+            color: #6c757d;
+        }
+
+            .btn-outline-secondary:hover {
+                background-color: #f1f3f5;
+                color: #212529;
+            }
+
+        .linha-clicavel {
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+            .linha-clicavel:hover {
+                background-color: rgba(0, 0, 0, 0.02) !important;
+            }
+    </style>

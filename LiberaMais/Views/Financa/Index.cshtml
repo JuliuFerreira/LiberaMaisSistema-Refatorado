@@ -5,9 +5,16 @@
     Layout = "_LayoutSistema";
     ViewData["Title"] = "Finanças";
 
+    // 1. Cálculos Separados por Tipo de Finança
     var totalReceitas = Model.Where(x => x.Tipo == TipoFinanca.Receita).Sum(x => x.Valor);
     var totalDespesas = Model.Where(x => x.Tipo == TipoFinanca.Despesa).Sum(x => x.Valor);
-    var saldoFinal = totalReceitas - totalDespesas;
+    var totalProLabore = Model.Where(x => x.Tipo == TipoFinanca.Salario).Sum(x => x.Valor);
+
+    // 2. Receita Líquida (Lucro Operacional antes dos Sócios)
+    var receitaLiquida = totalReceitas - totalDespesas;
+
+    // 3. Saldo Real em Caixa (Líquido - Pró-Labore/Sócios)
+    var saldoFinal = receitaLiquida - totalProLabore;
 
     string[] nomesMeses = { "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro" };
     int mesAtual = ViewBag.Mes ?? DateTime.Today.Month;
@@ -45,21 +52,36 @@
     }
 
     <div class="row g-3 mb-4">
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-3">
             <div class="card p-3 shadow-sm border-0 rounded-4 bg-white">
-                <small class="text-muted text-uppercase fw-bold pb-1 d-block" style="font-size: 0.7rem; letter-spacing: 0.5px;">Receitas</small>
+                <small class="text-muted text-uppercase fw-bold pb-1 d-block" style="font-size: 0.7rem; letter-spacing: 0.5px;">Receitas Brutas</small>
                 <span class="fs-4 fw-bold text-success font-monospace">@totalReceitas.ToString("C2")</span>
             </div>
         </div>
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-2">
             <div class="card p-3 shadow-sm border-0 rounded-4 bg-white">
-                <small class="text-muted text-uppercase fw-bold pb-1 d-block" style="font-size: 0.7rem; letter-spacing: 0.5px;">Despesas</small>
+                <small class="text-muted text-uppercase fw-bold pb-1 d-block" style="font-size: 0.7rem; letter-spacing: 0.5px;">Despesas Operacionais</small>
                 <span class="fs-4 fw-bold text-danger font-monospace">@totalDespesas.ToString("C2")</span>
             </div>
         </div>
-        <div class="col-12 col-md-4">
+
+        <div class="col-12 col-md-2">
+            <div class="card p-3 shadow-sm border-0 rounded-4 bg-white">
+                <small class="text-muted text-uppercase fw-bold pb-1 d-block" style="font-size: 0.7rem; letter-spacing: 0.5px;">Receita Liquida</small>
+                <span class="fs-4 fw-bold text-secondary font-monospace">@receitaLiquida.ToString("C2")</span>
+            </div>
+        </div>
+
+
+        <div class="col-12 col-md-2">
+            <div class="card p-3 shadow-sm border-0 rounded-4 bg-white">
+                <small class="text-muted text-uppercase fw-bold pb-1 d-block" style="font-size: 0.7rem; letter-spacing: 0.5px;">Pró-Labore / Sócios</small>
+                <span class="fs-4 fw-bold text-primary font-monospace">@totalProLabore.ToString("C2")</span>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
             <div class="card p-3 shadow-sm border-0 rounded-4 bg-dark text-white">
-                <small class="text-white-50 text-uppercase fw-bold pb-1 d-block" style="font-size: 0.7rem; letter-spacing: 0.5px;">Saldo do Mês</small>
+                <small class="text-white-50 text-uppercase fw-bold pb-1 d-block" style="font-size: 0.7rem; letter-spacing: 0.5px;">Saldo Final em Caixa</small>
                 <span class="fs-4 fw-bold font-monospace @(saldoFinal >= 0 ? "text-success" : "text-danger")">@saldoFinal.ToString("C2")</span>
             </div>
         </div>
@@ -67,7 +89,7 @@
 
     <div class="row g-4 align-items-start">
 
-        <div class="col-lg-8">
+        <div class="col-lg-9">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
                 <div class="table-responsive">
                     <table class="table table-custom align-middle mb-0 text-nowrap" style="width: 100%">
@@ -94,17 +116,26 @@
                                         <td class="fw-bold text-dark">@item.Descricao</td>
                                         <td class="text-muted small">@item.ContaSocio</td>
                                         <td>
-                                            <span class="badge @(item.Tipo == TipoFinanca.Receita ? "bg-success-subtle text-success border-success-subtle" : "bg-danger-subtle text-danger border-danger-subtle") border px-2 py-0.5 animate-badge" style="font-size: 0.7rem; font-weight: 600;">
-                                                @item.Tipo
-                                            </span>
+                                            @if (item.Tipo == TipoFinanca.Receita)
+                                            {
+                                                <span class="badge bg-success-subtle text-success border-success-subtle border px-2 py-0.5 animate-badge" style="font-size: 0.7rem;">Receita</span>
+                                            }
+                                            else if (item.Tipo == TipoFinanca.Despesa)
+                                            {
+                                                <span class="badge bg-danger-subtle text-danger border-danger-subtle border px-2 py-0.5 animate-badge" style="font-size: 0.7rem;">Despesa</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-primary-subtle text-primary border-primary-subtle border px-2 py-0.5 animate-badge" style="font-size: 0.7rem;">Pró-Labore</span>
+                                            }
                                         </td>
                                         <td class="text-secondary small">@(item.Promotora?.Nome ?? "—")</td>
-                                        <td class="text-end fw-bold font-monospace @(item.Tipo == TipoFinanca.Receita ? "text-success" : "text-danger")">
+                                        <td class="text-end fw-bold font-monospace @(item.Tipo == TipoFinanca.Receita ? "text-success" : (item.Tipo == TipoFinanca.Salario ? "text-primary" : "text-danger"))">
                                             @item.Valor.ToString("C2")
                                         </td>
                                         <td class="text-center pe-4 ignorar-clique">
                                             <div class="d-flex align-items-center justify-content-center">
-                                                <a href="#" class="text-danger link-icone-acao px-1" data-bs-toggle="modal" data-bs-target="#modalExcluir_@item.Id" title="Excluir">
+                                                <a href="#" class="text-danger link-icone-acao px-1 text-decoration-none" data-bs-toggle="modal" data-bs-target="#modalExcluir_@item.Id" title="Excluir">
                                                     <i class="bi bi-trash" style="font-size: 0.85rem;"></i>
                                                 </a>
                                             </div>
@@ -119,14 +150,14 @@
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body py-3 text-start">
-                                                    Deseja realmente remover o lançamento <strong>@item.Descricao</strong> no valor de <strong class="@(item.Tipo == TipoFinanca.Receita ? "text-success" : "text-danger")">@item.Valor.ToString("C2")</strong>?
+                                                    Deseja realmente remover o lançamento <strong>@item.Descricao</strong> no valor de <strong class="text-dark">@item.Valor.ToString("C2")</strong>?
                                                     <p class="text-muted mb-0 mt-1 small" style="font-size: 0.8rem;">Esta ação alterará os saldos consolidados do mês.</p>
                                                 </div>
                                                 <div class="modal-footer border-0 d-flex justify-content-end gap-2 pt-0 pb-4 pe-4">
-                                                    <button type="button" class="btn btn-secondary border-0 px-3 py-2 rounded-3 text-white small fw-medium" data-bs-dismiss="modal" style="background-color: #6c757d;">Cancelar</button>
+                                                    <button type="button" class="btn btn-secondary border-0 px-3 py-2 rounded-3 text-white small fw-medium" data-bs-dismiss="modal">Cancelar</button>
                                                     <form asp-action="Apagar" method="post" class="d-inline m-0">
                                                         <input type="hidden" name="id" value="@item.Id" />
-                                                        <button type="submit" class="btn btn-danger border-0 px-3 py-2 rounded-3 small fw-semibold" style="background-color: #dc3545;">Confirmar Exclusão</button>
+                                                        <button type="submit" class="btn btn-danger border-0 px-3 py-2 rounded-3 small fw-semibold">Confirmar Exclusão</button>
                                                     </form>
                                                 </div>
                                             </div>
@@ -149,7 +180,7 @@
             </div>
         </div>
 
-        <div class="col-lg-4">
+        <div class="col-lg-3">
             <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
                 <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-light-subtle">
                     <i class="bi bi-shield-lock text-dark fs-5"></i>
@@ -173,19 +204,35 @@
                 </form>
 
                 <div class="p-3 bg-light rounded-3 border border-light-subtle mb-4">
-                    <small class="text-uppercase fw-bold text-muted d-block font-monospace mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">
+                    <small class="text-uppercase fw-bold text-muted d-block font-monospace mb-2" style="font-size: 0.65rem; letter-spacing: 0.5px;">
                         Balanço da Competência
                     </small>
+
                     <div class="d-flex justify-content-between align-items-center my-1">
                         <span class="text-muted small">Total Receitas:</span>
                         <span class="font-monospace text-success fw-medium">@totalReceitas.ToString("C2")</span>
                     </div>
+
                     <div class="d-flex justify-content-between align-items-center my-1">
-                        <span class="text-muted small">Total Despesas:</span>
+                        <span class="text-muted small">Despesas Operacionais:</span>
                         <span class="font-monospace text-danger fw-medium">@totalDespesas.ToString("C2")</span>
                     </div>
+
+                    <div class="d-flex justify-content-between align-items-center my-1 fw-bold">
+                        <span class="text-dark small">(=) Receita Líquida:</span>
+                        <span class="font-monospace text-dark">@receitaLiquida.ToString("C2")</span>
+                    </div>
+
                     <hr class="my-2 border-light-subtle">
-                    <small class="text-uppercase fw-bold text-secondary d-block font-monospace mb-0" style="font-size: 0.65rem;">Líquido Disponível</small>
+
+                    <div class="d-flex justify-content-between align-items-center my-1">
+                        <span class="text-muted small">(-) Retirada Sócios:</span>
+                        <span class="font-monospace text-primary fw-medium">@totalProLabore.ToString("C2")</span>
+                    </div>
+
+                    <hr class="my-2 border-light-subtle">
+
+                    <small class="text-uppercase fw-bold text-secondary d-block font-monospace mb-0" style="font-size: 0.65rem;">Líquido Real em Caixa</small>
                     <h3 class="fw-bold font-monospace mb-0 @(saldoFinal >= 0 ? "text-success" : "text-danger")">@saldoFinal.ToString("C2")</h3>
                 </div>
 
@@ -230,7 +277,6 @@
         font-size: 0.85rem !important;
     }
 
-    /* Customização Clássica de Tabela Analítica */
     .table-custom thead {
         background-color: #fafafa;
         border-bottom: 1px solid #ededed;
@@ -241,7 +287,6 @@
         font-weight: 700;
         color: #6c757d;
         padding: 12px 10px;
-        text-uppercase: true;
         letter-spacing: 0.5px;
     }
 
@@ -260,6 +305,10 @@
 
     .bg-danger-subtle {
         background-color: #ffebee !important;
+    }
+
+    .bg-primary-subtle {
+        background-color: #e3f2fd !important;
     }
 
     .animate-badge {
@@ -285,7 +334,6 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Redirecionamento inteligente ao clicar na linha (ignorando botões de ação)
             $(".linha-tabela-clicavel").click(function (e) {
                 var selecaoTexto = window.getSelection().toString();
                 if (!$(e.target).closest('.ignorar-clique').length && !selecaoTexto) {
@@ -293,7 +341,6 @@
                 }
             });
 
-            // Ocultação suave dos alertas
             setTimeout(function () {
                 $(".alert").fadeOut("slow");
             }, 3000);

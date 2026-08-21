@@ -1,4 +1,6 @@
-﻿@model List<LiberaMais.Models.ComissaoRelatorioViewModel>
+﻿@using LiberaMais.Models.Enums
+@using System.Globalization
+@model List<LiberaMais.Models.ComissaoRelatorioViewModel>
 
 @{
     Layout = "_LayoutSistema";
@@ -6,11 +8,9 @@
 
     int mesFechamento = ViewBag.MesFechamento ?? DateTime.Today.Month;
     int anoFechamento = ViewBag.AnoFechamento ?? DateTime.Today.Year;
-    decimal totalSalarioMes = ViewBag.TotalSalarioMes ?? 0m;
-    int quantidadePagaMes = ViewBag.QuantidadePagaMes ?? 0;
 
-    // Captura o nome do usuário selecionado para o cabeçalho dinâmico
     string nomeUsuarioSelecionado = "Todos os Usuários";
+
     if (ViewBag.Usuarios != null && ViewBag.UsuarioAtual != null)
     {
         foreach (var user in ViewBag.Usuarios)
@@ -24,230 +24,802 @@
     }
 }
 
-<div class="container-fluid py-4 inner-system-page">
 
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-        <div>
-            <span class="text-uppercase fw-bold text-secondary font-monospace tracking-wider" style="font-size: 0.75rem;">Módulo Financeiro</span>
-            <h2 class="fw-bold text-dark mb-1 tracking-tight">Relatório de Comissões</h2>
-            <p class="text-muted small mb-0">Competência atual: <strong class="text-dark">@ViewBag.MesFechamento/@ViewBag.AnoFechamento</strong> | Operador: <strong class="text-dark">@nomeUsuarioSelecionado</strong></p>
-        </div>
+@* ============================================================
+   ALERTA DE SUCESSO
+   ============================================================ *@
 
-        <div>
-            <form method="get" asp-controller="Comissao" asp-action="Relatorio" class="row g-2 align-items-center mb-0">
-                <input type="hidden" name="mesFechamento" value="@mesFechamento" />
-                <input type="hidden" name="anoFechamento" value="@anoFechamento" />
+@if (TempData["MensagemSucesso"] != null)
+{
+    <div id="alertaSucesso"
+         class="alert alert-success alert-dismissible fade show"
+         role="alert">
 
-                <div class="col-auto">
-                    <select name="usuarioId" class="form-select form-select-sm filter-dropdown" style="min-width: 180px;">
-                        <option value="">Todos os Usuários</option>
-                        @if (ViewBag.Usuarios != null)
-                        {
-                            foreach (var user in ViewBag.Usuarios)
-                            {
-                                <!option value="@user.Id" @(ViewBag.UsuarioAtual == user.Id ? "selected" : "")>@user.Nome</!option>
-                            }
-                        }
-                    </select>
-                </div>
+        @TempData["MensagemSucesso"]
 
-                <div class="col-auto">
-                    <select name="filtroStatus" class="form-select form-select-sm filter-dropdown">
-                        <option value="">Todos os Status</option>
-                        <!option value="Paga" @(ViewBag.FiltroAtual == "Paga" ? "selected" : "")>Paga</!option>
-                        <!option value="Em Atraso" @(ViewBag.FiltroAtual == "Em Atraso" ? "selected" : "")>Em Atraso</!option>
-                        <!option value="Aguardando Recebimento" @(ViewBag.FiltroAtual == "Aguardando Recebimento" ? "selected" : "")>Aguardando Recebimento</!option>
-                    </select>
-                </div>
-
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-sm btn-dark px-3 btn-filter-submit">
-                        <i class="bi bi-funnel"></i> Filtrar
-                    </button>
-                </div>
-            </form>
-        </div>
     </div>
+}
 
-    <div class="row g-4 align-items-start">
 
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0 text-nowrap">
-                        <thead class="bg-table-header">
-                            <tr>
-                                <th scope="col" class="ps-4">Beneficiário</th>
-                                <th scope="col">Operação / Banco</th>
-                                <th scope="col">Usuário</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Data Pgto</th>
-                                <th scope="col" class="text-end pe-4">Valor Comissão</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (Model != null && Model.Any())
+@* ============================================================
+   ALERTA DE ERRO
+   ============================================================ *@
+
+@if (TempData["MensagemErro"] != null)
+{
+    <div id="alertaErro"
+         class="alert alert-danger alert-dismissible fade show"
+         role="alert">
+
+        @TempData["MensagemErro"]
+
+    </div>
+}
+
+
+<div class="inner-system-page">
+
+    @* ============================================================
+       CABEÇALHO
+       ============================================================ *@
+
+    <div>
+
+        <span class="text-uppercase fw-bold text-secondary font-monospace tracking-wider"
+              style="font-size: 0.75rem;">
+
+            Módulo Financeiro
+
+        </span>
+
+
+        <h2 class="fw-bold text-dark mb-1 tracking-tight">
+
+            Relatório de Comissões
+
+        </h2>
+
+
+        <p class="text-muted small mb-3">
+
+            Competência atual:
+
+            <strong class="text-dark">
+                @ViewBag.MesFechamento/@ViewBag.AnoFechamento
+            </strong>
+
+            |
+
+            Operador:
+
+            <strong class="text-dark">
+                @nomeUsuarioSelecionado
+            </strong>
+
+        </p>
+
+
+        @* ========================================================
+           FILTROS
+           ======================================================== *@
+
+        <form method="get"
+              asp-controller="Comissao"
+              asp-action="Relatorio"
+              class="row g-2 align-items-center">
+
+            <input type="hidden"
+                   name="mesFechamento"
+                   value="@mesFechamento" />
+
+            <input type="hidden"
+                   name="anoFechamento"
+                   value="@anoFechamento" />
+
+
+            @* USUÁRIO *@
+
+            <div class="col-auto">
+
+                <select name="usuarioId"
+                        class="form-select form-select-sm filter-dropdown"
+                        style="min-width: 180px;">
+
+                    <option value="">
+                        Todos os Usuários
+                    </option>
+
+
+                    @if (ViewBag.Usuarios != null)
+                    {
+                        foreach (var user in ViewBag.Usuarios)
+                        {
+                            if (ViewBag.UsuarioAtual == user.Id)
                             {
-                                foreach (var item in Model)
-                                {
-                                    <tr class="financas-row">
-                                        <td class="ps-4">
-                                            <div class="fw-bold text-dark mb-0 text-truncate" style="max-width: 200px;">@item.Venda.Cliente?.Nome</div>
-                                            <small class="text-muted font-monospace" style="font-size: 0.75rem;">@item.Venda.Cliente?.Cpf</small>
-                                        </td>
-                                        <td>
-                                            <div class="small fw-medium text-secondary">@item.Venda.Promotora?.Nome</div>
-                                            <span class="badge bg-light text-dark border-0 px-2 py-0.5" style="font-size: 0.7rem;">@item.Venda.Banco?.Nome</span>
-                                        </td>                                        
-                                        <td>
-                                            @item.Venda.Usuario.Nome
-                                        </td>
-                                        <td>
-                                            @if (item.StatusFinanceiro == "Paga")
-                                            {
-                                                <span class="status-dot status-paga">Paga</span>
-                                            }
-                                            else if (item.StatusFinanceiro == "Em Atraso")
-                                            {
-                                                <span class="status-dot status-atraso">Atraso</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="status-dot status-aguardando">Aguardando</span>
-                                            }
-                                        </td>
-                                        <td class="font-monospace text-secondary small">
-                                            @item.Venda.DataPgtoComissao?.ToString("dd/MM/yyyy")
-                                        </td>
-                                        <td class="text-end pe-4 fw-bold font-monospace text-dark">
-                                            @item.Venda.ValorComissao?.ToString("C2")
-                                        </td>
-                                    </tr>
-                                }
+                                <option value="@user.Id" selected>
+                                    @user.Nome
+                                </option>
                             }
                             else
                             {
-                                <tr>
-                                    <td colspan="5" class="text-center py-5 text-muted">
-                                        <i class="bi bi-receipt mb-2 d-block text-secondary" style="font-size: 1.8rem;"></i>
-                                        Nenhum registro encontrado para este filtro.
-                                    </td>
-                                </tr>
+                                <option value="@user.Id">
+                                    @user.Nome
+                                </option>
                             }
-                        </tbody>
-                    </table>
-                </div>
+                        }
+                    }
+
+                </select>
+
             </div>
-        </div>
-
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
-                <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-light-subtle">
-                    <i class="bi bi-calculator text-dark fs-5"></i>
-                    <h5 class="fw-bold text-dark mb-0">Acerto de Comissão</h5>
-                </div>
-
-                <form asp-controller="Comissao" asp-action="Relatorio" method="get" class="mb-4">
-                    <input type="hidden" name="usuarioId" value="@ViewBag.UsuarioAtual" />
-                    <input type="hidden" name="filtroStatus" value="@ViewBag.FiltroAtual" />
-
-                    <div class="row g-2 mb-2">
-                        <div class="col-7">
-                            <label class="form-label text-muted small fw-medium mb-1">Mês de Referência</label>
-                            <select name="mesFechamento" class="form-select form-select-sm filter-dropdown">
-                                <!option value="1" @(mesFechamento == 1 ? "selected" : "")>Janeiro</!option>
-                                <!option value="2" @(mesFechamento == 2 ? "selected" : "")>Fevereiro</!option>
-                                <!option value="3" @(mesFechamento == 3 ? "selected" : "")>Março</!option>
-                                <!option value="4" @(mesFechamento == 4 ? "selected" : "")>Abril</!option>
-                                <!option value="5" @(mesFechamento == 5 ? "selected" : "")>Maio</!option>
-                                <!option value="6" @(mesFechamento == 6 ? "selected" : "")>Junho</!option>
-                                <!option value="7" @(mesFechamento == 7 ? "selected" : "")>Julho</!option>
-                                <!option value="8" @(mesFechamento == 8 ? "selected" : "")>Agosto</!option>
-                                <!option value="9" @(mesFechamento == 9 ? "selected" : "")>Setembro</!option>
-                                <!option value="10" @(mesFechamento == 10 ? "selected" : "")>Outubro</!option>
-                                <!option value="11" @(mesFechamento == 11 ? "selected" : "")>Novembro</!option>
-                                <!option value="12" @(mesFechamento == 12 ? "selected" : "")>Dezembro</!option>
-                            </select>
-                        </div>
-                        <div class="col-5">
-                            <label class="form-label text-muted small fw-medium mb-1">Ano</label>
-                            <select name="anoFechamento" class="form-select form-select-sm filter-dropdown">
-                                @for (int i = DateTime.Today.Year - 2; i <= DateTime.Today.Year + 1; i++)
-                                {
-                                    <!option value="@i" @(anoFechamento == i ? "selected" : "")>@i</!option>
-                                }
-                            </select>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-sm btn-outline-dark w-100 rounded-3 py-1.5 fw-semibold mb-3">
-                        <i class="bi bi-arrow-clockwise me-1"></i> Atualizar Mês
-                    </button>
-                </form>
-
-                <div class="mb-4">
-                    <label class="form-label text-dark small fw-bold mb-1">Porcentagem do Repasse</label>
-                    <select id="selectPorcentagem" class="form-select form-select-sm filter-dropdown" style="border-color: #212529 !important;">
-                        <option value="0" selected>0% da Comissão</option>
-                        <option value="10">10% da Comissão</option>
-                        <option value="20">20% da Comissão</option>
-                        <option value="30">30% da Comissão</option>
-                        <option value="40">40% da Comissão</option>
-                        <option value="50">50% da Comissão</option>
-                        <option value="60">60% da Comissão</option>
-                        <option value="70">70% da Comissão</option>
-                        <option value="80">80% da Comissão</option>
-                        <option value="90">90% da Comissão</option>
-                        <option value="100">100% da Comissão</option>
 
 
-                    </select>
-                </div>
+            @* STATUS *@
 
-                <div class="p-3 bg-light rounded-3 border border-light-subtle d-flex flex-column gap-3">
-                    <div>
-                        <small class="text-uppercase fw-bold text-muted d-block font-monospace mb-0" style="font-size: 0.65rem; letter-spacing: 0.5px;">
-                            Comissões recebidas
-                        </small>
-                        <h4 class="fw-bold text-dark font-monospace mb-0">@totalSalarioMes.ToString("C2")</h4>
-                    </div>
+            <div class="col-auto">
 
-                    <div class="border-top border-light-subtle pt-2">
-                        <small class="text-uppercase fw-bold text-primary d-block font-monospace mb-0" style="font-size: 0.65rem; letter-spacing: 0.5px;">
-                            Repasse Devido (<span id="txtPorcentagemLabel">50%</span>) para <span class="text-dark">@nomeUsuarioSelecionado</span>
-                        </small>
-                        <h3 class="fw-bold text-success font-monospace mb-0" id="txtValorRepasse">R$ 0,00</h3>
-                    </div>
+                <select name="filtroStatus"
+                        class="form-select form-select-sm filter-dropdown">
 
-                    <div class="d-flex justify-content-between align-items-center border-top border-light-subtle pt-2">
-                        <span class="text-muted small">Qtd. Contratos:</span>
-                        <span class="badge bg-dark text-white font-monospace rounded-pill">@quantidadePagaMes</span>
-                    </div>
-                </div>
+                    <option value="">
+                        Todos os Status
+                    </option>
+
+
+                    @if (ViewBag.FiltroAtual == "Paga")
+                    {
+                        <option value="Paga" selected>
+                            Paga
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="Paga">
+                            Paga
+                        </option>
+                    }
+
+
+                    @if (ViewBag.FiltroAtual == "Em Atraso")
+                    {
+                        <option value="Em Atraso" selected>
+                            Em Atraso
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="Em Atraso">
+                            Em Atraso
+                        </option>
+                    }
+
+
+                    @if (ViewBag.FiltroAtual == "Aguardando Recebimento")
+                    {
+                        <option value="Aguardando Recebimento" selected>
+                            Aguardando Recebimento
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="Aguardando Recebimento">
+                            Aguardando Recebimento
+                        </option>
+                    }
+
+                </select>
+
             </div>
-        </div>
+
+
+            @* BOTÃO FILTRAR *@
+
+            <div class="col-auto">
+
+                <button type="submit"
+                        class="btn btn-sm btn-dark px-3 btn-filter-submit">
+
+                    <i class="bi bi-funnel me-1"></i>
+
+                    Filtrar
+
+                </button>
+
+            </div>
+
+        </form>
+
     </div>
 
+
+    @* ============================================================
+       TABELA
+       ============================================================ *@
+
+    <div class="col-lg-12 mt-4">
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+
+            <div class="table-responsive">
+
+                <table class="table align-middle mb-0 text-nowrap">
+
+                    <thead class="bg-table-header">
+
+                        <tr>
+
+                            @* CHECKBOX *@
+                            <th scope="col"
+                                class="text-center"
+                                style="width: 70px;">
+
+                                <i class="bi bi-check2-square"></i>
+
+                            </th>
+
+                            <th scope="col"
+                                class="ps-4">
+
+                                Número
+
+                            </th>
+
+
+
+                            @* CLIENTE *@
+                            <th scope="col"
+                                class="ps-4">
+
+                                Beneficiário
+
+                            </th>
+
+
+                            @* OPERAÇÃO / BANCO *@
+                            <th scope="col">
+
+                                Operação / Banco
+
+                            </th>
+
+
+                            @* USUÁRIO *@
+                            <th scope="col">
+
+                                Usuário
+
+                            </th>
+                                                      
+
+                            <th scope="col">
+
+                               Operação / Valor Contrato
+
+                            </th>
+
+                            @* COMISSÃO *@
+                            <th scope="col"
+                                class="text-end pe-4">
+
+                                Valor Comissão /  Status
+
+                            </th>
+
+                            <th scope="col"
+                                class="text-end pe-4">
+
+                                Data Pgto Comissão
+
+                            </th>
+
+
+
+
+                            @* REPASSE *@
+                            <th scope="col"
+                                class="text-end">
+
+                                Valor Repasse
+
+                            </th>
+
+
+                            @* STATUS REPASSE *@
+                            <th scope="col">
+
+                                Status Repasse
+
+                            </th>
+
+
+                            @* DATA REPASSE *@
+                            <th scope="col">
+
+                                Data Repasse
+
+                            </th>
+
+
+                            @* AÇÃO *@
+                            <th scope="col">
+
+                                Ação
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                bool usuarioPadrao =
+                                item.Venda.Usuario?.Perfil == PerfilEnum.Padrao;
+
+
+                                <tr class="financas-row">
+
+
+                                    @* ==================================================
+                                       CHECKBOX
+                                       SOMENTE USUÁRIO PADRÃO COM VALOR DE REPASSE
+                                       ================================================== *@
+
+                                    <td class="text-center">
+
+                                        @if (usuarioPadrao &&
+                                                                        item.Venda.ValorRepasse.HasValue &&
+                                                                        item.Venda.RepasseComissao != StatusRepasseComissaoEnum.Pago)
+                                        {
+                                            <input type="checkbox"
+                                                   class="form-check-input repasse-checkbox"
+                                                   value="@item.Venda.Id"
+                                                   data-contrato="@item.Venda.ValorComissao?.ToString(CultureInfo.InvariantCulture)"
+                                                   data-repasse="@item.Venda.ValorRepasse.Value.ToString(CultureInfo.InvariantCulture)" />
+                                        }
+                                        else if (usuarioPadrao &&
+                                        item.Venda.RepasseComissao == StatusRepasseComissaoEnum.Pago)
+                                        {
+                                            <i class="bi bi-check-circle-fill text-success"
+                                               title="Repasse já efetivado"></i>
+                                        }
+
+                                    </td>
+
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-dark mb-0 text-truncate"
+                                             style="max-width: 200px;">
+
+                                            @item.Venda.Id
+
+                                        </div>
+                                    </td>
+
+
+
+                                    @* ==================================================
+                                       BENEFICIÁRIO
+                                       ================================================== *@
+
+                                    <td class="ps-4">
+
+                                        <div class="fw-bold text-dark mb-0 text-truncate"
+                                             style="max-width: 200px;">
+
+                                            @item.Venda.Cliente?.Nome
+
+                                        </div>
+
+
+                                        <small class="text-muted font-monospace"
+                                               style="font-size: 0.75rem;">
+
+                                            @item.Venda.Cliente?.Cpf
+
+                                        </small>
+
+                                    </td>
+
+
+                                    @* ==================================================
+                                       OPERAÇÃO / BANCO
+                                       ================================================== *@
+
+                                    <td>
+
+                                        <div class="small fw-medium text-secondary">
+
+                                            @item.Venda.Promotora?.Nome
+
+                                        </div>
+
+
+                                        <span class="badge bg-light text-dark border-0 px-2 py-1"
+                                              style="font-size: 0.7rem;">
+
+                                            @item.Venda.Banco?.Nome
+
+                                        </span>
+
+                                    </td>
+
+
+                                    @* ==================================================
+                                       USUÁRIO
+                                       ================================================== *@
+
+                                    <td>
+
+                                        @item.Venda.Usuario?.Nome
+
+                                    </td>
+
+
+                                    @* ==================================================
+                                       STATUS FINANCEIRO
+                                       ================================================== *@
+
+
+
+
+                                    <td class="ps-4">
+
+                                        <div class="small fw-medium text-secondary">
+
+                                            @item.Venda.Operacao.GetDisplayName()
+
+                                        </div>
+
+                                        <span class="text-muted font-monospace"
+                                              style="font-size: 0.75rem;">
+
+                                            @item.Venda.ValorContrato?.ToString("C2")  @item.Venda.SaldoDevedor?.ToString("C2")
+
+                                        </span>
+    
+                                    </td>
+
+                                    <td class="ps-4">
+
+                                        <div class="fw-bold text-dark mb-0 text-truncate"
+                                             style="max-width: 200px;">
+
+                                            @item.Venda.ValorComissao?.ToString("C2")
+
+                                        </div>
+
+                                        <small class="text-muted font-monospace"
+                                               style="font-size: 0.75rem;">
+
+                                            @if (item.StatusFinanceiro == "Paga")
+                                            {
+                                                <span class="status-dot status-paga">
+
+                                                    Paga
+
+                                                </span>
+                                            }
+                                            else if (item.StatusFinanceiro == "Em Atraso")
+                                            {
+                                                <span class="status-dot status-atraso">
+
+                                                    Atraso
+
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status-dot status-aguardando">
+
+                                                    Aguardando
+
+                                                </span>
+                                            }
+
+
+                                        </small>
+
+                                    </td>
+
+                                    <td class="font-monospace text-secondary small">
+
+                                        @item.Venda.DataPgtoComissao?.ToString("dd/MM/yyyy")
+
+                                    </td>
+
+
+                                    @* ==================================================
+                                       DADOS DE REPASSE
+                                       SOMENTE USUÁRIO PADRÃO
+                                       ================================================== *@
+
+                                    @if (usuarioPadrao)
+                                    {
+
+                                        @* VALOR REPASSE *@
+
+                                        <td class="text-end fw-bold font-monospace text-dark">
+
+                                            @if (item.Venda.ValorRepasse.HasValue)
+                                            {
+                                                @item.Venda.ValorRepasse.Value.ToString("C2")
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">
+
+                                                    -
+
+                                                </span>
+                                            }
+
+                                        </td>
+
+
+                                        @* STATUS REPASSE *@
+
+                                        <td>
+
+                                            @if (item.Venda.RepasseComissao ==
+                                                                            StatusRepasseComissaoEnum.Pago)
+                                            {
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+
+                                                    <i class="bi bi-check-circle-fill me-1"></i>
+
+                                                    Pago
+
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1">
+
+                                                    <i class="bi bi-clock me-1"></i>
+
+                                                    Aberto
+
+                                                </span>
+                                            }
+
+                                        </td>
+
+
+                                        @* DATA REPASSE *@
+
+                                        <td class="font-monospace text-secondary small">
+
+                                            @item.Venda.DataRepasse?.ToString("dd/MM/yyyy")
+
+                                        </td>
+
+
+                                        @* AÇÃO *@
+
+                                        <td>
+
+                                            @if (item.Venda.RepasseComissao ==
+                                                                            StatusRepasseComissaoEnum.Pago)
+                                            {
+                                                <a asp-controller="Comissao"
+                                                   asp-action="RegistrarRepasse"
+                                                   asp-route-vendaId="@item.Venda.Id"
+                                                   class="btn btn-outline-success btn-sm px-3 py-2 rounded-3 shadow-sm d-inline-flex align-items-center gap-2 fw-semibold">
+
+                                                    <i class="bi bi-pencil-square"></i>
+
+                                                    Editar Repasse
+
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a asp-controller="Comissao"
+                                                   asp-action="RegistrarRepasse"
+                                                   asp-route-vendaId="@item.Venda.Id"
+                                                   class="btn btn-success btn-sm px-3 py-2 rounded-3 shadow-sm d-inline-flex align-items-center gap-2 fw-semibold">
+
+                                                    <i class="bi bi-cash-coin"></i>
+
+                                                    Registrar Repasse
+
+                                                </a>
+                                            }
+
+                                        </td>
+
+                                    }
+                                    else
+                                    {
+                                        @* ==================================================
+                                           USUÁRIO NÃO PADRÃO
+                                           NÃO EXIBE DADOS DE REPASSE
+                                           ================================================== *@
+
+                                        <td colspan="4"></td>
+                                    }
+
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+
+                                <td colspan="11"
+                                    class="text-center py-5 text-muted">
+
+                                    <i class="bi bi-receipt mb-2 d-block text-secondary"
+                                       style="font-size: 1.8rem;"></i>
+
+                                    Nenhum registro encontrado para este filtro.
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    @* ============================================================
+       RESUMO DOS CONTRATOS SELECIONADOS
+       ============================================================ *@
+
+    <div id="resumoRepasses"
+         class="card border-0 shadow-sm rounded-4 mt-4">
+
+        <div class="card-body">
+
+            <div class="row g-4 align-items-center">
+
+
+                @* QUANTIDADE *@
+
+                <div class="col-md-4">
+
+                    <div class="text-muted small mb-1">
+
+                        Contratos selecionados
+
+                    </div>
+
+                    <div class="fs-4 fw-bold text-dark">
+
+                        <span id="quantidadeSelecionados">
+                            0
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                @* TOTAL CONTRATOS *@
+
+                @* <div class="col-md-4">
+
+                    <div class="text-muted small mb-1">
+
+                        Total dos contratos
+
+                    </div>
+
+                    <div class="fs-4 fw-bold text-dark">
+
+                        <span id="totalContratos">
+                            R$ 0,00
+                        </span>
+
+                    </div>
+
+                </div> *@
+
+
+                @* TOTAL REPASSES *@
+
+                @* <div class="col-md-4">
+
+                    <div class="text-muted small mb-1">
+
+                        Total dos repasses
+
+                    </div>
+
+                    <div class="fs-4 fw-bold text-success">
+
+                        <span id="totalRepasses">
+                            R$ 0,00
+                        </span>
+
+                    </div>
+
+                </div> *@
+
+            </div>
+
+
+            <hr class="my-4" />
+
+
+            <div class="d-flex justify-content-end">
+
+                <button type="button"
+                        id="btnGerarRelatorio"
+                        class="btn btn-primary px-4 rounded-3"
+                        disabled>
+
+                    <i class="bi bi-file-earmark-text me-2"></i>
+
+                    Gerar relatório de pagamento
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    @* ============================================================
+       VOLTAR AO PAINEL
+       ============================================================ *@
+
     <div class="mt-4">
-        <a asp-controller="Apps" asp-action="Index" class="btn btn-link text-decoration-none text-secondary p-0 d-inline-flex align-items-center gap-2 btn-back-hover">
-            <i class="bi bi-arrow-left-short fs-4"></i> <span class="fw-medium small">Voltar ao Painel</span>
+
+        <a asp-controller="Apps"
+           asp-action="Index"
+           class="btn btn-link text-decoration-none text-secondary p-0 d-inline-flex align-items-center gap-2 btn-back-hover">
+
+            <i class="bi bi-arrow-left-short fs-4"></i>
+
+            <span class="fw-medium small">
+
+                Voltar ao Painel
+
+            </span>
+
         </a>
+
     </div>
 
 </div>
 
+
 <style>
+
     .inner-system-page {
         font-family: 'Segoe UI', system-ui, sans-serif;
     }
+
 
     .tracking-tight {
         letter-spacing: -0.5px;
     }
 
+
     .tracking-wider {
         letter-spacing: 0.8px;
     }
+
+
+    /* =========================
+                   FILTROS
+                   ========================= */
 
     .filter-dropdown {
         border-color: #dee2e6 !important;
@@ -258,10 +830,12 @@
         background-color: #ffffff;
     }
 
+
         .filter-dropdown:focus {
             border-color: #212529 !important;
             box-shadow: 0 0 0 0.2rem rgba(33, 37, 41, 0.04) !important;
         }
+
 
     .btn-filter-submit {
         height: 34px;
@@ -270,28 +844,71 @@
         border-radius: 6px;
     }
 
+
+    /* =========================
+                   TABELA
+                   ========================= */
+
     .bg-table-header {
         background-color: #fafafa;
         border-bottom: 1px solid #ededed;
     }
 
+
         .bg-table-header th {
             font-size: 0.72rem;
             font-weight: 700;
-            text-uppercase: true;
             color: #6c757d;
             padding: 12px 10px;
             letter-spacing: 0.5px;
         }
 
+
     .financas-row {
         border-bottom: 1px solid #f6f6f6;
-        transition: background-color 0.2s ease;
+        transition: all 0.2s ease;
     }
+
 
         .financas-row:hover {
             background-color: #fafafa !important;
         }
+
+
+    /* =========================
+                   CHECKBOX
+                   ========================= */
+
+    .repasse-checkbox {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+
+
+        .repasse-checkbox:checked {
+            cursor: pointer;
+        }
+
+
+    /* =========================
+                   LINHA COM REPASSE PAGO
+                   ========================= */
+
+    .linha-repasse-pago {
+        background-color: #f0fff4 !important;
+        border-left: 4px solid #198754;
+    }
+
+
+        .linha-repasse-pago:hover {
+            background-color: #e8f8ee !important;
+        }
+
+
+    /* =========================
+                   STATUS
+                   ========================= */
 
     .status-dot {
         display: inline-flex;
@@ -302,6 +919,7 @@
         color: #495057;
     }
 
+
         .status-dot::before {
             content: '';
             width: 8px;
@@ -309,35 +927,279 @@
             border-radius: 50%;
         }
 
+
     .status-paga::before {
         background-color: #2ec4b6;
     }
+
 
     .status-atraso::before {
         background-color: #e71d36;
     }
 
+
     .status-aguardando::before {
         background-color: #ff9f1c;
     }
-</style>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const totalRecebido = parseFloat("@totalSalarioMes.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)");
-        const selectPorcentagem = document.getElementById("selectPorcentagem");
-        const txtPorcentagemLabel = document.getElementById("txtPorcentagemLabel");
-        const txtValorRepasse = document.getElementById("txtValorRepasse");
 
-        function calcularRepasse() {
-            const porcentagem = parseInt(selectPorcentagem.value) || 0;
-            const valorCalculado = totalRecebido * (porcentagem / 100);
+    /* =========================
+                   BOTÃO REGISTRAR
+                   ========================= */
 
-            txtPorcentagemLabel.innerText = porcentagem + "%";
-            txtValorRepasse.innerText = valorCalculado.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    .btn-registrar {
+        transition: all 0.2s ease;
+    }
+
+
+        .btn-registrar:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(25, 135, 84, 0.20) !important;
         }
 
-        selectPorcentagem.addEventListener("change", calcularRepasse);
-        calcularRepasse(); // Executa ao carregar a página
+
+    /* =========================
+                   RESUMO
+                   ========================= */
+
+    #resumoRepasses {
+        transition: all 0.2s ease;
+    }
+
+
+    #btnGerarRelatorio {
+        transition: all 0.2s ease;
+    }
+
+
+        #btnGerarRelatorio:not(:disabled):hover {
+            transform: translateY(-1px);
+        }
+
+</style>
+
+
+<script>
+
+    /* =========================================================
+       ALERTAS
+       ========================================================= */
+
+    window.addEventListener('load', function () {
+
+        setTimeout(function () {
+
+            var alertas = [
+
+                document.getElementById("alertaSucesso"),
+
+                document.getElementById("alertaErro")
+
+            ];
+
+
+            alertas.forEach(function (alerta) {
+
+                if (alerta) {
+
+                    alerta.style.transition =
+                        "opacity 0.5s ease";
+
+                    alerta.style.opacity = "0";
+
+
+                    setTimeout(function () {
+
+                        alerta.style.display = "none";
+
+                    }, 500);
+
+                }
+
+            });
+
+        }, 3000);
+
     });
+
+
+
+    /* =========================================================
+       SELEÇÃO DE CONTRATOS E SOMA DOS VALORES
+       ========================================================= */
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+
+        const checkboxes =
+            document.querySelectorAll(".repasse-checkbox");
+
+
+        const quantidadeSelecionados =
+            document.getElementById("quantidadeSelecionados");
+
+
+        // const totalContratos =
+        //     document.getElementById("totalContratos");
+
+
+        // const totalRepasses =
+        //     document.getElementById("totalRepasses");
+
+
+        const btnGerarRelatorio =
+            document.getElementById("btnGerarRelatorio");
+
+
+
+        /* =====================================================
+           FORMATA VALOR PARA REAL
+           ===================================================== */
+
+        function formatarMoeda(valor) {
+
+            return valor.toLocaleString("pt-BR", {
+
+                style: "currency",
+
+                currency: "BRL"
+
+            });
+
+        }
+
+
+
+        /* =====================================================
+           ATUALIZA OS TOTAIS
+           ===================================================== */
+
+        function atualizarTotais() {
+
+
+            let quantidade = 0;
+
+            // let totalContrato = 0;
+
+            // let totalRepasse = 0;
+
+
+
+            checkboxes.forEach(function (checkbox) {
+
+
+                if (checkbox.checked) {
+
+
+                    quantidade++;
+
+
+                    // const valorContrato =
+                    //     parseFloat(
+                    //         checkbox.dataset.contrato
+                    //     ) || 0;
+
+
+                    // const valorRepasse =
+                    //     parseFloat(
+                    //         checkbox.dataset.repasse
+                    //     ) || 0;
+
+
+
+                    // totalContrato += valorContrato;
+
+                    // totalRepasse += valorRepasse;
+
+                }
+
+            });
+
+
+
+            quantidadeSelecionados.textContent =
+                quantidade;
+
+
+            // totalContratos.textContent =
+            //     formatarMoeda(totalContrato);
+
+
+            // totalRepasses.textContent =
+            //     formatarMoeda(totalRepasse);
+
+
+
+            /* =================================================
+               HABILITA O BOTÃO SOMENTE SE HOUVER SELEÇÃO
+               ================================================= */
+
+            btnGerarRelatorio.disabled =
+                quantidade === 0;
+
+        }
+
+
+
+        /* =====================================================
+           ESCUTA OS CHECKBOXES
+           ===================================================== */
+
+        checkboxes.forEach(function (checkbox) {
+
+            checkbox.addEventListener(
+                "change",
+                atualizarTotais
+            );
+
+        });
+
+    btnGerarRelatorio.addEventListener("click", function () {
+
+        const vendasSelecionadas = [];
+
+        checkboxes.forEach(function (checkbox) {
+
+            if (checkbox.checked) {
+                vendasSelecionadas.push(checkbox.value);
+            }
+
+        });
+
+        if (vendasSelecionadas.length === 0) {
+            return;
+        }
+
+        const form = document.createElement("form");
+
+        form.method = "POST";
+        form.action = "/Comissao/RelatorioDePagamento";
+
+        vendasSelecionadas.forEach(function (id) {
+
+            const input = document.createElement("input");
+
+            input.type = "hidden";
+            input.name = "vendasSelecionadas";
+            input.value = id;
+
+            form.appendChild(input);
+
+        });
+
+        document.body.appendChild(form);
+
+        form.submit();
+
+    });
+
+
+        /* =====================================================
+           INICIA OS VALORES
+           ===================================================== */
+
+        atualizarTotais();
+
+    });
+
 </script>

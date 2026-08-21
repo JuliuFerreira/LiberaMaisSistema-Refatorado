@@ -49,14 +49,41 @@ namespace LiberaMais.Controllers
             return View(lista);
         }
 
-        public IActionResult Criar  ()
+        [HttpGet]
+        public IActionResult Criar()
         {
             ViewBag.Usuarios = _usuarioRepositorio.BuscarTodos();
             ViewBag.Promotoras = _promotorasRepositorio.ListarPromotora();
 
-            return View();
-        }
+            var financa = new Financa();
 
+            financa.Data = DateTime.Now;
+
+            if (TempData["FinancaData"] != null)
+            {
+                financa.Data = DateTime.Parse(TempData["FinancaData"].ToString());
+            }
+
+            if (TempData["FinancaValor"] != null)
+            {
+                financa.Valor = decimal.Parse(
+                    TempData["FinancaValor"].ToString(),
+                    System.Globalization.CultureInfo.InvariantCulture);
+            }
+
+            if (TempData["FinancaTipo"] != null)
+            {
+                financa.Tipo = Enum.Parse<TipoFinanca>(
+                    TempData["FinancaTipo"].ToString());
+            }
+
+            if (TempData["FinancaDescricao"] != null)
+            {
+                financa.Descricao = TempData["FinancaDescricao"]?.ToString();
+            }
+
+            return View(financa);
+        }
 
 
         [HttpPost]

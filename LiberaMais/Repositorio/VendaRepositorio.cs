@@ -127,6 +127,11 @@ namespace LiberaMais.Repositorio
                 .Take(tamanhoCorte)
                 .ToList();
         }
+
+        public void SalvarAlteracoes()
+        {
+            _bancoContext.SaveChanges();
+        }
     }
 
 }
