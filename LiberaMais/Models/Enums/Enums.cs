@@ -95,6 +95,12 @@ namespace LiberaMais.Models.Enums
 
     }
 
+    public enum TipoAgendamentoEnum : int   
+    {
+        Agendado = 1,
+        Finalizado = 2
+    }
+
     public enum TipoFinanca : int
     {
 

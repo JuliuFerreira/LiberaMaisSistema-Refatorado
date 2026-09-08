@@ -1,0 +1,2368 @@
+﻿@using LiberaMais.Models
+@using System.Globalization
+
+@{
+    Layout = string.Empty;
+    ViewData["Title"] = "Calculadoras";
+
+    var taxasCoeficientes = ViewBag.TaxaCoeficiente as IEnumerable<TaxaCoeficiente>
+                            ?? Enumerable.Empty<TaxaCoeficiente>();
+}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Calculadoras | Libera Mais</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f5f7f7;
+            color: #20252b;
+        }
+
+        body {
+            padding: 24px;
+        }
+
+        /* ================================
+                           CONTAINER
+                        ================================= */
+
+        .pagina {
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        /* ================================
+                           CABEÇALHO
+                        ================================= */
+
+        .cabecalho {
+            margin-bottom: 18px;
+        }
+
+            .cabecalho .eyebrow {
+                font-size: 10px;
+                font-weight: 700;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                color: #64748b;
+                margin-bottom: 5px;
+            }
+
+            .cabecalho h1 {
+                margin: 0;
+                font-size: 25px;
+                line-height: 1.2;
+                font-weight: 700;
+                color: #171b20;
+            }
+
+            .cabecalho p {
+                margin: 5px 0 0;
+                color: #64748b;
+                font-size: 13px;
+            }
+
+        /* ================================
+                           CARD PRINCIPAL
+                        ================================= */
+
+        .card {
+            background: #ffffff;
+            border: 1px solid #e5e8eb;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(15, 23, 42, 0.045);
+            overflow: hidden;
+        }
+
+        .card-header {
+            min-height: 58px;
+            padding: 12px 18px;
+            border-bottom: 1px solid #edf0f2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #edf8f4;
+            color: #159570;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .header-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #20252b;
+            margin: 0;
+        }
+
+        .header-subtitle {
+            font-size: 10px;
+            color: #8a949e;
+            margin-top: 2px;
+        }
+
+        .card-body {
+            padding: 18px;
+        }
+
+        /* ================================
+                           ABAS
+                        ================================= */
+
+        .abas {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border-bottom: 1px solid #e7eaed;
+            padding: 0 18px;
+            background: #ffffff;
+        }
+
+        .aba {
+            border: 0;
+            background: transparent;
+            color: #74808c;
+            padding: 12px 15px 11px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            transition: .18s ease;
+        }
+
+            .aba:hover {
+                color: #20252b;
+            }
+
+            .aba.active {
+                color: #e87519;
+            }
+
+                .aba.active::after {
+                    content: "";
+                    position: absolute;
+                    height: 2px;
+                    background: #e87519;
+                    left: 10px;
+                    right: 10px;
+                    bottom: -1px;
+                    border-radius: 2px 2px 0 0;
+                }
+
+        /* ================================
+                           SEÇÕES
+                        ================================= */
+
+        .secao {
+            display: none;
+        }
+
+            .secao.active {
+                display: block;
+            }
+
+        .subtitulo {
+            margin: 0 0 13px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #4d5965;
+            text-transform: uppercase;
+            letter-spacing: .65px;
+        }
+
+            .subtitulo span {
+                color: #9aa3ab;
+                font-weight: 500;
+                text-transform: none;
+                letter-spacing: 0;
+                margin-left: 5px;
+            }
+
+        /* ================================
+                           MODO DE CÁLCULO
+                        ================================= */
+
+        .modo-container {
+            display: flex;
+            background: #f7f8f9;
+            border: 1px solid #e5e8eb;
+            border-radius: 8px;
+            padding: 3px;
+            width: fit-content;
+            margin-bottom: 17px;
+        }
+
+        .modo-btn {
+            border: 0;
+            background: transparent;
+            padding: 7px 13px;
+            border-radius: 6px;
+            color: #6d7781;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .18s ease;
+        }
+
+            .modo-btn.active {
+                background: #ffffff;
+                color: #252b31;
+                box-shadow: 0 1px 4px rgba(15, 23, 42, .08);
+            }
+
+        /* ================================
+                           GRID
+                        ================================= */
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 13px;
+        }
+
+        .col-3 {
+            grid-column: span 3;
+        }
+
+        .col-4 {
+            grid-column: span 4;
+        }
+
+        .col-5 {
+            grid-column: span 5;
+        }
+
+        .col-6 {
+            grid-column: span 6;
+        }
+
+        .col-7 {
+            grid-column: span 7;
+        }
+
+        .col-8 {
+            grid-column: span 8;
+        }
+
+        .col-12 {
+            grid-column: span 12;
+        }
+
+        /* ================================
+                           CAMPOS
+                        ================================= */
+
+        .campo {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .campo label {
+                font-size: 10px;
+                font-weight: 700;
+                color: #5c6873;
+                text-transform: uppercase;
+                letter-spacing: .45px;
+                margin-bottom: 6px;
+            }
+
+            .campo input,
+            .campo select {
+                width: 100%;
+                height: 38px;
+                border: 1px solid #dce1e5;
+                border-radius: 7px;
+                background: #ffffff;
+                padding: 0 11px;
+                font-size: 12px;
+                color: #252b31;
+                outline: none;
+                transition: .18s ease;
+            }
+
+                .campo input::placeholder {
+                    color: #a7afb7;
+                }
+
+                .campo input:focus,
+                .campo select:focus {
+                    border-color: #e7a46f;
+                    box-shadow: 0 0 0 3px rgba(232, 117, 25, .08);
+                }
+
+            .campo small {
+                font-size: 9px;
+                color: #98a1a9;
+                margin-top: 4px;
+            }
+
+        /* ================================
+                           INPUT MOEDA
+                        ================================= */
+
+        .input-moeda {
+            position: relative;
+        }
+
+            .input-moeda span {
+                position: absolute;
+                left: 11px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #8a949d;
+                font-size: 10px;
+                pointer-events: none;
+            }
+
+            .input-moeda input {
+                padding-left: 30px;
+            }
+
+        /* ================================
+                           BOTÕES
+                        ================================= */
+
+        .acoes {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 17px;
+            padding-top: 15px;
+            border-top: 1px solid #edf0f2;
+        }
+
+        .btn {
+            height: 36px;
+            border-radius: 7px;
+            border: 1px solid transparent;
+            padding: 0 15px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            transition: .18s ease;
+        }
+
+        .btn-principal {
+            background: #252a2f;
+            color: #ffffff;
+        }
+
+            .btn-principal:hover {
+                background: #15191c;
+            }
+
+        .btn-laranja {
+            background: #e87519;
+            color: #ffffff;
+        }
+
+            .btn-laranja:hover {
+                background: #d9680b;
+            }
+
+        .btn-secundario {
+            background: #ffffff;
+            border-color: #dce1e5;
+            color: #5e6973;
+        }
+
+            .btn-secundario:hover {
+                background: #f8f9fa;
+            }
+
+        /* ================================
+                           RESULTADO
+                        ================================= */
+
+        .resultado {
+            display: none;
+            margin-top: 17px;
+            border: 1px solid #e4e8ea;
+            border-radius: 9px;
+            background: #fafbfb;
+            overflow: hidden;
+        }
+
+            .resultado.show {
+                display: block;
+            }
+
+        .resultado-topo {
+            padding: 10px 13px;
+            border-bottom: 1px solid #e8ebed;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .resultado-icon {
+            width: 27px;
+            height: 27px;
+            border-radius: 7px;
+            background: #edf8f4;
+            color: #159570;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+        }
+
+        .resultado-titulo {
+            font-size: 10px;
+            font-weight: 700;
+            color: #69737d;
+            text-transform: uppercase;
+            letter-spacing: .55px;
+        }
+
+        .resultado-conteudo {
+            padding: 14px;
+        }
+
+        .resultado-valor {
+            font-size: 23px;
+            line-height: 1.1;
+            font-weight: 700;
+            color: #1d242a;
+        }
+
+        .resultado-descricao {
+            font-size: 10px;
+            color: #8b949d;
+            margin-top: 4px;
+        }
+
+        /* ================================
+                           RESULTADO EM LINHA
+                        ================================= */
+
+        .resultado-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+        }
+
+        .resultado-item {
+            padding: 4px 16px;
+            border-right: 1px solid #e8ebed;
+        }
+
+            .resultado-item:last-child {
+                border-right: 0;
+            }
+
+            .resultado-item .label {
+                font-size: 9px;
+                color: #8a949d;
+                margin-bottom: 4px;
+            }
+
+            .resultado-item .valor {
+                font-size: 16px;
+                font-weight: 700;
+                color: #22282e;
+            }
+
+        /* ================================
+                           SALDO DEVEDOR
+                        ================================= */
+
+        .saldo-box {
+            margin-top: 17px;
+            border: 1px solid #e2e7e9;
+            border-radius: 9px;
+            background: #fbfcfc;
+            overflow: hidden;
+        }
+
+        .saldo-header {
+            padding: 10px 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #e8ebed;
+        }
+
+        .saldo-header-icon {
+            width: 27px;
+            height: 27px;
+            border-radius: 7px;
+            background: #edf8f4;
+            color: #159570;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+        }
+
+        .saldo-header-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #30373d;
+        }
+
+        .saldo-header-subtitle {
+            font-size: 9px;
+            color: #929aa2;
+            margin-top: 1px;
+        }
+
+        .saldo-body {
+            padding: 14px;
+        }
+
+        .saldo-resultado {
+            display: none;
+            margin-top: 14px;
+            padding: 13px;
+            background: #f3f8f6;
+            border: 1px solid #dcebe5;
+            border-radius: 8px;
+        }
+
+            .saldo-resultado.show {
+                display: block;
+            }
+
+        .saldo-resultado-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #708078;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .saldo-resultado-valor {
+            font-size: 21px;
+            font-weight: 700;
+            color: #187d60;
+            margin-top: 3px;
+        }
+
+        /* ================================
+                           REFINANCIAMENTO
+                        ================================= */
+
+        .refin-box {
+            margin-top: 18px;
+            border-top: 1px solid #edf0f2;
+            padding-top: 18px;
+        }
+
+        .refin-titulo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 13px;
+        }
+
+        .refin-icon {
+            width: 27px;
+            height: 27px;
+            border-radius: 7px;
+            background: #fff5ec;
+            color: #e87519;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+        }
+
+        .refin-titulo strong {
+            font-size: 11px;
+            color: #30373d;
+        }
+
+        .refin-titulo span {
+            display: block;
+            font-size: 9px;
+            color: #929aa2;
+            font-weight: 400;
+            margin-top: 1px;
+        }
+
+        /* ================================
+                           TROCO
+                        ================================= */
+
+        .troco-box {
+            display: none;
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid #dcebe5;
+            background: #f3f8f6;
+        }
+
+            .troco-box.show {
+                display: block;
+            }
+
+        .troco-label {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: #708078;
+        }
+
+        .troco-valor {
+            font-size: 24px;
+            font-weight: 700;
+            color: #198754;
+            margin-top: 3px;
+        }
+
+        .troco-info {
+            margin-top: 3px;
+            color: #7d8983;
+            font-size: 9px;
+        }
+
+        /* ================================
+                           AVISOS
+                        ================================= */
+
+        .alerta {
+            display: none;
+            margin-top: 14px;
+            border-radius: 8px;
+            padding: 11px 13px;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+            .alerta.show {
+                display: block;
+            }
+
+            .alerta.erro {
+                background: #fff5f5;
+                border: 1px solid #f0dada;
+                color: #a94442;
+            }
+
+            .alerta.info {
+                background: #f4f7fa;
+                border: 1px solid #e1e7ec;
+                color: #697681;
+            }
+
+        /* ================================
+                           DIVISOR
+                        ================================= */
+
+        .divisor {
+            height: 1px;
+            background: #edf0f2;
+            margin: 18px 0;
+        }
+
+        /* ================================
+                           RESPONSIVO
+                        ================================= */
+
+        @@media (max-width: 900px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .col-3,
+            .col-4,
+            .col-5,
+            .col-6,
+            .col-7,
+            .col-8 {
+                grid-column: span 1;
+            }
+
+            .col-12 {
+                grid-column: span 2;
+            }
+        }
+
+        @@media (max-width: 600px) {
+
+            body {
+                padding: 10px;
+            }
+
+            .cabecalho h1 {
+                font-size: 21px;
+            }
+
+            .card-header {
+                padding: 11px 13px;
+            }
+
+            .card-body {
+                padding: 13px;
+            }
+
+            .abas {
+                padding: 0 10px;
+            }
+
+            .aba {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .grid {
+                display: block;
+            }
+
+            .campo {
+                margin-bottom: 12px;
+            }
+
+            .resultado-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .resultado-item {
+                border-right: 0;
+                border-bottom: 1px solid #e8ebed;
+                padding: 10px 0;
+            }
+
+                .resultado-item:last-child {
+                    border-bottom: 0;
+                }
+
+            .acoes {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="pagina">
+
+        <!-- CABEÇALHO -->
+
+        <div class="cabecalho">
+            <div class="eyebrow">SIMULAÇÃO</div>
+            <h1>Calculadoras</h1>
+            <p>Simule operações de crédito consignado.</p>
+        </div>
+
+
+        <!-- CARD PRINCIPAL -->
+
+        <div class="card">
+
+            <!-- ABAS -->
+
+            <div class="abas">
+
+                <button type="button"
+                        class="aba active"
+                        id="abaNovo"
+                        onclick="mostrarAba('novo')">
+                    NOVO
+                </button>
+
+                <button type="button"
+                        class="aba"
+                        id="abaPortabilidade"
+                        onclick="mostrarAba('portabilidade')">
+                    PORTABILIDADE
+                </button>
+
+            </div>
+
+
+            <!-- =====================================================
+                 NOVO
+            ====================================================== -->
+
+            <div id="secaoNovo"
+                 class="secao active">
+
+                <div class="card-body">
+
+                    <div class="subtitulo">
+                        Nova operação
+                        <span>• escolha a forma de cálculo</span>
+                    </div>
+
+
+                    <!-- MODO -->
+
+                    <div class="modo-container">
+
+                        <button type="button"
+                                id="btnModoParcela"
+                                class="modo-btn active"
+                                onclick="alterarModoNovo('parcela')">
+                            Calcular por parcela
+                        </button>
+
+                        <button type="button"
+                                id="btnModoValor"
+                                class="modo-btn"
+                                onclick="alterarModoNovo('valor')">
+                            Calcular por valor
+                        </button>
+
+                    </div>
+
+
+                    <!-- =============================================
+                         NOVO - POR PARCELA
+                    ============================================== -->
+
+                    <div id="novoPorParcela">
+
+                        <div class="grid">
+
+                            <div class="campo col-4">
+
+                                <label for="novoValorParcela">
+                                    Valor da parcela
+                                </label>
+
+                                <div class="input-moeda">
+                                    <span>R$</span>
+
+                                    <input type="text"
+                                           id="novoValorParcela"
+                                           placeholder="0,00"
+                                           inputmode="decimal" />
+                                </div>
+
+                            </div>
+
+
+                            <div class="campo col-4">
+
+                                <label for="novoPlanoParcela">
+                                    Plano
+                                </label>
+
+                                <select id="novoPlanoParcela">
+
+                                    <option value="">
+                                        Selecione o plano
+                                    </option>
+
+                                    @foreach (var taxa in taxasCoeficientes)
+                                    {
+                                        <option value="@taxa.Id"
+                                                data-operacao="@((int)taxa.Operacao)"
+                                                data-plano="@taxa.Taxa"
+                                                data-coeficiente="@taxa.Coeficiente.ToString(CultureInfo.InvariantCulture)">
+                                            @taxa.Taxa
+                                        </option>
+                                    }
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="acoes">
+
+                            <button type="button"
+                                    class="btn btn-secundario"
+                                    onclick="limparNovoParcela()">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                Limpar
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-principal"
+                                    onclick="calcularNovoPorParcela()">
+                                <i class="fa-solid fa-calculator"></i>
+                                Calcular
+                            </button>
+
+                        </div>
+
+
+                        <div id="resultadoNovoParcela"
+                             class="resultado">
+
+                            <div class="resultado-topo">
+
+                                <div class="resultado-icon">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+
+                                <div class="resultado-titulo">
+                                    Resultado da simulação
+                                </div>
+
+                            </div>
+
+                            <div class="resultado-conteudo">
+
+                                <div class="resultado-valor"
+                                     id="novoValorLiberado">
+                                    R$ 0,00
+                                </div>
+
+                                <div class="resultado-descricao">
+                                    Valor liberado estimado
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =============================================
+                         NOVO - POR VALOR
+                    ============================================== -->
+
+                    <div id="novoPorValor"
+                         style="display:none;">
+
+                        <div class="grid">
+
+                            <div class="campo col-4">
+
+                                <label for="novoValorContrato">
+                                    Valor do contrato
+                                </label>
+
+                                <div class="input-moeda">
+                                    <span>R$</span>
+
+                                    <input type="text"
+                                           id="novoValorContrato"
+                                           placeholder="0,00"
+                                           inputmode="decimal" />
+                                </div>
+
+                            </div>
+
+
+                            <div class="campo col-4">
+
+                                <label for="novoPlanoValor">
+                                    Plano
+                                </label>
+
+                                <select id="novoPlanoValor">
+
+                                    <option value="">
+                                        Selecione o plano
+                                    </option>
+
+                                    @foreach (var taxa in taxasCoeficientes)
+                                    {
+                                        <option value="@taxa.Id"
+                                                data-operacao="@((int)taxa.Operacao)"
+                                                data-plano="@taxa.Taxa"
+                                                data-coeficiente="@taxa.Coeficiente.ToString(CultureInfo.InvariantCulture)">
+                                            @taxa.Taxa
+                                        </option>
+                                    }
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="acoes">
+
+                            <button type="button"
+                                    class="btn btn-secundario"
+                                    onclick="limparNovoValor()">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                Limpar
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-principal"
+                                    onclick="calcularNovoPorValor()">
+                                <i class="fa-solid fa-calculator"></i>
+                                Calcular
+                            </button>
+
+                        </div>
+
+
+                        <div id="resultadoNovoValor"
+                             class="resultado">
+
+                            <div class="resultado-topo">
+
+                                <div class="resultado-icon">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+
+                                <div class="resultado-titulo">
+                                    Resultado da simulação
+                                </div>
+
+                            </div>
+
+                            <div class="resultado-conteudo">
+
+                                <div class="resultado-valor"
+                                     id="novoValorParcelaResultado">
+                                    R$ 0,00
+                                </div>
+
+                                <div class="resultado-descricao">
+                                    Valor da parcela estimada
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 PORTABILIDADE
+            ====================================================== -->
+
+            <div id="secaoPortabilidade"
+                 class="secao">
+
+                <div class="card-body">
+
+                    <!-- SALDO DEVEDOR -->
+
+                    <div class="saldo-box">
+
+                        <div class="saldo-header">
+
+                            <div class="saldo-header-icon">
+                                <i class="fa-solid fa-file-invoice-dollar"></i>
+                            </div>
+
+                            <div>
+                                <div class="saldo-header-title">
+                                    Calculadora de Saldo Devedor
+                                </div>
+
+                                <div class="saldo-header-subtitle">
+                                    Informe os dados atuais do contrato
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="saldo-body">
+
+                            <div class="grid">
+
+                                <div class="campo col-3">
+
+                                    <label for="saldoValorContrato">
+                                        Valor do contrato
+                                    </label>
+
+                                    <div class="input-moeda">
+                                        <span>R$</span>
+
+                                        <input type="text"
+                                               id="saldoValorContrato"
+                                               placeholder="0,00"
+                                               inputmode="decimal" />
+                                    </div>
+
+                                </div>
+
+
+                                <div class="campo col-3">
+
+                                    <label for="saldoNumeroParcelas">
+                                        Número de parcelas
+                                    </label>
+
+                                    <input type="number"
+                                           id="saldoNumeroParcelas"
+                                           placeholder="Ex.: 96"
+                                           min="1" />
+
+                                </div>
+
+
+                                <div class="campo col-3">
+
+                                    <label for="saldoValorParcela">
+                                        Valor da parcela
+                                    </label>
+
+                                    <div class="input-moeda">
+                                        <span>R$</span>
+
+                                        <input type="text"
+                                               id="saldoValorParcela"
+                                               placeholder="0,00"
+                                               inputmode="decimal" />
+                                    </div>
+
+                                </div>
+
+
+                                <div class="campo col-3">
+
+                                    <label for="saldoParcelasPagas">
+                                        Parcelas pagas
+                                    </label>
+
+                                    <input type="number"
+                                           id="saldoParcelasPagas"
+                                           placeholder="Ex.: 30"
+                                           min="0" />
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="acoes">
+
+                                <button type="button"
+                                        class="btn btn-secundario"
+                                        onclick="limparSaldoDevedor()">
+                                    <i class="fa-solid fa-rotate-left"></i>
+                                    Limpar
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-principal"
+                                        onclick="calcularSaldo()">
+                                    <i class="fa-solid fa-calculator"></i>
+                                    Calcular saldo
+                                </button>
+
+                            </div>
+
+
+                            <div id="erroSaldo"
+                                 class="alerta erro">
+                            </div>
+
+
+                            <div id="resultadoSaldo"
+                                 class="saldo-resultado">
+
+                                <div class="saldo-resultado-label">
+                                    Saldo devedor estimado
+                                </div>
+
+                                <div class="saldo-resultado-valor"
+                                     id="saldoDevedorResultado">
+                                    R$ 0,00
+                                </div>
+
+                            </div>
+
+
+                            <!-- REFINANCIAMENTO -->
+
+                            <div class="refin-box">
+
+                                <div class="refin-titulo">
+
+                                    <div class="refin-icon">
+                                        <i class="fa-solid fa-arrows-rotate"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+                                            Refinanciamento da Portabilidade
+                                        </strong>
+
+                                        <span>
+                                            Simule o novo contrato e o troco disponível
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="grid">
+
+                                    <div class="campo col-4">
+
+                                        <label for="refinValorParcela">
+                                            Valor da parcela
+                                        </label>
+
+                                        <div class="input-moeda">
+
+                                            <span>R$</span>
+
+                                            <input type="text"
+                                                   id="refinValorParcela"
+                                                   placeholder="0,00"
+                                                   inputmode="decimal" />
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="campo col-4">
+
+                                        <label for="refinPlano">
+                                            Plano
+                                        </label>
+
+                                        <select id="refinPlano">
+
+                                            <option value="">
+                                                Selecione o plano
+                                            </option>
+
+                                            @foreach (var taxa in taxasCoeficientes)
+                                            {
+                                                <option value="@taxa.Id"
+                                                        data-operacao="@((int)taxa.Operacao)"
+                                                        data-plano="@taxa.Taxa"
+                                                        data-coeficiente="@taxa.Coeficiente.ToString(CultureInfo.InvariantCulture)">
+                                                    @taxa.Taxa
+                                                </option>
+                                            }
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <div class="campo col-4">
+
+                                        <label for="refinSaldoDevedor">
+                                            Saldo devedor
+                                        </label>
+
+                                        <div class="input-moeda">
+
+                                            <span>R$</span>
+
+                                            <input type="text"
+                                                   id="refinSaldoDevedor"
+                                                   placeholder="Calculado acima"
+                                                   readonly />
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="acoes">
+
+                                    <button type="button"
+                                            class="btn btn-secundario"
+                                            onclick="limparRefinanciamento()">
+                                        <i class="fa-solid fa-rotate-left"></i>
+                                        Limpar
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-laranja"
+                                            onclick="calcularRefinanciamento()">
+                                        <i class="fa-solid fa-calculator"></i>
+                                        Calcular refinanciamento
+                                    </button>
+
+                                </div>
+
+
+                                <div id="erroRefin"
+                                     class="alerta erro">
+                                </div>
+
+
+                                <div id="resultadoRefin"
+                                     class="resultado">
+
+                                    <div class="resultado-topo">
+
+                                        <div class="resultado-icon">
+                                            <i class="fa-solid fa-check"></i>
+                                        </div>
+
+                                        <div class="resultado-titulo">
+                                            Resultado do refinanciamento
+                                        </div>
+
+                                    </div>
+
+                                    <div class="resultado-conteudo">
+
+                                        <div class="resultado-grid">
+
+                                            <div class="resultado-item">
+
+                                                <div class="label">
+                                                    Novo contrato
+                                                </div>
+
+                                                <div class="valor"
+                                                     id="refinValorContrato">
+                                                    R$ 0,00
+                                                </div>
+
+                                            </div>
+
+
+                                            <div class="resultado-item">
+
+                                                <div class="label">
+                                                    Saldo devedor
+                                                </div>
+
+                                                <div class="valor"
+                                                     id="refinSaldoResultado">
+                                                    R$ 0,00
+                                                </div>
+
+                                            </div>
+
+
+                                            <div class="resultado-item">
+
+                                                <div class="label">
+                                                    Troco
+                                                </div>
+
+                                                <div class="valor"
+                                                     id="refinTrocoResultado">
+                                                    R$ 0,00
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div id="trocoBox"
+                                     class="troco-box">
+
+                                    <div class="troco-label">
+                                        Troco disponível
+                                    </div>
+
+                                    <div class="troco-valor"
+                                         id="trocoValor">
+                                        R$ 0,00
+                                    </div>
+
+                                    <div class="troco-info">
+                                        Valor estimado disponível após quitar o saldo devedor.
+                                    </div>
+
+                                </div>
+
+
+                                <div id="alertaSemTroco"
+                                     class="alerta erro">
+
+                                    O novo contrato não gera troco. A operação não é viável nessas condições.
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        /* ============================================================
+           CONFIGURAÇÃO DAS OPERAÇÕES
+        ============================================================ */
+
+        /*
+         * Valores correspondentes ao OperacaoEnum.
+         *
+         * NOVO = 1
+         * RefinDaPort = 6
+         */
+
+        const OPERACAO_NOVO = 1;
+        const OPERACAO_REFIN_DA_PORT = 6;
+
+
+        /* ============================================================
+           FILTRAR PLANOS POR OPERAÇÃO
+        ============================================================ */
+
+        function filtrarPlanosPorOperacao(selectId, operacao) {
+
+            var select =
+                document.getElementById(selectId);
+
+            if (!select)
+                return;
+
+
+            var valorAtual =
+                select.value;
+
+
+            var encontrouValorAtual = false;
+
+
+            Array.from(select.options).forEach(function (option, index) {
+
+                /*
+                 * A primeira opção é:
+                 *
+                 * "Selecione o plano"
+                 *
+                 * Ela sempre permanece visível.
+                 */
+
+                if (index === 0) {
+
+                    option.hidden = false;
+                    return;
+
+                }
+
+
+                var operacaoTaxa =
+                    parseInt(
+                        option.getAttribute('data-operacao')
+                    );
+
+
+                if (operacaoTaxa === operacao) {
+
+                    option.hidden = false;
+
+                    if (option.value === valorAtual) {
+                        encontrouValorAtual = true;
+                    }
+
+                }
+                else {
+
+                    option.hidden = true;
+
+                }
+
+            });
+
+
+            /*
+             * Se o plano anteriormente selecionado
+             * não pertence à nova operação,
+             * volta para "Selecione o plano".
+             */
+
+            if (!encontrouValorAtual) {
+
+                select.selectedIndex = 0;
+
+            }
+
+        }
+
+
+        /* ============================================================
+           APLICAR FILTRO DO NOVO
+        ============================================================ */
+
+        function filtrarPlanosNovo() {
+
+            filtrarPlanosPorOperacao(
+                'novoPlanoParcela',
+                OPERACAO_NOVO
+            );
+
+            filtrarPlanosPorOperacao(
+                'novoPlanoValor',
+                OPERACAO_NOVO
+            );
+
+        }
+
+
+        /* ============================================================
+           APLICAR FILTRO DO REFIN DA PORT
+        ============================================================ */
+
+        function filtrarPlanoRefinDaPort() {
+
+            filtrarPlanosPorOperacao(
+                'refinPlano',
+                OPERACAO_REFIN_DA_PORT
+            );
+
+        }
+
+
+        /* ============================================================
+           UTILITÁRIOS
+        ============================================================ */
+
+        function converterValorBR(valor) {
+
+            if (valor === null || valor === undefined)
+                return 0;
+
+            valor = valor.toString().trim();
+
+            if (valor === '')
+                return 0;
+
+            valor = valor
+                .replace(/\s/g, '')
+                .replace(/R\$/gi, '');
+
+            if (valor.indexOf(',') >= 0) {
+
+                valor = valor
+                    .replace(/\./g, '')
+                    .replace(',', '.');
+
+            }
+
+            return parseFloat(valor) || 0;
+
+        }
+
+
+        function formatarMoeda(valor) {
+
+            return valor.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            });
+
+        }
+
+
+        /* ============================================================
+           ABAS
+        ============================================================ */
+
+        function mostrarAba(aba) {
+
+            document.getElementById('secaoNovo')
+                .classList.remove('active');
+
+            document.getElementById('secaoPortabilidade')
+                .classList.remove('active');
+
+            document.getElementById('abaNovo')
+                .classList.remove('active');
+
+            document.getElementById('abaPortabilidade')
+                .classList.remove('active');
+
+
+            if (aba === 'novo') {
+
+                document.getElementById('secaoNovo')
+                    .classList.add('active');
+
+                document.getElementById('abaNovo')
+                    .classList.add('active');
+
+            }
+            else {
+
+                document.getElementById('secaoPortabilidade')
+                    .classList.add('active');
+
+                document.getElementById('abaPortabilidade')
+                    .classList.add('active');
+
+            }
+
+        }
+
+
+        /* ============================================================
+           NOVO - MODOS
+        ============================================================ */
+
+        function alterarModoNovo(modo) {
+
+            document.getElementById('novoPorParcela')
+                .style.display = 'none';
+
+            document.getElementById('novoPorValor')
+                .style.display = 'none';
+
+            document.getElementById('btnModoParcela')
+                .classList.remove('active');
+
+            document.getElementById('btnModoValor')
+                .classList.remove('active');
+
+
+            if (modo === 'parcela') {
+
+                document.getElementById('novoPorParcela')
+                    .style.display = 'block';
+
+                document.getElementById('btnModoParcela')
+                    .classList.add('active');
+
+            }
+            else {
+
+                document.getElementById('novoPorValor')
+                    .style.display = 'block';
+
+                document.getElementById('btnModoValor')
+                    .classList.add('active');
+
+            }
+
+        }
+
+
+        /* ============================================================
+           NOVO - POR PARCELA
+        ============================================================ */
+
+        function calcularNovoPorParcela() {
+
+            var valorParcela =
+                converterValorBR(
+                    document.getElementById('novoValorParcela').value
+                );
+
+            var select =
+                document.getElementById('novoPlanoParcela');
+
+            var option =
+                select.options[select.selectedIndex];
+
+            if (!valorParcela || !option || !option.value) {
+
+                alert('Informe o valor da parcela e selecione o plano.');
+
+                return;
+            }
+
+
+            var coeficiente =
+                parseFloat(
+                    option.getAttribute('data-coeficiente')
+                );
+
+
+            if (!coeficiente || coeficiente <= 0) {
+
+                alert('Coeficiente inválido para o plano selecionado.');
+
+                return;
+            }
+
+
+            var valorLiberado =
+                valorParcela / coeficiente;
+
+
+            document.getElementById('novoValorLiberado')
+                .innerText =
+                formatarMoeda(valorLiberado);
+
+
+            document.getElementById('resultadoNovoParcela')
+                .classList.add('show');
+
+        }
+
+
+        /* ============================================================
+           NOVO - POR VALOR
+        ============================================================ */
+
+        function calcularNovoPorValor() {
+
+            var valorContrato =
+                converterValorBR(
+                    document.getElementById('novoValorContrato').value
+                );
+
+            var select =
+                document.getElementById('novoPlanoValor');
+
+            var option =
+                select.options[select.selectedIndex];
+
+
+            if (!valorContrato || !option || !option.value) {
+
+                alert('Informe o valor do contrato e selecione o plano.');
+
+                return;
+            }
+
+
+            var coeficiente =
+                parseFloat(
+                    option.getAttribute('data-coeficiente')
+                );
+
+
+            if (!coeficiente || coeficiente <= 0) {
+
+                alert('Coeficiente inválido para o plano selecionado.');
+
+                return;
+            }
+
+
+            var valorParcela =
+                valorContrato * coeficiente;
+
+
+            document.getElementById('novoValorParcelaResultado')
+                .innerText =
+                formatarMoeda(valorParcela);
+
+
+            document.getElementById('resultadoNovoValor')
+                .classList.add('show');
+
+        }
+
+
+        /* ============================================================
+           LIMPAR NOVO
+        ============================================================ */
+
+        function limparNovoParcela() {
+
+            document.getElementById('novoValorParcela').value = '';
+
+            document.getElementById('novoPlanoParcela').selectedIndex = 0;
+
+            document.getElementById('novoValorLiberado')
+                .innerText = 'R$ 0,00';
+
+            document.getElementById('resultadoNovoParcela')
+                .classList.remove('show');
+
+        }
+
+
+        function limparNovoValor() {
+
+            document.getElementById('novoValorContrato').value = '';
+
+            document.getElementById('novoPlanoValor').selectedIndex = 0;
+
+            document.getElementById('novoValorParcelaResultado')
+                .innerText = 'R$ 0,00';
+
+            document.getElementById('resultadoNovoValor')
+                .classList.remove('show');
+
+        }
+
+
+        /* ============================================================
+           TAXA MENSAL
+           MANTIDA A LÓGICA PRECISA
+        ============================================================ */
+
+        function calcularTaxaMensal(
+            valorContrato,
+            valorParcela,
+            numeroParcelas
+        ) {
+
+            if (
+                valorContrato <= 0 ||
+                valorParcela <= 0 ||
+                numeroParcelas <= 0
+            ) {
+                return null;
+            }
+
+
+            if (
+                valorParcela * numeroParcelas <= valorContrato
+            ) {
+
+                return 0;
+
+            }
+
+
+            var taxaMin = 0;
+
+            var taxaMax = 1;
+
+
+            for (var i = 0; i < 100; i++) {
+
+                var taxaMedia =
+                    (taxaMin + taxaMax) / 2;
+
+
+                var fator =
+                    Math.pow(
+                        1 + taxaMedia,
+                        numeroParcelas
+                    );
+
+
+                var parcelaCalculada =
+                    valorContrato *
+                    (taxaMedia * fator) /
+                    (fator - 1);
+
+
+                if (parcelaCalculada > valorParcela) {
+
+                    taxaMax = taxaMedia;
+
+                }
+                else {
+
+                    taxaMin = taxaMedia;
+
+                }
+
+            }
+
+
+            return (taxaMin + taxaMax) / 2;
+
+        }
+
+
+        /* ============================================================
+           SALDO DEVEDOR
+           MANTIDA A LÓGICA PRECISA
+        ============================================================ */
+
+        function calcularSaldoDevedor(
+            valorParcela,
+            taxaMensal,
+            parcelasRestantes
+        ) {
+
+            if (parcelasRestantes <= 0)
+                return 0;
+
+
+            if (
+                taxaMensal === null ||
+                taxaMensal === undefined
+            ) {
+                return 0;
+            }
+
+
+            if (
+                Math.abs(taxaMensal) < 0.000000001
+            ) {
+
+                return valorParcela *
+                    parcelasRestantes;
+
+            }
+
+
+            return valorParcela *
+                (
+                    1 -
+                    Math.pow(
+                        1 + taxaMensal,
+                        -parcelasRestantes
+                    )
+                ) /
+                taxaMensal;
+
+        }
+
+
+        /* ============================================================
+           CALCULAR SALDO
+        ============================================================ */
+
+        function calcularSaldo() {
+
+            var valorContrato =
+                converterValorBR(
+                    document.getElementById('saldoValorContrato').value
+                );
+
+            var numeroParcelas =
+                parseInt(
+                    document.getElementById('saldoNumeroParcelas').value
+                );
+
+            var valorParcela =
+                converterValorBR(
+                    document.getElementById('saldoValorParcela').value
+                );
+
+            var parcelasPagas =
+                parseInt(
+                    document.getElementById('saldoParcelasPagas').value
+                );
+
+
+            var erro =
+                document.getElementById('erroSaldo');
+
+
+            erro.classList.remove('show');
+
+            erro.innerText = '';
+
+
+            if (
+                valorContrato <= 0 ||
+                !numeroParcelas ||
+                valorParcela <= 0 ||
+                parcelasPagas < 0
+            ) {
+
+                erro.innerText =
+                    'Informe corretamente todos os dados do contrato.';
+
+                erro.classList.add('show');
+
+                return;
+
+            }
+
+
+            if (parcelasPagas > numeroParcelas) {
+
+                erro.innerText =
+                    'O número de parcelas pagas não pode ser maior que o número total de parcelas.';
+
+                erro.classList.add('show');
+
+                return;
+
+            }
+
+
+            var parcelasRestantes =
+                numeroParcelas - parcelasPagas;
+
+
+            var taxaMensal =
+                calcularTaxaMensal(
+                    valorContrato,
+                    valorParcela,
+                    numeroParcelas
+                );
+
+
+            if (taxaMensal === null) {
+
+                erro.innerText =
+                    'Não foi possível calcular a taxa do contrato.';
+
+                erro.classList.add('show');
+
+                return;
+
+            }
+
+
+            var saldo =
+                calcularSaldoDevedor(
+                    valorParcela,
+                    taxaMensal,
+                    parcelasRestantes
+                );
+
+
+            document.getElementById('saldoDevedorResultado')
+                .innerText =
+                formatarMoeda(saldo);
+
+
+            document.getElementById('resultadoSaldo')
+                .classList.add('show');
+
+
+            /*
+             * Sincroniza automaticamente o saldo
+             * com o refinanciamento.
+             */
+
+            document.getElementById('refinSaldoDevedor')
+                .value =
+                saldo.toLocaleString(
+                    'pt-BR',
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+        }
+
+
+        /* ============================================================
+           REFINANCIAMENTO
+        ============================================================ */
+
+        function calcularRefinanciamento() {
+
+            var valorParcela =
+                converterValorBR(
+                    document.getElementById('refinValorParcela').value
+                );
+
+
+            var saldoDevedor =
+                converterValorBR(
+                    document.getElementById('refinSaldoDevedor').value
+                );
+
+
+            var select =
+                document.getElementById('refinPlano');
+
+
+            var option =
+                select.options[select.selectedIndex];
+
+
+            var erro =
+                document.getElementById('erroRefin');
+
+
+            var resultado =
+                document.getElementById('resultadoRefin');
+
+
+            var trocoBox =
+                document.getElementById('trocoBox');
+
+
+            var alertaSemTroco =
+                document.getElementById('alertaSemTroco');
+
+
+            erro.classList.remove('show');
+
+            resultado.classList.remove('show');
+
+            trocoBox.classList.remove('show');
+
+            alertaSemTroco.classList.remove('show');
+
+
+            if (
+                valorParcela <= 0 ||
+                saldoDevedor <= 0 ||
+                !option ||
+                !option.value
+            ) {
+
+                erro.innerText =
+                    'Informe o valor da parcela, o plano e calcule o saldo devedor.';
+
+                erro.classList.add('show');
+
+                return;
+
+            }
+
+
+            var coeficiente =
+                parseFloat(
+                    option.getAttribute('data-coeficiente')
+                );
+
+
+            if (
+                !coeficiente ||
+                coeficiente <= 0
+            ) {
+
+                erro.innerText =
+                    'Coeficiente inválido para o plano selecionado.';
+
+                erro.classList.add('show');
+
+                return;
+
+            }
+
+
+            /*
+             * Cálculo original:
+             *
+             * Valor contrato =
+             * Valor parcela / Coeficiente
+             */
+
+            var valorContrato =
+                valorParcela /
+                coeficiente;
+
+
+            /*
+             * Cálculo original:
+             *
+             * Troco =
+             * Valor contrato - Saldo devedor
+             */
+
+            var troco =
+                valorContrato -
+                saldoDevedor;
+
+
+            document.getElementById('refinValorContrato')
+                .innerText =
+                formatarMoeda(valorContrato);
+
+
+            document.getElementById('refinSaldoResultado')
+                .innerText =
+                formatarMoeda(saldoDevedor);
+
+
+            document.getElementById('refinTrocoResultado')
+                .innerText =
+                formatarMoeda(troco);
+
+
+            resultado.classList.add('show');
+
+
+            if (troco > 0) {
+
+                document.getElementById('trocoValor')
+                    .innerText =
+                    formatarMoeda(troco);
+
+                trocoBox.classList.add('show');
+
+            }
+            else {
+
+                alertaSemTroco.classList.add('show');
+
+            }
+
+        }
+
+
+        /* ============================================================
+           LIMPAR SALDO
+        ============================================================ */
+
+        function limparSaldoDevedor() {
+
+            document.getElementById('saldoValorContrato').value = '';
+
+            document.getElementById('saldoNumeroParcelas').value = '';
+
+            document.getElementById('saldoValorParcela').value = '';
+
+            document.getElementById('saldoParcelasPagas').value = '';
+
+            document.getElementById('saldoDevedorResultado')
+                .innerText = 'R$ 0,00';
+
+            document.getElementById('resultadoSaldo')
+                .classList.remove('show');
+
+            document.getElementById('erroSaldo')
+                .classList.remove('show');
+
+            document.getElementById('refinSaldoDevedor')
+                .value = '';
+
+        }
+
+
+        /* ============================================================
+           LIMPAR REFINANCIAMENTO
+        ============================================================ */
+
+        function limparRefinanciamento() {
+
+            document.getElementById('refinValorParcela')
+                .value = '';
+
+            document.getElementById('refinPlano')
+                .selectedIndex = 0;
+
+            document.getElementById('refinSaldoDevedor')
+                .value = '';
+
+            document.getElementById('resultadoRefin')
+                .classList.remove('show');
+
+            document.getElementById('trocoBox')
+                .classList.remove('show');
+
+            document.getElementById('alertaSemTroco')
+                .classList.remove('show');
+
+            document.getElementById('erroRefin')
+                .classList.remove('show');
+
+        }
+
+
+        /* ============================================================
+           FORMATAÇÃO AUTOMÁTICA DOS CAMPOS MONETÁRIOS
+        ============================================================ */
+
+        function formatarCampoMoeda(input) {
+
+            input.addEventListener('blur', function () {
+
+                var valor =
+                    converterValorBR(this.value);
+
+                if (valor > 0) {
+
+                    this.value =
+                        valor.toLocaleString(
+                            'pt-BR',
+                            {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            }
+                        );
+
+                }
+
+            });
+
+        }
+
+
+        [
+            'novoValorParcela',
+            'novoValorContrato',
+            'saldoValorContrato',
+            'saldoValorParcela',
+            'refinValorParcela'
+        ].forEach(function (id) {
+
+            var input =
+                document.getElementById(id);
+
+            if (input) {
+
+                formatarCampoMoeda(input);
+
+            }
+
+        });
+
+
+        /* ============================================================
+           INICIALIZAÇÃO
+        ============================================================ */
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            /*
+             * NOVO:
+             * mostra somente taxas cadastradas
+             * com OperacaoEnum.NOVO.
+             */
+
+            filtrarPlanosNovo();
+
+
+            /*
+             * REFIN DA PORT:
+             * mostra somente taxas cadastradas
+             * com OperacaoEnum.RefinDaPort.
+             */
+
+            filtrarPlanoRefinDaPort();
+
+        });
+
+    </script>
+
+</body>
+</html>

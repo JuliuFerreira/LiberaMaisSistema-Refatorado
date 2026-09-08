@@ -16,6 +16,8 @@ namespace LiberaMais.Models
         [Required(ErrorMessage = "O número da casa é obrigatório")]
         public string Numero { get; set; }
 
+        public string? Complemento { get; set; }
+
         [Required(ErrorMessage = "O Bairro é obrigatório")]
         public string Bairro { get; set; }
 

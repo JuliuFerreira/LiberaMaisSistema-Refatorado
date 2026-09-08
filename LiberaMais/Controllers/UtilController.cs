@@ -100,6 +100,8 @@ namespace LiberaMais.Controllers
 
 
             utilDb.Nome = util.Nome;
+            utilDb.Login = util.Login;
+            utilDb.Senha = util.Senha;
             utilDb.Url = util.Url;
             utilDb.Descricao = util.Descricao;
 

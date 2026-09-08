@@ -1,4 +1,15 @@
-﻿<html lang="pt-br">
+﻿@using LiberaMais.Models.Enums
+@using LiberaMais.Helper
+
+@inject ISessao Sessao
+
+@{
+    var usuarioLogado = Sessao.BuscarSessaoDoUsuario();
+    bool IsAdmin = usuarioLogado?.Perfil == PerfilEnum.Admin;
+
+    }
+<html lang="pt-br">
+
 <head>
     <meta charset="utf-8" />
 
@@ -9,6 +20,11 @@
 
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" href="~/css/Agendamentos.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Acionamentos.css" asp-append-version="true" />
+
+
 
 
     <style>
@@ -226,12 +242,34 @@
             </a>
 
 
+            <a asp-controller="Agendamento"
+               asp-action="Index"
+               class="menu-item">
+
+                <i class="bi bi-calendar3"></i>
+                Agenda
+
+            </a>
+
+
             <a asp-controller="Venda"
                asp-action="Index"
                class="menu-item">
 
                 <i class="bi bi-currency-dollar"></i>
                 Vendas
+
+            </a>
+
+            <a asp-controller="Calculadora"
+               target="_blank"
+               rel="noopener noreferrer"
+               asp-action="Index"
+               class="menu-item">
+
+                <i class="bi bi-calculator"></i>
+                
+                Calculadora
 
             </a>
 
@@ -275,46 +313,54 @@
 
             </a>
 
+            @if (IsAdmin)
+            {
+                <a asp-controller="Comissao"
+                   asp-action="Relatorio"
+                   class="menu-item">
 
-            <a asp-controller="Comissao"
-               asp-action="Relatorio"
-               class="menu-item">
+                    <i class="bi bi-coin"></i>
+                    Comissões
 
-                <i class="bi bi-coin"></i>
-                Comissões
+                </a>
 
-            </a>
+                <a asp-controller="Financa"
+                   asp-action="Index"
+                   class="menu-item">
+
+                    <i class="bi bi-wallet2"></i>
+                    Finança
+
+                </a>
+
+                <a class="menu-item d-flex justify-content-between align-items-center"
+                   data-bs-toggle="collapse"
+                   href="#submenuSetup"
+                   role="button"
+                   aria-expanded="false"
+                   aria-controls="submenuSetup">
+
+                    <span>
+
+                        <i class="bi bi-gear-fill"></i>
+                        Configurações
+
+                    </span>
+
+                    <span class="menu-indicador fw-bold"></span>
+
+                </a>
+            }
+
+            
 
 
-            <a asp-controller="Financa"
-               asp-action="Index"
-               class="menu-item">
-
-                <i class="bi bi-wallet2"></i>
-                Finança
-
-            </a>
+            
 
 
             <!-- CONFIGURAÇÕES -->
 
-            <a class="menu-item d-flex justify-content-between align-items-center"
-               data-bs-toggle="collapse"
-               href="#submenuSetup"
-               role="button"
-               aria-expanded="false"
-               aria-controls="submenuSetup">
-
-                <span>
-
-                    <i class="bi bi-gear-fill"></i>
-                    Configurações
-
-                </span>
-
-                <span class="menu-indicador fw-bold"></span>
-
-            </a>
+            
 
 
             <div class="collapse submenu-wrapper"
@@ -359,6 +405,16 @@
 
                         <i class="bi bi-card-checklist"></i>
                         Beneficios
+
+                    </a>
+
+                    <a asp-controller="TaxaCoeficiente"
+                       asp-action="Index"
+                       class="submenu-item small text-decoration-none text-muted">
+
+                        <i class="bi bi-file-spreadsheet"></i>
+
+                        Taxas
 
                     </a>
 
@@ -421,8 +477,8 @@
             // Verifica imediatamente ao abrir qualquer página
             verificarAgendamentos();
 
-            // Verifica novamente a cada 5 minutos
-            setInterval(verificarAgendamentos, 300000);
+            // Verifica a cada 30 segundos
+            setInterval(verificarAgendamentos, 30000);
 
         });
 
@@ -432,6 +488,10 @@
             console.log("Verificando agendamentos...");
 
 
+            // =====================================================
+            // AGENDAMENTOS DE PROSPECÇÃO / ACIONAMENTO
+            // =====================================================
+
             fetch('/Acionamento/Agendamentos')
 
                 .then(response => {
@@ -439,7 +499,7 @@
                     if (!response.ok) {
 
                         throw new Error(
-                            "Erro ao consultar os agendamentos."
+                            "Erro ao consultar agendamentos de prospecção."
                         );
 
                     }
@@ -451,47 +511,66 @@
                 .then(agendamentos => {
 
                     console.log(
-                        "Agendamentos encontrados:",
+                        "Agendamentos de prospecção:",
                         agendamentos
                     );
 
-
-                    const agora = new Date();
-
-
-                    agendamentos.forEach(function (agendamento) {
-
-                        if (!agendamento.dataAgendamento) {
-                            return;
-                        }
-
-
-                        const dataAgendamento =
-                            new Date(
-                                agendamento.dataAgendamento
-                            );
-
-
-                        /*
-                         * Só mostra se o horário já chegou.
-                         */
-
-                        if (dataAgendamento <= agora) {
-
-                            mostrarAlertaAgendamento(
-                                agendamento
-                            );
-
-                        }
-
-                    });
+                    processarAgendamentos(
+                        agendamentos,
+                        "acionamento"
+                    );
 
                 })
 
                 .catch(error => {
 
                     console.error(
-                        "Erro ao verificar agendamentos:",
+                        "Erro ao verificar agendamentos de prospecção:",
+                        error
+                    );
+
+                });
+
+
+
+            // =====================================================
+            // AGENDAMENTOS DE CLIENTES
+            // =====================================================
+
+            fetch('/Agendamento/Agendamentos')
+
+                .then(response => {
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            "Erro ao consultar agendamentos de clientes."
+                        );
+
+                    }
+
+                    return response.json();
+
+                })
+
+                .then(agendamentos => {
+
+                    console.log(
+                        "Agendamentos de clientes:",
+                        agendamentos
+                    );
+
+                    processarAgendamentos(
+                        agendamentos,
+                        "cliente"
+                    );
+
+                })
+
+                .catch(error => {
+
+                    console.error(
+                        "Erro ao verificar agendamentos de clientes:",
                         error
                     );
 
@@ -500,7 +579,62 @@
         }
 
 
-        function mostrarAlertaAgendamento(agendamento) {
+
+        // =====================================================
+        // PROCESSA OS DOIS TIPOS DE AGENDAMENTO
+        // =====================================================
+
+        function processarAgendamentos(
+            agendamentos,
+            tipo
+        ) {
+
+            const agora = new Date();
+
+
+            agendamentos.forEach(function (agendamento) {
+
+                if (!agendamento.dataAgendamento) {
+
+                    return;
+
+                }
+
+
+                const dataAgendamento =
+                    new Date(
+                        agendamento.dataAgendamento
+                    );
+
+
+                /*
+                 * Só mostra quando o horário
+                 * do agendamento já chegou.
+                 */
+
+                if (dataAgendamento <= agora) {
+
+                    mostrarAlertaAgendamento(
+                        agendamento,
+                        tipo
+                    );
+
+                }
+
+            });
+
+        }
+
+
+
+        // =====================================================
+        // MOSTRA O ALERTA
+        // =====================================================
+
+        function mostrarAlertaAgendamento(
+            agendamento,
+            tipo
+        ) {
 
             const area =
                 document.getElementById(
@@ -509,17 +643,10 @@
 
 
             if (!area) {
+
                 return;
+
             }
-
-
-            /*
-             * Não utiliza mais sessionStorage.
-             *
-             * Portanto, se o agendamento continuar válido,
-             * ele poderá aparecer novamente na próxima
-             * verificação de 5 minutos.
-             */
 
 
             const data =
@@ -545,19 +672,29 @@
 
 
             /*
-             * Evita duplicar o mesmo alerta dentro
-             * da mesma verificação.
+             * Cada tipo possui um ID diferente.
+             *
+             * Isso evita que um agendamento de
+             * Acionamento e um Agendamento de Cliente
+             * entrem em conflito.
              */
 
             const idAlerta =
-                "alerta_agendamento_" + agendamento.id;
+                "alerta_" +
+                tipo +
+                "_" +
+                agendamento.id;
 
 
-            const alertaExistente =
-                document.getElementById(idAlerta);
+            /*
+             * Evita duplicar o mesmo alerta.
+             */
 
-
-            if (alertaExistente) {
+            if (
+                document.getElementById(
+                    idAlerta
+                )
+            ) {
 
                 return;
 
@@ -568,7 +705,8 @@
                 document.createElement("div");
 
 
-            alerta.id = idAlerta;
+            alerta.id =
+                idAlerta;
 
 
             alerta.className =
@@ -578,6 +716,49 @@
             alerta.style.borderLeft =
                 "5px solid #ffc107";
 
+
+
+            // =================================================
+            // DEFINE O DESTINO DO BOTÃO
+            // =================================================
+
+            let link;
+
+            let titulo;
+
+            let textoBotao;
+
+
+            if (tipo === "acionamento") {
+
+                link =
+                    `/Historico/Index?acionamentoId=${agendamento.acionamentoId}`;
+
+                titulo =
+                    "Agendamento de Prospecção";
+
+                textoBotao =
+                    "Ver Histórico";
+
+            }
+            else {
+
+                link =
+                    `/Agendamento/Index`;
+
+                titulo =
+                    "Agendamento de Cliente";
+
+                textoBotao =
+                    "Ver Agendamentos";
+
+            }
+
+
+
+            // =================================================
+            // HTML DO ALERTA
+            // =================================================
 
             alerta.innerHTML = `
 
@@ -610,7 +791,7 @@
 
                         <div class="fw-bold text-dark mb-1">
 
-                            Agendamento
+                            ${titulo}
 
                         </div>
 
@@ -635,12 +816,12 @@
                         </div>
 
 
-                        <a href="/Historico/Index?acionamentoId=${agendamento.acionamentoId}"
+                        <a href="${link}"
                            class="btn btn-dark btn-sm rounded-3 px-3">
 
-                            <i class="bi bi-chat-square-text me-1"></i>
+                            <i class="bi bi-arrow-right me-1"></i>
 
-                            Ver Histórico
+                            ${textoBotao}
 
                         </a>
 
@@ -666,6 +847,11 @@
         }
 
     </script>
+
+
+    <script src="~/js/Acionamentos.js" asp-append-version="true"></script>
+    <script src="~/js/Agendamentos.js" asp-append-version="true"></script>
+
 
 
     @await RenderSectionAsync("Scripts", required: false)

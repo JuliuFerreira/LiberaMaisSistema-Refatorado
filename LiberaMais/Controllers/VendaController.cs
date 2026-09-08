@@ -60,6 +60,61 @@ namespace LiberaMais.Controllers
             ViewBag.Beneficio = _beneficioRepositorio.ListarTodos();
         }
 
+        private bool ComissaoEstaAtrasada(Venda venda)
+        {
+            if (venda.StatusContrato != StatusEnum.Pago ||
+                !venda.DataPgtoContrato.HasValue)
+            {
+                return false;
+            }
+
+            var dataPagamento = venda.DataPgtoContrato.Value;
+
+            // =========================================================
+            // BANCO 34 - BRB (RED CONSIG)
+            // =========================================================
+            if (venda.BancoId == 34)
+            {
+                DateTime dataPrevistaComissao;
+
+                if (dataPagamento.Day <= 15)
+                {
+                    // Pagamento de 01 a 15
+                    // Comissão no último dia do mesmo mês
+
+                    dataPrevistaComissao = new DateTime(
+                        dataPagamento.Year,
+                        dataPagamento.Month,
+                        DateTime.DaysInMonth(
+                            dataPagamento.Year,
+                            dataPagamento.Month));
+                }
+                else
+                {
+                    // Pagamento de 16 ao final do mês
+                    // Comissão no dia 15 do mês seguinte
+
+                    var proximoMes = dataPagamento.AddMonths(1);
+
+                    dataPrevistaComissao = new DateTime(
+                        proximoMes.Year,
+                        proximoMes.Month,
+                        15);
+                }
+
+                return DateTime.Now.Date > dataPrevistaComissao.Date;
+            }
+
+            // =========================================================
+            // DEMAIS BANCOS
+            // Regra atual: 5 dias após o pagamento
+            // =========================================================
+
+            var dataLimite = DateTime.Now.AddDays(-5);
+
+            return dataPagamento < dataLimite;
+        }
+
         public JsonResult BuscarBancosPorPromotora(int promotoraId)
         {
             var bancos = _promotoraBancoRepositorio.ListarPorPromotora(promotoraId)
@@ -78,9 +133,9 @@ namespace LiberaMais.Controllers
             int mesAtual = mes ?? DateTime.Now.Month;
             int anoAtual = ano ?? DateTime.Now.Year;
 
-            // 1. Busca o usuário logado para sabermos se ele é Admin ou operador comum
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             bool isAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+
             ViewBag.IsAdmin = isAdmin;
             ViewBag.UsuarioAtual = isAdmin ? usuarioId : usuarioLogado.Id;
 
@@ -88,14 +143,10 @@ namespace LiberaMais.Controllers
             ViewBag.Ano = anoAtual;
             ViewBag.Todos = todos;
 
-
-            // 2. Configura a lista de usuários para o dropdown no dashboard (apenas se for Admin)
             if (isAdmin)
             {
                 ViewBag.Usuarios = _usuarioRepositorio.BuscarTodos();
 
-                // Comportamento padrão inicial: se não escolheu um operador no dropdown ainda,
-                // carrega por padrão apenas os dados do próprio Admin
                 if (usuarioId == null && !Request.Query.ContainsKey("usuarioId"))
                 {
                     usuarioId = usuarioLogado.Id;
@@ -107,149 +158,357 @@ namespace LiberaMais.Controllers
             var dataInicio = new DateTime(anoAtual, mesAtual, 1);
             var dataFim = dataInicio.AddMonths(1);
 
-            // 3. CHAMADA DO REPOSITÓRIO: Buscamos todos os contratos do banco
-            var listaContratos = _vendaRepositorio.ListarTodasVendas();
+            // =========================================================
+            // TODOS OS CONTRATOS
+            // =========================================================
+
+            var todosContratos = _vendaRepositorio.ListarTodasVendas();
+
+            // =========================================================
+            // VERIFICA COMISSÕES EM ATRASO
+            // INDEPENDENTE DO MÊS SELECIONADO
+            // =========================================================
+
+            var contratosParaVerificarAtraso = todosContratos.AsEnumerable();
+
+            if (isAdmin)
+            {
+                if (usuarioId.HasValue)
+                {
+                    contratosParaVerificarAtraso = contratosParaVerificarAtraso
+                        .Where(c => c.UsuarioId == usuarioId.Value);
+                }
+            }
+            else
+            {
+                contratosParaVerificarAtraso = contratosParaVerificarAtraso
+                    .Where(c => c.UsuarioId == usuarioLogado.Id);
+            }
+
+            var contratosComissaoAtrasada = contratosParaVerificarAtraso
+                .Where(c => ComissaoEstaAtrasada(c))
+                .ToList();
+
+            // =========================================================
+            // FILTRO NORMAL DO MÊS
+            // =========================================================
+
+            var listaContratos = todosContratos;
 
             if (!todos)
             {
                 listaContratos = listaContratos
-                .Where(c => c.DataCadastro >= dataInicio &&
-                       c.DataCadastro < dataFim)
-                .ToList();
-
+                    .Where(c =>
+                        (
+                            (c.StatusContrato == StatusEnum.Digitado ||
+                             c.StatusContrato == StatusEnum.Assinado)
+                            &&
+                            c.DataCadastro.HasValue &&
+                            c.DataCadastro.Value < dataFim
+                        )
+                        ||
+                        (
+                            c.StatusContrato == StatusEnum.Pago &&
+                            c.DataPgtoContrato.HasValue &&
+                            c.DataPgtoContrato.Value >= dataInicio &&
+                            c.DataPgtoContrato.Value < dataFim
+                        )
+                        ||
+                        (
+                            c.StatusContrato == StatusEnum.ComissaoPaga &&
+                            c.DataPgtoComissao.HasValue &&
+                            c.DataPgtoComissao.Value >= dataInicio &&
+                            c.DataPgtoComissao.Value < dataFim
+                        )
+                    )
+                    .ToList();
             }
 
-            // 4. SEGURANÇA E FILTRAGEM INTELIGENTE:
+            // =========================================================
+            // FILTRO DE USUÁRIO
+            // =========================================================
+
             if (isAdmin)
             {
-                // Se o Admin escolheu filtrar por um usuário específico no dropdown
                 if (usuarioId.HasValue)
                 {
-                    listaContratos = listaContratos.Where(c => c.UsuarioId == usuarioId.Value).ToList();
+                    listaContratos = listaContratos
+                        .Where(c => c.UsuarioId == usuarioId.Value)
+                        .ToList();
                 }
-                // Se escolheu "Todos os Usuários" (usuarioId é nulo mas o filtro foi enviado), não aplica Where
             }
             else
             {
-                // Se for operador comum, trava rigidamente a segurança para ver só o dele
-                listaContratos = listaContratos.Where(c => c.UsuarioId == usuarioLogado.Id).ToList();
+                listaContratos = listaContratos
+                    .Where(c => c.UsuarioId == usuarioLogado.Id)
+                    .ToList();
             }
 
-            // 5. REGRA DE NEGÓCIO: Calcula a data limite para comissão atrasada (Hoje menos 5 dias)
-            var dataLimite = DateTime.Now.AddDays(-5);
+            // =========================================================
+            // DASHBOARD
+            // =========================================================
 
-            // 6. Montamos o seu Dashboard contando os status dinamicamente da lista filtrada
             DashboardVendaViewModel dashboard = new DashboardVendaViewModel
             {
-                Digitado = listaContratos.Count(c => c.StatusContrato == StatusEnum.Digitado),
-                Assinado = listaContratos.Count(c => c.StatusContrato == StatusEnum.Assinado),
-                Pago = listaContratos.Count(c => c.StatusContrato == StatusEnum.Pago),
-                Cancelado = listaContratos.Count(c => c.StatusContrato == StatusEnum.Cancelado),
-                ComissaoPaga = listaContratos.Count(c => c.StatusContrato == StatusEnum.ComissaoPaga),
+                Digitado = listaContratos.Count(c =>
+                    c.StatusContrato == StatusEnum.Digitado),
 
-                // Verifica se há alguma comissão atrasada na lista filtrada
-                PossuiComissaoAtrasada = listaContratos.Any(c =>
-                    c.StatusContrato == StatusEnum.Pago &&
-                    c.DataPgtoContrato.HasValue &&
-                    c.DataPgtoContrato.Value < dataLimite),
+                Assinado = listaContratos.Count(c =>
+                    c.StatusContrato == StatusEnum.Assinado),
 
-                // Conta quantos contratos estão com a comissão atrasada na lista filtrada
-                ContratosComissaoAtrasada = listaContratos.Count(c =>
-                    c.StatusContrato == StatusEnum.Pago &&
-                    c.DataPgtoContrato.HasValue &&
-                    c.DataPgtoContrato.Value < dataLimite),
+                Pago = listaContratos.Count(c =>
+                    c.StatusContrato == StatusEnum.Pago),
 
-                // Envia a lista filtrada para alimentar a tabela    da View
+                Cancelado = listaContratos.Count(c =>
+                    c.StatusContrato == StatusEnum.Cancelado),
+
+                ComissaoPaga = listaContratos.Count(c =>
+                    c.StatusContrato == StatusEnum.ComissaoPaga),
+
+                PossuiComissaoAtrasada = contratosComissaoAtrasada.Any(),
+
+                ContratosComissaoAtrasada = contratosComissaoAtrasada.Count,
+
                 ListaContratos = listaContratos
             };
 
-
-
-            // Retorna a View passando o Dashboard montadinho
             return View(dashboard);
         }
 
-        public IActionResult PorStatus(string status, string busca, int? usuarioId, int pagina = 1)
+        public IActionResult PorStatus(string status, string busca, int? usuarioId, OperacaoEnum? operacao, int? mes, int? ano, int pagina = 1, bool atrasadas = false)
         {
-
             ViewBag.Banco = _bancosRepositorio.ListarBancos();
+            ViewBag.OperacaoEnum = operacao;
 
-
-            if (usuarioId == 0)
+if (usuarioId == 0)
             {
                 usuarioId = null;
             }
 
-            // 1. Buscamos o usuário logado e definimos regras de Admin
             var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
             bool isAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
+
             ViewBag.IsAdmin = isAdmin;
             ViewBag.BuscaAtual = busca;
             ViewBag.StatusParametro = status;
+            ViewBag.Atrasadas = atrasadas;
 
-            // 2. Configura a lista de usuários para o dropdown (apenas se for Admin)
+            // =========================================================
+            // MÊS / ANO
+            // =========================================================
+
+            int anoSelecionado = ano ?? DateTime.Now.Year;
+
+            // Se o mês NÃO foi informado na URL, significa que o usuário
+            // acabou de entrar na tela. Nesse caso, selecionamos o mês atual.
+            //
+            // Se "mes" foi informado e veio vazio/nulo, significa que o
+            // usuário escolheu "Todos os meses".
+            int? mesSelecionado = mes;
+
+            if (!Request.Query.ContainsKey("mes") && !mes.HasValue)
+            {
+                mesSelecionado = DateTime.Now.Month;
+            }
+
+            DateTime? dataInicio = null;
+            DateTime? dataFim = null;
+
+            if (mesSelecionado.HasValue)
+            {
+                dataInicio = new DateTime(
+                    anoSelecionado,
+                    mesSelecionado.Value,
+                    1);
+
+                dataFim = dataInicio.Value.AddMonths(1);
+            }
+
+            ViewBag.Mes = mesSelecionado;
+            ViewBag.Ano = anoSelecionado;
+
+            // =========================================================
+            // USUÁRIOS
+            // =========================================================
+
             if (isAdmin)
             {
-                ViewBag.Usuarios = _usuarioRepositorio.BuscarTodos(); // Altere para seu repositório de usuários real se necessário
+                ViewBag.Usuarios = _usuarioRepositorio.BuscarTodos();
 
-                // Comportamento padrão inicial do Admin (sem busca ativa e sem clique explícito no dropdown):
-                if (usuarioId == null && !Request.Query.ContainsKey("usuarioId") && string.IsNullOrWhiteSpace(busca))
+                if (usuarioId == null &&
+                    !Request.Query.ContainsKey("usuarioId") &&
+                    string.IsNullOrWhiteSpace(busca))
                 {
-                    usuarioId = usuarioLogado.Id; // Começa exibindo apenas as dele
+                    usuarioId = usuarioLogado.Id;
                 }
 
                 ViewBag.UsuarioAtual = usuarioId;
             }
 
+            // =========================================================
+            // PAGINAÇÃO
+            // =========================================================
 
             int tamanhoCorte = 10;
             int totalRegistros = 0;
+
             List<Venda> vendas;
 
-            // 3. Se houver termo de busca, usa o BuscarCompleto. Se não, usa o ListarTodasVendas original
             if (!string.IsNullOrWhiteSpace(busca))
             {
-                vendas = _vendaRepositorio.BuscarCompleto(busca, pagina, tamanhoCorte, out totalRegistros);
+                vendas = _vendaRepositorio.BuscarCompleto(
+                    busca,
+                    pagina,
+                    tamanhoCorte,
+                    out totalRegistros);
             }
             else
             {
                 vendas = _vendaRepositorio.ListarTodasVendas();
             }
 
-            // 4. Segurança e Filtros de Usuário:
+            // =========================================================
+            // FILTRO DE USUÁRIO
+            // =========================================================
+
             if (isAdmin)
             {
-                // Se o Admin escolheu filtrar por um usuário específico no dropdown
                 if (usuarioId.HasValue)
                 {
-                    vendas = vendas.Where(v => v.UsuarioId == usuarioId.Value).ToList();
+                    vendas = vendas
+                        .Where(v => v.UsuarioId == usuarioId.Value)
+                        .ToList();
                 }
-                // Se escolheu "Todos os Usuários" (usuarioId vem nulo, mas chave existe na URL), não filtramos por ID
             }
             else
             {
-                // Se não for admin, vê rigidamente apenas as suas próprias vendas
-                vendas = vendas.Where(v => v.UsuarioId == usuarioLogado.Id).ToList();
+                vendas = vendas
+                    .Where(v => v.UsuarioId == usuarioLogado.Id)
+                    .ToList();
             }
 
+            // =========================================================
+            // FILTRO DE OPERAÇÃO
+            // =========================================================
 
-            // 5. Filtragem por Status: Convertemos a string para o Enum
+            if (operacao.HasValue)
+            {
+                vendas = vendas
+                    .Where(v => v.Operacao == operacao.Value)
+                    .ToList();
+            }
+
+            // =========================================================
+            // STATUS
+            // =========================================================
+
             if (Enum.TryParse(typeof(StatusEnum), status, out var statusEnum))
             {
-                var field = statusEnum.GetType().GetField(statusEnum.ToString());
-                var attribute = (System.ComponentModel.DataAnnotations.DisplayAttribute)
-                    Attribute.GetCustomAttribute(field, typeof(System.ComponentModel.DataAnnotations.DisplayAttribute));
+                var field = statusEnum.GetType()
+                    .GetField(statusEnum.ToString());
 
-                // Enviamos a descrição pronta para o título da View
-                ViewBag.StatusAtual = attribute != null ? attribute.Name : status;
+                var attribute =
+                    (System.ComponentModel.DataAnnotations.DisplayAttribute)
+                    Attribute.GetCustomAttribute(
+                        field,
+                        typeof(System.ComponentModel.DataAnnotations.DisplayAttribute));
 
-                // Aplica o filtro do status selecionado
-                vendas = vendas.Where(v => v.StatusContrato == (StatusEnum)statusEnum).ToList();
+                ViewBag.StatusAtual = attribute != null
+                    ? attribute.Name
+                    : status;
 
-                // Se não houver busca ativa, fazemos a paginação em memória para manter o ListarTodasVendas intacto
+                var statusSelecionado = (StatusEnum)statusEnum;
+
+                vendas = vendas
+                    .Where(v => v.StatusContrato == statusSelecionado)
+                    .ToList();
+
+                // =====================================================
+                // COMISSÕES EM ATRASO
+                // =====================================================
+
+                if (statusSelecionado == StatusEnum.Pago && atrasadas)
+                {
+                    vendas = vendas
+                        .Where(v => ComissaoEstaAtrasada(v))
+                        .ToList();
+                }
+
+                // =====================================================
+                // DIGITADO / ASSINADO
+                // =====================================================
+
+                else if (statusSelecionado == StatusEnum.Digitado ||
+                         statusSelecionado == StatusEnum.Assinado)
+                {
+                    if (dataFim.HasValue)
+                    {
+                        vendas = vendas
+                            .Where(v =>
+                                v.DataCadastro.HasValue &&
+                                v.DataCadastro.Value < dataFim.Value)
+                            .ToList();
+                    }
+                }
+
+                // =====================================================
+                // PAGO - FILTRO NORMAL POR MÊS
+                // =====================================================
+
+                else if (statusSelecionado == StatusEnum.Pago)
+                {
+                    // Se mesSelecionado for null = Todos os meses.
+                    // Nesse caso, não aplicamos filtro de mês.
+                    if (dataInicio.HasValue && dataFim.HasValue)
+                    {
+                        vendas = vendas
+                            .Where(v =>
+                                v.DataPgtoContrato.HasValue &&
+                                v.DataPgtoContrato.Value >= dataInicio.Value &&
+                                v.DataPgtoContrato.Value < dataFim.Value)
+                            .ToList();
+                    }
+                }
+
+                // =====================================================
+                // COMISSÃO PAGA
+                // =====================================================
+
+                else if (statusSelecionado == StatusEnum.ComissaoPaga)
+                {
+                    // Se mesSelecionado for null = Todos os meses.
+                    if (dataInicio.HasValue && dataFim.HasValue)
+                    {
+                        vendas = vendas
+                            .Where(v =>
+                                v.DataPgtoComissao.HasValue &&
+                                v.DataPgtoComissao.Value >= dataInicio.Value &&
+                                v.DataPgtoComissao.Value < dataFim.Value)
+                            .ToList();
+                    }
+                }
+
+                // =====================================================
+                // TOTAIS
+                // =====================================================
+
+                ViewBag.ValorContrato =
+                    vendas.Sum(v => v.ValorContrato ?? 0);
+
+                ViewBag.ValorSaldo =
+                    vendas.Sum(v => v.SaldoDevedor ?? 0);
+
+                ViewBag.ValorComissao =
+                    vendas.Sum(v => v.ValorComissao ?? 0);
+
+                // =====================================================
+                // PAGINAÇÃO
+                // =====================================================
+
                 if (string.IsNullOrWhiteSpace(busca))
                 {
                     totalRegistros = vendas.Count;
+
                     vendas = vendas
                         .OrderByDescending(v => v.DataCadastro)
                         .Skip((pagina - 1) * tamanhoCorte)
@@ -258,23 +517,34 @@ namespace LiberaMais.Controllers
                 }
                 else
                 {
-                    // Se houver busca, reajusta o total baseado no filtro final de usuários/status
                     totalRegistros = vendas.Count;
                 }
 
-                // Dados para os botões de paginação na tela
                 ViewBag.PaginaAtual = pagina;
-                ViewBag.TotalPaginas = (int)Math.Ceiling((double)totalRegistros / tamanhoCorte);
+
+                ViewBag.TotalPaginas =
+                    (int)Math.Ceiling(
+                        (double)totalRegistros / tamanhoCorte);
+
                 ViewBag.TotalRegistros = totalRegistros;
+
+                ViewBag.ContratosComissaoAtrasadaIds = vendas
+                    .Where(v => ComissaoEstaAtrasada(v))
+                    .Select(v => v.Id)
+                    .ToHashSet();
 
                 return View(vendas);
             }
             else
             {
-                TempData["mensagemErro"] = "Status inválido ou não encontrado.";
+                TempData["mensagemErro"] =
+                    "Status inválido ou não encontrado.";
+
                 return RedirectToAction("Index");
             }
-        }
+
+}
+
 
 
         [HttpGet]
@@ -318,44 +588,7 @@ namespace LiberaMais.Controllers
             return Json(resultadoJson);
         }
 
-        //[HttpPost]
-        //public IActionResult BuscarCliente(string cpf)
-        //{
-        //    var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
-        //    ViewBag.IsAdmin = usuarioLogado.Perfil == PerfilEnum.Admin;
-
-        //    CarregarCombos();
-
-        //    if (string.IsNullOrWhiteSpace(cpf))
-        //    {
-        //        TempData["MensagemErro"] = "Digite um CPF.";
-        //        return View("Criar");
-        //    }
-
-        //    var cliente = _clienteRepositorio.BuscarPorCpf(cpf);
-
-        //    if (cliente == null)
-        //    {
-        //        TempData["MensagemErro"] = "Cliente não cadastrado, para seguir com a venda, favor cadastrar o cliente e o beneficio.";
-        //        return View("Criar");
-        //    }
-
-        //    if(cliente.ClienteBeneficios == null)
-        //    {
-        //        TempData["MensagemErro"] = "Não é possivel prosseguir com a venda, cliente não possui beneficio cadastrado";
-        //        return View("Criar");
-        //    }
-
-        //    var beneficios = _clienteBeneficioRepositorio.ListarBeneficiosPorCliente(cliente.Id);
-
-        //    ViewBag.Cpf = cpf;
-        //    ViewBag.ClienteId = cliente.Id;
-        //    ViewBag.ClienteNome = cliente.Nome;
-        //    ViewBag.Beneficios = beneficios;
-
-        //    return View("Criar");
-        //}
-
+    
         [HttpGet]
         public IActionResult Criar(int? clienteId, int? usuarioId, string dataCadastro, decimal? valorParcela, bool? modoRefinPort, int? promotoraId, int? bancoId, int? beneficioId)
         {
@@ -576,10 +809,10 @@ namespace LiberaMais.Controllers
 
             // --- REGRA DE NEGÓCIO DA COMISSÃO ---
             // Se o valor da comissão foi preenchido e é maior que zero, força o status para ComissaoPaga
-            if (venda.ValorComissao.HasValue && venda.ValorComissao.Value > 0)
-            {
-                venda.StatusContrato = StatusEnum.ComissaoPaga; // Altere para StatusContrato se for o nome no seu Model
-            }
+            //if (venda.ValorComissao.HasValue && venda.ValorComissao.Value > 0)
+            //{
+            //    venda.StatusContrato = StatusEnum.ComissaoPaga; // Altere para StatusContrato se for o nome no seu Model
+            //}
 
             if (venda.StatusContrato == StatusEnum.ComissaoPaga)
             {
@@ -636,6 +869,7 @@ namespace LiberaMais.Controllers
                 vendaDb.UsuarioId = venda.UsuarioId;
             }
             // Mapeamento seguro dos dados enviados pelo formulário para o objeto rastreado do Banco
+            vendaDb.DataCadastro = venda.DataCadastro;
             vendaDb.ClienteBeneficioId = venda.ClienteBeneficioId;
             vendaDb.PromotoraId = venda.PromotoraId;
             vendaDb.BancoId = venda.BancoId;

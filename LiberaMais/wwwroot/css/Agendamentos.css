@@ -1,0 +1,433 @@
+﻿
+.inner-system-page {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+
+/* ==========================
+           TÍTULO
+           ========================== */
+
+.titulo-pagina {
+    font-size: 1.55rem;
+}
+
+.titulo-icone {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #f1f3f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #212529;
+}
+
+
+/* ==========================
+           FILTROS
+           ========================== */
+
+.filtro-usuario {
+    min-width: 190px;
+}
+
+.card .form-control,
+.card .form-select {
+    border-color: #e1e4e8;
+    min-height: 38px;
+}
+
+.input-group-text {
+    border-color: #e1e4e8;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #212529;
+    box-shadow: 0 0 0 0.15rem rgba(33, 37, 41, 0.08);
+}
+
+
+/* ==========================
+           TABELA
+           ========================== */
+
+.card-table {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table-custom {
+    min-width: 1250px;
+}
+
+    .table-custom thead {
+        background: #f8f9fa;
+    }
+
+    .table-custom th {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #6c757d;
+        padding: 15px 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .table-custom td {
+        padding: 15px 12px;
+        font-size: 0.88rem;
+        border-bottom: 1px solid #f1f3f5;
+        vertical-align: middle;
+    }
+
+    .table-custom tbody tr {
+        transition: background-color 0.15s ease;
+    }
+
+        .table-custom tbody tr:hover {
+            background-color: #fafafa;
+        }
+
+        .table-custom tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+
+/* ==========================
+           COLUNAS
+           ========================== */
+
+.coluna-data {
+    width: 105px;
+}
+
+.coluna-agendamento {
+    width: 155px;
+}
+
+.coluna-info {
+    max-width: 220px;
+}
+
+.coluna-acoes {
+    width: 100px;
+}
+
+
+/* ==========================
+           DATA CADASTRO
+           ========================== */
+
+.data-cadastro {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+}
+
+.data-dia {
+    font-weight: 600;
+    color: #343a40;
+}
+
+.data-cadastro small {
+    color: #adb5bd;
+    font-size: 0.75rem;
+}
+
+
+/* ==========================
+           CLIENTE
+           ========================== */
+
+.cliente-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 190px;
+}
+
+.cliente-avatar {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 10px;
+    background: #f1f3f5;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .cliente-avatar.grande {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+    }
+
+.cliente-nome {
+    font-weight: 600;
+    color: #212529;
+    white-space: nowrap;
+}
+
+
+/* ==========================
+           CPF / TELEFONE
+           ========================== */
+
+.cpf-text,
+.telefone-text {
+    white-space: nowrap;
+    font-size: 0.84rem;
+}
+
+
+/* ==========================
+           USUÁRIO
+           ========================== */
+
+.usuario-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    color: #495057;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+
+/* ==========================
+           DATA DO AGENDAMENTO
+           ========================== */
+
+.data-agendamento {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: fit-content;
+    padding: 7px 10px;
+    border-radius: 10px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+}
+
+.data-agendamento-icone {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #495057;
+}
+
+.data-agendamento-data {
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: #343a40;
+    white-space: nowrap;
+}
+
+.data-agendamento-hora {
+    font-size: 0.78rem;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+
+/* HOJE */
+
+.agendamento-hoje {
+    background: #fff8e1;
+    border-color: #ffe69c;
+}
+
+    .agendamento-hoje .data-agendamento-icone {
+        color: #997404;
+    }
+
+
+/* PRÓXIMO */
+
+.agendamento-proximo {
+    background: #f0f7ff;
+    border-color: #cfe2ff;
+}
+
+    .agendamento-proximo .data-agendamento-icone {
+        color: #0d6efd;
+    }
+
+
+/* ATRASADO */
+
+.agendamento-atrasado {
+    background: #fff5f5;
+    border-color: #f5c2c7;
+}
+
+    .agendamento-atrasado .data-agendamento-icone {
+        color: #dc3545;
+    }
+
+
+/* ==========================
+           INFORMAÇÕES
+           ========================== */
+
+.informacoes-text {
+    display: block;
+    max-width: 210px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #495057;
+}
+
+
+/* ==========================
+           AÇÕES
+           ========================== */
+
+.acoes {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.btn-acao {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.btn-editar {
+    color: #997404;
+    background: #fff8e1;
+}
+
+    .btn-editar:hover {
+        background: #ffc107;
+        color: #212529;
+    }
+
+.btn-excluir {
+    color: #198754;
+    background: #eaf7f0;
+}
+
+    .btn-excluir:hover {
+        background: #198754;
+        color: white;
+    }
+
+
+/* ==========================
+           TOTAL
+           ========================== */
+
+.total-registros {
+    padding: 10px 18px;
+    font-size: 0.8rem;
+    color: #6c757d;
+    background: #fafafa;
+    border-top: 1px solid #f1f3f5;
+}
+
+    .total-registros strong {
+        color: #212529;
+    }
+
+
+/* ==========================
+           MODAL
+           ========================== */
+
+.confirmacao-cliente {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+
+/* ==========================
+           ESTADO VAZIO
+           ========================== */
+
+.estado-vazio {
+    padding: 20px;
+}
+
+.icone-vazio {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto;
+    border-radius: 18px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: #adb5bd;
+}
+
+
+/* ==========================
+           RESPONSIVO
+           ========================== */
+
+@@media (max-width: 768px) {
+    .titulo-pagina {
+        font-size: 1.3rem;
+    }
+
+    .table-custom {
+        min-width: 1100px;
+    }
+}
+
+
+.inner-system-page {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.form-control {
+    border: 1px solid #dee2e6;
+}
+
+    .form-control:focus {
+        border-color: #212529;
+        box-shadow: 0 0 0 0.2rem rgba(33, 37, 41, 0.1);
+    }
+
+.list-group-item {
+    cursor: pointer;
+}
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+

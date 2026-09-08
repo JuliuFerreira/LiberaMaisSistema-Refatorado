@@ -7,7 +7,6 @@
 
 <div class="container-fluid py-4 inner-system-page">
 
-    <!-- Cabeçalho alinhado com a Index -->
     <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
         <div>
             <h2 class="fw-bold text-dark mb-1" style="font-size: 1.6rem;">Editar</h2>
@@ -28,8 +27,6 @@
         </div>
     }
 
-
-    <!-- Container com a largura padronizada -->
     <div class="row">
         <div class="col-12 col-lg-12">
             <div class="card shadow-sm border-0 rounded-4">
@@ -90,37 +87,4 @@
     </div>
 </div>
 
-<script>
-    window.addEventListener('load', function() {
-        setTimeout(function() {
-            var alertas = [document.getElementById("alertaSucesso"), document.getElementById("alertaErro")];
 
-            alertas.forEach(function(alerta) {
-                if (alerta) {
-                    alerta.style.transition = "opacity 0.5s ease";
-                    alerta.style.opacity = "0";
-
-                    // Remove do DOM após a animação
-                    setTimeout(function() {
-                        alerta.style.display = "none";
-                    }, 500);
-                }
-            });
-        }, 3000);
-    });
-</script>
-
-<style>
-    .inner-system-page {
-        font-family: 'Segoe UI', system-ui, sans-serif;
-    }
-
-    .form-control {
-        border: 1px solid #dee2e6;
-    }
-
-        .form-control:focus {
-            border-color: #212529;
-            box-shadow: 0 0 0 0.2rem rgba(33, 37, 41, 0.1);
-        }
-</style>

@@ -31,6 +31,68 @@ namespace LiberaMais.Controllers
             // 2. Busca TODAS as vendas do repositório
             var vendas = _vendaRepositorio.ListarTodasVendas();
 
+            var vendasComissaoPaga = vendas
+    .Where(v => v.DataPgtoComissao.HasValue)
+    .ToList();
+
+            if (usuarioId.HasValue)
+            {
+                vendasComissaoPaga = vendasComissaoPaga
+                    .Where(v => v.UsuarioId == usuarioId.Value)
+                    .ToList();
+            }
+
+            // Se foi selecionado um mês específico,
+            // o gráfico mostra somente aquele mês.
+            // Se for "Todos os períodos", mostra todos os meses.
+            if (mes != 0)
+            {
+                vendasComissaoPaga = vendasComissaoPaga
+                    .Where(v => v.DataPgtoComissao!.Value.Month == mes
+                             && v.DataPgtoComissao.Value.Year == ano)
+                    .ToList();
+            }
+
+            // Agrupa por mês/ano
+            var comissoesPorMes = vendasComissaoPaga
+                .GroupBy(v => new
+                {
+                    Ano = v.DataPgtoComissao!.Value.Year,
+                    Mes = v.DataPgtoComissao.Value.Month
+                })
+                .OrderBy(g => g.Key.Ano)
+                .ThenBy(g => g.Key.Mes)
+                .Select(g => new
+                {
+                    Ano = g.Key.Ano,
+                    Mes = g.Key.Mes,
+                    Quantidade = g.Count(),
+                    Total = g.Sum(v => v.ValorComissao ?? 0m)
+                })
+                .ToList();
+
+            ViewBag.ComissoesPorMes = comissoesPorMes;
+
+            ViewBag.TotalComissoesPagas = vendasComissaoPaga.Count;
+            ViewBag.TotalValorComissoesPagas = vendasComissaoPaga
+                .Sum(v => v.ValorComissao ?? 0m);
+
+            ViewBag.MediaComissaoPaga = vendasComissaoPaga.Any()
+                ? vendasComissaoPaga.Average(v => v.ValorComissao ?? 0m)
+                : 0m;
+
+            if (mes != 0)
+            {
+                vendas = vendas.Where(v => v.DataPgtoContrato.HasValue && v.DataPgtoContrato.Value.Month == mes && v.DataPgtoContrato.Value.Year == ano).ToList();
+
+            }
+
+            else
+            {
+                vendas = vendas.Where(v => v.DataPgtoContrato.HasValue).ToList();
+            }
+
+
             // 3. FILTRO POR USUÁRIO (Tabela Principal)
             if (usuarioId.HasValue)
             {
@@ -68,8 +130,11 @@ namespace LiberaMais.Controllers
             ViewBag.UsuarioAtual = usuarioId;
             ViewBag.MesFechamento = mes;
             ViewBag.AnoFechamento = ano;
+            ViewBag.TotalValorVendido = vendas
+    .Sum(v => v.ValorContrato ?? 0m);
             //ViewBag.TotalSalarioMes = totalSalarioMes;
             //ViewBag.QuantidadePagaMes = quantidadePagaMes;
+
 
             return View(listaRelatorio);
         }
@@ -109,7 +174,6 @@ namespace LiberaMais.Controllers
             vendaDb.DataRepasse = venda.DataRepasse;
             vendaDb.RepasseComissao = venda.RepasseComissao;
             vendaDb.ObservacaoRepasse = venda.ObservacaoRepasse;
-            vendaDb.ValorContrato = venda.ValorContrato;
 
             _vendaRepositorio.Atualizar(vendaDb);
             TempData["MensagemSucesso"] = "Repasse de comissão registrado com sucesso.";

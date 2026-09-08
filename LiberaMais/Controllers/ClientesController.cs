@@ -430,6 +430,9 @@ namespace LiberaMais.Controllers
                 clienteDb.Endereco.Rua =
                     model.Endereco.Rua;
 
+                clienteDb.Endereco.Complemento =
+                    model.Endereco.Complemento;
+
                 clienteDb.Endereco.Numero =
                     model.Endereco.Numero;
 

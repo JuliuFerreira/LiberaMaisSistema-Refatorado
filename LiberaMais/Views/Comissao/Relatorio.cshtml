@@ -22,6 +22,20 @@
             }
         }
     }
+
+    var cultura = CultureInfo.GetCultureInfo("pt-BR");
+
+    string nomeMesAtual;
+
+    if (mesFechamento == 0)
+    {
+        nomeMesAtual = "Todos os períodos";
+    }
+    else
+    {
+        nomeMesAtual = cultura.DateTimeFormat.GetMonthName(mesFechamento);
+        nomeMesAtual = char.ToUpper(nomeMesAtual[0]) + nomeMesAtual.Substring(1);
+    }
 }
 
 
@@ -85,7 +99,14 @@
             Competência atual:
 
             <strong class="text-dark">
-                @ViewBag.MesFechamento/@ViewBag.AnoFechamento
+
+                @nomeMesAtual
+
+                @if (mesFechamento != 0)
+                {
+                    <span>/@anoFechamento</span>
+                }
+
             </strong>
 
             |
@@ -93,7 +114,9 @@
             Operador:
 
             <strong class="text-dark">
+
                 @nomeUsuarioSelecionado
+
             </strong>
 
         </p>
@@ -108,16 +131,98 @@
               asp-action="Relatorio"
               class="row g-2 align-items-center">
 
-            <input type="hidden"
-                   name="mesFechamento"
-                   value="@mesFechamento" />
 
-            <input type="hidden"
-                   name="anoFechamento"
-                   value="@anoFechamento" />
+            
 
 
-            @* USUÁRIO *@
+            @* ====================================================
+               MÊS
+               ==================================================== *@
+
+            <div class="col-auto">
+
+                <select name="mesFechamento"
+                        class="form-select form-select-sm filter-dropdown"
+                        style="min-width: 160px;">
+
+                    @if (mesFechamento == 0)
+                    {
+                        <option value="0" selected>
+                            Todos os períodos
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="0">
+                            Todos os períodos
+                        </option>
+                    }
+
+
+                    @for (int mes = 1; mes <= 12; mes++)
+                    {
+                        string nomeMes =
+                        cultura.DateTimeFormat.GetMonthName(mes);
+
+                        nomeMes =
+                        char.ToUpper(nomeMes[0])
+                        + nomeMes.Substring(1);
+
+                        if (mes == mesFechamento)
+                        {
+                            <option value="@mes" selected>
+                                @nomeMes
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@mes">
+                                @nomeMes
+                            </option>
+                        }
+                    }
+
+                </select>
+
+            </div>
+
+            @* ====================================================
+               ANO
+               ==================================================== *@
+
+            <div class="col-auto">
+
+                <select name="anoFechamento"
+                        class="form-select form-select-sm filter-dropdown"
+                        style="min-width: 110px;"
+                        @(mesFechamento == 0 ? "disabled" : "")>
+
+                    @for (int ano = DateTime.Today.Year - 2;
+                                        ano <= DateTime.Today.Year + 1;
+                                        ano++)
+                    {
+                        if (ano == anoFechamento)
+                        {
+                            <option value="@ano" selected>
+                                @ano
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@ano">
+                                @ano
+                            </option>
+                        }
+                    }
+
+                </select>
+
+            </div>
+
+
+            @* ====================================================
+               USUÁRIO
+               ==================================================== *@
 
             <div class="col-auto">
 
@@ -154,7 +259,9 @@
             </div>
 
 
-            @* STATUS *@
+            @* ====================================================
+               STATUS
+               ==================================================== *@
 
             <div class="col-auto">
 
@@ -212,7 +319,9 @@
             </div>
 
 
-            @* BOTÃO FILTRAR *@
+            @* ====================================================
+               BOTÃO FILTRAR
+               ==================================================== *@
 
             <div class="col-auto">
 
@@ -233,6 +342,314 @@
 
 
     @* ============================================================
+       RESUMO FINANCEIRO
+       ============================================================ *@
+
+    <div class="row g-3 mt-3">
+
+
+        @* ========================================================
+           COMISSÕES PAGAS
+           ======================================================== *@
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex align-items-center justify-content-between">
+
+                        <div>
+
+                            <div class="text-muted small fw-semibold mb-2">
+
+                                COMISSÕES PAGAS
+
+                            </div>
+
+                            <div class="fs-3 fw-bold text-dark">
+
+                                @ViewBag.TotalComissoesPagas
+
+                            </div>
+
+                            <div class="text-muted small mt-1">
+
+                                @if (mesFechamento == 0)
+                                {
+                                    <span>Todo o período</span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        @nomeMesAtual / @anoFechamento
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="resumo-icon resumo-icon-blue">
+
+                            <i class="bi bi-check-circle"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        @* ========================================================
+           VALOR TOTAL PAGO
+           ======================================================== *@
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex align-items-center justify-content-between">
+
+                        <div>
+
+                            <div class="text-muted small fw-semibold mb-2">
+
+                                VALOR TOTAL PAGO
+
+                            </div>
+
+                            <div class="fs-3 fw-bold text-success">
+
+                                @(((decimal)(ViewBag.TotalValorComissoesPagas ?? 0m)).ToString("C2"))
+
+                            </div>
+
+                            <div class="text-muted small mt-1">
+
+                                Comissões efetivamente pagas
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="resumo-icon resumo-icon-green">
+
+                            <i class="bi bi-cash-stack"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        @* ========================================================
+           VALOR VENDIDO
+           ======================================================== *@
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex align-items-center justify-content-between">
+
+                        <div>
+
+                            <div class="text-muted small fw-semibold mb-2">
+
+                                VALOR VENDIDO
+
+                            </div>
+
+                            <div class="fs-3 fw-bold text-dark">
+
+                                @(((decimal)(ViewBag.TotalValorVendido ?? 0m)).ToString("C2"))
+
+                            </div>
+
+                            <div class="text-muted small mt-1">
+
+                                Valor dos contratos
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="resumo-icon resumo-icon-purple">
+
+                            <i class="bi bi-graph-up-arrow"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    @* ============================================================
+       GRÁFICO
+       ============================================================ *@
+
+    <div class="card border-0 shadow-sm rounded-4 mt-3">
+
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <div>
+
+                    <h5 class="fw-bold text-dark mb-1">
+
+                        Comissões pagas por mês
+
+                    </h5>
+
+                    <p class="text-muted small mb-0">
+
+                        Visualização das comissões efetivamente pagas
+
+                    </p>
+
+                </div>
+
+
+                <div class="text-muted small">
+
+                    <i class="bi bi-calendar3 me-1"></i>
+
+                    @if (mesFechamento == 0)
+                    {
+                        <span>Todos os períodos</span>
+                    }
+                    else
+                    {
+                        <span>
+                            @nomeMesAtual / @anoFechamento
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+
+            @{
+                var dadosGrafico =
+                ViewBag.ComissoesPorMes as IEnumerable<dynamic>;
+            }
+
+
+            @if (dadosGrafico != null && dadosGrafico.Any())
+            {
+                var maiorValor =
+                dadosGrafico.Max(x => (decimal)x.Total);
+
+
+                <div class="grafico-container">
+
+                    @foreach (var item in dadosGrafico)
+                    {
+                        var percentual =
+                        maiorValor > 0
+                        ? ((decimal)item.Total / maiorValor) * 100
+                        : 0;
+
+
+                        string nomeMesGrafico =
+                        cultura.DateTimeFormat
+                        .GetAbbreviatedMonthName((int)item.Mes);
+
+                        nomeMesGrafico =
+                        char.ToUpper(nomeMesGrafico[0])
+                        + nomeMesGrafico.Substring(1);
+
+
+                        <div class="grafico-coluna">
+
+                            <div class="grafico-valor">
+
+                                @(((decimal)item.Total).ToString("C0"))
+
+                            </div>
+
+
+                            <div class="grafico-barra-area">
+
+                                <div class="grafico-barra"
+                                     style="height: @percentual%;"
+                                     title="@nomeMesGrafico/@item.Ano - @(((decimal)item.Total).ToString("C2")) - @item.Quantidade comissões">
+                                </div>
+
+                            </div>
+
+
+                            <div class="grafico-mes">
+
+                                @nomeMesGrafico
+
+                            </div>
+
+
+                            <div class="grafico-quantidade">
+
+                                @item.Quantidade
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+
+                <div class="text-center text-muted small mt-3">
+
+                    <i class="bi bi-info-circle me-1"></i>
+
+                    Passe o mouse sobre uma barra para visualizar os detalhes.
+
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4 text-muted">
+
+                    <i class="bi bi-bar-chart-line fs-2 d-block mb-2"></i>
+
+                    Nenhuma comissão paga encontrada para este período.
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+
+    @* ============================================================
        TABELA
        ============================================================ *@
 
@@ -248,7 +665,6 @@
 
                         <tr>
 
-                            @* CHECKBOX *@
                             <th scope="col"
                                 class="text-center"
                                 style="width: 70px;">
@@ -256,6 +672,7 @@
                                 <i class="bi bi-check2-square"></i>
 
                             </th>
+
 
                             <th scope="col"
                                 class="ps-4">
@@ -265,8 +682,6 @@
                             </th>
 
 
-
-                            @* CLIENTE *@
                             <th scope="col"
                                 class="ps-4">
 
@@ -275,7 +690,6 @@
                             </th>
 
 
-                            @* OPERAÇÃO / BANCO *@
                             <th scope="col">
 
                                 Operação / Banco
@@ -283,27 +697,27 @@
                             </th>
 
 
-                            @* USUÁRIO *@
                             <th scope="col">
 
                                 Usuário
 
                             </th>
-                                                      
+
 
                             <th scope="col">
 
-                               Operação / Valor Contrato
+                                Operação / Valor Contrato
 
                             </th>
 
-                            @* COMISSÃO *@
+
                             <th scope="col"
                                 class="text-end pe-4">
 
-                                Valor Comissão /  Status
+                                Valor Comissão / Status
 
                             </th>
+
 
                             <th scope="col"
                                 class="text-end pe-4">
@@ -313,9 +727,6 @@
                             </th>
 
 
-
-
-                            @* REPASSE *@
                             <th scope="col"
                                 class="text-end">
 
@@ -324,7 +735,6 @@
                             </th>
 
 
-                            @* STATUS REPASSE *@
                             <th scope="col">
 
                                 Status Repasse
@@ -332,7 +742,6 @@
                             </th>
 
 
-                            @* DATA REPASSE *@
                             <th scope="col">
 
                                 Data Repasse
@@ -340,7 +749,6 @@
                             </th>
 
 
-                            @* AÇÃO *@
                             <th scope="col">
 
                                 Ação
@@ -359,22 +767,21 @@
                             foreach (var item in Model)
                             {
                                 bool usuarioPadrao =
-                                item.Venda.Usuario?.Perfil == PerfilEnum.Padrao;
+                                item.Venda.Usuario?.Perfil ==
+                                PerfilEnum.Padrao;
 
 
                                 <tr class="financas-row">
 
 
-                                    @* ==================================================
-                                       CHECKBOX
-                                       SOMENTE USUÁRIO PADRÃO COM VALOR DE REPASSE
-                                       ================================================== *@
+                                    @* CHECKBOX *@
 
                                     <td class="text-center">
 
                                         @if (usuarioPadrao &&
                                                                         item.Venda.ValorRepasse.HasValue &&
-                                                                        item.Venda.RepasseComissao != StatusRepasseComissaoEnum.Pago)
+                                                                        item.Venda.RepasseComissao !=
+                                                                        StatusRepasseComissaoEnum.Pago)
                                         {
                                             <input type="checkbox"
                                                    class="form-check-input repasse-checkbox"
@@ -383,7 +790,8 @@
                                                    data-repasse="@item.Venda.ValorRepasse.Value.ToString(CultureInfo.InvariantCulture)" />
                                         }
                                         else if (usuarioPadrao &&
-                                        item.Venda.RepasseComissao == StatusRepasseComissaoEnum.Pago)
+                                        item.Venda.RepasseComissao ==
+                                        StatusRepasseComissaoEnum.Pago)
                                         {
                                             <i class="bi bi-check-circle-fill text-success"
                                                title="Repasse já efetivado"></i>
@@ -391,20 +799,22 @@
 
                                     </td>
 
+
+                                    @* NÚMERO *@
+
                                     <td class="ps-4">
+
                                         <div class="fw-bold text-dark mb-0 text-truncate"
                                              style="max-width: 200px;">
 
                                             @item.Venda.Id
 
                                         </div>
+
                                     </td>
 
 
-
-                                    @* ==================================================
-                                       BENEFICIÁRIO
-                                       ================================================== *@
+                                    @* BENEFICIÁRIO *@
 
                                     <td class="ps-4">
 
@@ -426,9 +836,7 @@
                                     </td>
 
 
-                                    @* ==================================================
-                                       OPERAÇÃO / BANCO
-                                       ================================================== *@
+                                    @* OPERAÇÃO / BANCO *@
 
                                     <td>
 
@@ -449,9 +857,7 @@
                                     </td>
 
 
-                                    @* ==================================================
-                                       USUÁRIO
-                                       ================================================== *@
+                                    @* USUÁRIO *@
 
                                     <td>
 
@@ -460,12 +866,7 @@
                                     </td>
 
 
-                                    @* ==================================================
-                                       STATUS FINANCEIRO
-                                       ================================================== *@
-
-
-
+                                    @* OPERAÇÃO / VALOR *@
 
                                     <td class="ps-4">
 
@@ -478,11 +879,16 @@
                                         <span class="text-muted font-monospace"
                                               style="font-size: 0.75rem;">
 
-                                            @item.Venda.ValorContrato?.ToString("C2")  @item.Venda.SaldoDevedor?.ToString("C2")
+                                            @item.Venda.ValorContrato?.ToString("C2")
+
+                                            @item.Venda.SaldoDevedor?.ToString("C2")
 
                                         </span>
-    
+
                                     </td>
+
+
+                                    @* COMISSÃO / STATUS *@
 
                                     <td class="ps-4">
 
@@ -493,38 +899,35 @@
 
                                         </div>
 
+
                                         <small class="text-muted font-monospace"
                                                style="font-size: 0.75rem;">
 
                                             @if (item.StatusFinanceiro == "Paga")
                                             {
                                                 <span class="status-dot status-paga">
-
                                                     Paga
-
                                                 </span>
                                             }
                                             else if (item.StatusFinanceiro == "Em Atraso")
                                             {
                                                 <span class="status-dot status-atraso">
-
                                                     Atraso
-
                                                 </span>
                                             }
                                             else
                                             {
                                                 <span class="status-dot status-aguardando">
-
                                                     Aguardando
-
                                                 </span>
                                             }
-
 
                                         </small>
 
                                     </td>
+
+
+                                    @* DATA PAGAMENTO COMISSÃO *@
 
                                     <td class="font-monospace text-secondary small">
 
@@ -533,15 +936,10 @@
                                     </td>
 
 
-                                    @* ==================================================
-                                       DADOS DE REPASSE
-                                       SOMENTE USUÁRIO PADRÃO
-                                       ================================================== *@
+                                    @* REPASSE *@
 
                                     @if (usuarioPadrao)
                                     {
-
-                                        @* VALOR REPASSE *@
 
                                         <td class="text-end fw-bold font-monospace text-dark">
 
@@ -552,9 +950,7 @@
                                             else
                                             {
                                                 <span class="text-muted">
-
                                                     -
-
                                                 </span>
                                             }
 
@@ -636,12 +1032,9 @@
                                     }
                                     else
                                     {
-                                        @* ==================================================
-                                           USUÁRIO NÃO PADRÃO
-                                           NÃO EXIBE DADOS DE REPASSE
-                                           ================================================== *@
 
                                         <td colspan="4"></td>
+
                                     }
 
                                 </tr>
@@ -686,9 +1079,6 @@
 
             <div class="row g-4 align-items-center">
 
-
-                @* QUANTIDADE *@
-
                 <div class="col-md-4">
 
                     <div class="text-muted small mb-1">
@@ -706,48 +1096,6 @@
                     </div>
 
                 </div>
-
-
-                @* TOTAL CONTRATOS *@
-
-                @* <div class="col-md-4">
-
-                    <div class="text-muted small mb-1">
-
-                        Total dos contratos
-
-                    </div>
-
-                    <div class="fs-4 fw-bold text-dark">
-
-                        <span id="totalContratos">
-                            R$ 0,00
-                        </span>
-
-                    </div>
-
-                </div> *@
-
-
-                @* TOTAL REPASSES *@
-
-                @* <div class="col-md-4">
-
-                    <div class="text-muted small mb-1">
-
-                        Total dos repasses
-
-                    </div>
-
-                    <div class="fs-4 fw-bold text-success">
-
-                        <span id="totalRepasses">
-                            R$ 0,00
-                        </span>
-
-                    </div>
-
-                </div> *@
 
             </div>
 
@@ -802,6 +1150,10 @@
 
 <style>
 
+    /* =========================================================
+           PÁGINA
+           ========================================================= */
+
     .inner-system-page {
         font-family: 'Segoe UI', system-ui, sans-serif;
     }
@@ -817,9 +1169,9 @@
     }
 
 
-    /* =========================
-                   FILTROS
-                   ========================= */
+    /* =========================================================
+           FILTROS
+           ========================================================= */
 
     .filter-dropdown {
         border-color: #dee2e6 !important;
@@ -837,6 +1189,13 @@
         }
 
 
+        .filter-dropdown:disabled {
+            background-color: #f8f9fa;
+            color: #adb5bd;
+            cursor: not-allowed;
+        }
+
+
     .btn-filter-submit {
         height: 34px;
         font-size: 0.85rem;
@@ -845,9 +1204,127 @@
     }
 
 
-    /* =========================
-                   TABELA
-                   ========================= */
+    /* =========================================================
+           CARDS RESUMO
+           ========================================================= */
+
+    .resumo-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+
+    .resumo-icon-blue {
+        background-color: #eef4ff;
+        color: #3b82f6;
+    }
+
+
+    .resumo-icon-green {
+        background-color: #ecfdf3;
+        color: #198754;
+    }
+
+
+    .resumo-icon-purple {
+        background-color: #f4f0ff;
+        color: #7c3aed;
+    }
+
+
+    /* =========================================================
+           GRÁFICO
+           ========================================================= */
+
+    .grafico-container {
+        height: 230px;
+        max-width: 850px;
+        margin: 0 auto;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 14px;
+        padding: 15px 10px 0;
+        overflow-x: auto;
+        border-bottom: 1px solid #eeeeee;
+    }
+
+
+    .grafico-coluna {
+        min-width: 60px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+
+    .grafico-valor {
+        font-size: 0.68rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 5px;
+        white-space: nowrap;
+    }
+
+
+    .grafico-barra-area {
+        height: 145px;
+        width: 38px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        background-color: #f8f9fa;
+        border-radius: 7px 7px 0 0;
+        overflow: hidden;
+    }
+
+
+    .grafico-barra {
+        width: 100%;
+        min-height: 3px;
+        background-color: #198754;
+        border-radius: 7px 7px 0 0;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+
+        .grafico-barra:hover {
+            opacity: 0.75;
+            transform: scaleX(1.08);
+        }
+
+
+    .grafico-mes {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #495057;
+        margin-top: 7px;
+    }
+
+
+    .grafico-quantidade {
+        font-size: 0.62rem;
+        color: #adb5bd;
+        margin-top: 2px;
+    }
+
+
+        .grafico-quantidade::after {
+            content: " com.";
+        }
+
+
+    /* =========================================================
+           TABELA
+           ========================================================= */
 
     .bg-table-header {
         background-color: #fafafa;
@@ -875,9 +1352,9 @@
         }
 
 
-    /* =========================
-                   CHECKBOX
-                   ========================= */
+    /* =========================================================
+           CHECKBOX
+           ========================================================= */
 
     .repasse-checkbox {
         width: 18px;
@@ -891,9 +1368,9 @@
         }
 
 
-    /* =========================
-                   LINHA COM REPASSE PAGO
-                   ========================= */
+    /* =========================================================
+           LINHA COM REPASSE PAGO
+           ========================================================= */
 
     .linha-repasse-pago {
         background-color: #f0fff4 !important;
@@ -906,9 +1383,9 @@
         }
 
 
-    /* =========================
-                   STATUS
-                   ========================= */
+    /* =========================================================
+           STATUS
+           ========================================================= */
 
     .status-dot {
         display: inline-flex;
@@ -943,9 +1420,9 @@
     }
 
 
-    /* =========================
-                   BOTÃO REGISTRAR
-                   ========================= */
+    /* =========================================================
+           BOTÃO REGISTRAR
+           ========================================================= */
 
     .btn-registrar {
         transition: all 0.2s ease;
@@ -958,9 +1435,9 @@
         }
 
 
-    /* =========================
-                   RESUMO
-                   ========================= */
+    /* =========================================================
+           RESUMO REPASSES
+           ========================================================= */
 
     #resumoRepasses {
         transition: all 0.2s ease;
@@ -1025,11 +1502,10 @@
 
 
     /* =========================================================
-       SELEÇÃO DE CONTRATOS E SOMA DOS VALORES
+       SELEÇÃO DE CONTRATOS
        ========================================================= */
 
     document.addEventListener("DOMContentLoaded", function () {
-
 
         const checkboxes =
             document.querySelectorAll(".repasse-checkbox");
@@ -1039,100 +1515,33 @@
             document.getElementById("quantidadeSelecionados");
 
 
-        // const totalContratos =
-        //     document.getElementById("totalContratos");
-
-
-        // const totalRepasses =
-        //     document.getElementById("totalRepasses");
-
-
         const btnGerarRelatorio =
             document.getElementById("btnGerarRelatorio");
 
 
-
         /* =====================================================
-           FORMATA VALOR PARA REAL
-           ===================================================== */
-
-        function formatarMoeda(valor) {
-
-            return valor.toLocaleString("pt-BR", {
-
-                style: "currency",
-
-                currency: "BRL"
-
-            });
-
-        }
-
-
-
-        /* =====================================================
-           ATUALIZA OS TOTAIS
+           ATUALIZA QUANTIDADE
            ===================================================== */
 
         function atualizarTotais() {
 
-
             let quantidade = 0;
-
-            // let totalContrato = 0;
-
-            // let totalRepasse = 0;
-
 
 
             checkboxes.forEach(function (checkbox) {
 
-
                 if (checkbox.checked) {
 
-
                     quantidade++;
-
-
-                    // const valorContrato =
-                    //     parseFloat(
-                    //         checkbox.dataset.contrato
-                    //     ) || 0;
-
-
-                    // const valorRepasse =
-                    //     parseFloat(
-                    //         checkbox.dataset.repasse
-                    //     ) || 0;
-
-
-
-                    // totalContrato += valorContrato;
-
-                    // totalRepasse += valorRepasse;
 
                 }
 
             });
 
 
-
             quantidadeSelecionados.textContent =
                 quantidade;
 
-
-            // totalContratos.textContent =
-            //     formatarMoeda(totalContrato);
-
-
-            // totalRepasses.textContent =
-            //     formatarMoeda(totalRepasse);
-
-
-
-            /* =================================================
-               HABILITA O BOTÃO SOMENTE SE HOUVER SELEÇÃO
-               ================================================= */
 
             btnGerarRelatorio.disabled =
                 quantidade === 0;
@@ -1142,7 +1551,7 @@
 
 
         /* =====================================================
-           ESCUTA OS CHECKBOXES
+           ESCUTA CHECKBOXES
            ===================================================== */
 
         checkboxes.forEach(function (checkbox) {
@@ -1154,48 +1563,76 @@
 
         });
 
-    btnGerarRelatorio.addEventListener("click", function () {
-
-        const vendasSelecionadas = [];
-
-        checkboxes.forEach(function (checkbox) {
-
-            if (checkbox.checked) {
-                vendasSelecionadas.push(checkbox.value);
-            }
-
-        });
-
-        if (vendasSelecionadas.length === 0) {
-            return;
-        }
-
-        const form = document.createElement("form");
-
-        form.method = "POST";
-        form.action = "/Comissao/RelatorioDePagamento";
-
-        vendasSelecionadas.forEach(function (id) {
-
-            const input = document.createElement("input");
-
-            input.type = "hidden";
-            input.name = "vendasSelecionadas";
-            input.value = id;
-
-            form.appendChild(input);
-
-        });
-
-        document.body.appendChild(form);
-
-        form.submit();
-
-    });
 
 
         /* =====================================================
-           INICIA OS VALORES
+           GERAR RELATÓRIO
+           ===================================================== */
+
+        btnGerarRelatorio.addEventListener("click", function () {
+
+            const vendasSelecionadas = [];
+
+
+            checkboxes.forEach(function (checkbox) {
+
+                if (checkbox.checked) {
+
+                    vendasSelecionadas.push(
+                        checkbox.value
+                    );
+
+                }
+
+            });
+
+
+            if (vendasSelecionadas.length === 0) {
+
+                return;
+
+            }
+
+
+            const form =
+                document.createElement("form");
+
+
+            form.method = "POST";
+
+            form.action =
+                "/Comissao/RelatorioDePagamento";
+
+
+            vendasSelecionadas.forEach(function (id) {
+
+                const input =
+                    document.createElement("input");
+
+
+                input.type = "hidden";
+
+                input.name =
+                    "vendasSelecionadas";
+
+                input.value = id;
+
+
+                form.appendChild(input);
+
+            });
+
+
+            document.body.appendChild(form);
+
+            form.submit();
+
+        });
+
+
+
+        /* =====================================================
+           INICIALIZA
            ===================================================== */
 
         atualizarTotais();

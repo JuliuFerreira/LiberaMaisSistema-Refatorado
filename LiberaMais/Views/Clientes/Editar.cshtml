@@ -111,16 +111,22 @@
                         <span asp-validation-for="Endereco.Cep" class="text-danger small d-block mt-1" id="cepErro"></span>
                     </div>
 
-                    <div class="col-12 col-md-7">
+                    <div class="col-12 col-md-3">
                         <label class="text-muted d-block info-label mb-1">Logradouro (Rua/Av)</label>
                         <input asp-for="Endereco.Rua" class="form-control rounded-3" id="rua" />
                         <span asp-validation-for="Endereco.Rua" class="text-danger small mt-1 d-block"></span>
                     </div>
 
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-2">
                         <label class="text-muted d-block info-label mb-1">Número</label>
                         <input asp-for="Endereco.Numero" class="form-control rounded-3" id="numero" />
                         <span asp-validation-for="Endereco.Numero" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="col-12 col-md-5">
+                        <label class="text-muted d-block info-label mb-1">Complemento</label>
+                        <input asp-for="Endereco.Complemento" class="form-control rounded-3" id="complemento" placeholder="casa 1, ap 01..." />
+                        <span asp-validation-for="Endereco.Complemento" class="text-danger small d-block mt-1"></span>
                     </div>
 
                     <div class="col-6 col-md-4 mt-3">

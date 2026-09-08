@@ -3,7 +3,7 @@
 @{
     Layout = "_LayoutSistema";
     ViewData["Title"] = "Promotoras e Acesso a Bancos";
-    var isAdmin = ViewBag.IsAdmin as bool? ?? false;
+    var isAdmin = ViewBag.IsAdmin;
 }
 
 <div class="container-fluid py-4 inner-system-page">
@@ -14,13 +14,20 @@
             <p class="text-muted small mb-0">Gerencie os acessos, credenciais e links de acesso das promotoras parceiras.</p>
         </div>
 
-        @if (isAdmin)
-        {
-            <a asp-action="Criar" class="btn btn-dark d-flex align-items-center gap-2 px-3 py-2 shadow-sm rounded-3">
-                <i class="bi bi-plus-lg"></i>
-                <span class="fw-semibold small">Nova Promotora</span>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-controller="RegraBanco" asp-action="Index" class="btn btn-dark d-flex align-items-center gap-2 px-3 py-2 shadow-sm rounded-3">
+                <i class="bi bi-info-circle"></i>
+                <span class="fw-semibold small">Regras de Bancos</span>
             </a>
-        }
+
+            @if (isAdmin)
+            {
+                <a asp-action="Criar" class="btn btn-dark d-flex align-items-center gap-2 px-3 py-2 shadow-sm rounded-3">
+                    <i class="bi bi-plus-lg"></i>
+                    <span class="fw-semibold small">Nova Promotora</span>
+                </a>
+            }
+        </div>
     </div>
 
     @if (TempData["MensagemSucesso"] != null)
@@ -35,6 +42,7 @@
             <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["MensagemErro"]
         </div>
     }
+
 
     <div class="row g-3">
         @if (Model != null && Model.Any())

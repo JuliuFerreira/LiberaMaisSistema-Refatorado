@@ -63,6 +63,8 @@
                     <thead>
                         <tr>
                             <th class="ps-4">Nome</th>
+                            <th>Login</th>
+                            <th>Senha</th>
                             <th>URL de Acesso</th>
                             <th>Descrição</th>
                             <th class="text-center pe-4">Ações</th>
@@ -74,9 +76,21 @@
                             foreach (var util in Model)
                             {
                                 <tr class="linha-clicavel" onclick="navegarParaEditar(event, '@Url.Action("Editar", new { id = util.Id })')">
-                                    <td class="ps-4">
+                                    <td class="ps-2">
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="fw-bold text-dark text-copy-target">@util.Nome</span>
+
+                                        </div>
+                                    </td>
+                                    <td class="ps-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fw-bold text-dark text-copy-target">@util.Login</span>
+
+                                        </div>
+                                    </td>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fw-bold text-dark text-copy-target">@util.Senha</span>
 
                                         </div>
                                     </td>

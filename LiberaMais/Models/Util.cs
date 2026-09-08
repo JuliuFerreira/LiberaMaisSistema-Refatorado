@@ -17,5 +17,9 @@ namespace LiberaMais.Models
         public string Url { get; set; }
 
         public string? Descricao { get; set; }
+
+        public string? Login { get; set; }
+
+        public string? Senha { get; set; }
     }
 }

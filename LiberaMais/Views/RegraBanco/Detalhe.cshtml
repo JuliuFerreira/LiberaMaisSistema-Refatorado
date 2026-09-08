@@ -1,0 +1,842 @@
+﻿@using LiberaMais.Models.Enums
+@model RegraBanco
+
+@{
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Detalhes das Regras";
+
+    var banco = Model?.PromotoraBanco?.Banco?.Nome ?? "Banco não informado";
+    var promotora = Model?.PromotoraBanco?.Promotora?.Nome ?? "Promotora não informada";
+    var dataAtualizacao = Model?.DataAtualizacao.ToString("dd/MM/yyyy") ?? "-";
+}
+
+<div class="container-fluid px-0 mt-4 inner-system-page">
+
+    <!-- ===================================================== -->
+    <!-- CABEÇALHO -->
+    <!-- ===================================================== -->
+
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+
+        <div>
+
+            <div class="d-flex align-items-center gap-2 mb-2">
+
+                <span class="rule-icon">
+                    <i class="bi bi-bank2"></i>
+                </span>
+
+                <span class="text-muted small fw-semibold text-uppercase tracking-wide">
+                    Regras Operacionais
+                </span>
+
+            </div>
+
+            <h3 class="fw-bold text-dark mb-1 tracking-tight">
+                @banco
+            </h3>
+
+            <div class="d-flex align-items-center flex-wrap gap-2">
+
+                <span class="text-muted small">
+                    Regras específicas da promotora
+                </span>
+
+                <span class="separator-dot">•</span>
+
+                <span class="promotora-badge">
+                    <i class="bi bi-building me-1"></i>
+                    @promotora
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="d-flex align-items-center gap-2">
+
+            <div class="update-box">
+
+                <div class="update-icon">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+
+                <div>
+                    <small class="text-muted d-block">
+                        Última atualização
+                    </small>
+
+                    <strong class="text-dark small">
+                        @dataAtualizacao
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- LINHA DE IDENTIFICAÇÃO -->
+    <!-- ===================================================== -->
+
+    <div class="context-card mb-4">
+
+        <div class="context-item">
+
+            <div class="context-icon banco">
+                <i class="bi bi-bank"></i>
+            </div>
+
+            <div>
+                <small class="text-muted d-block">
+                    Banco
+                </small>
+
+                <strong class="text-dark">
+                    @banco
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="context-divider"></div>
+
+
+        <div class="context-item">
+
+            <div class="context-icon promotora">
+                <i class="bi bi-building"></i>
+            </div>
+
+            <div>
+                <small class="text-muted d-block">
+                    Promotora
+                </small>
+
+                <strong class="text-dark">
+                    @promotora
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="context-divider"></div>
+
+
+        <div class="context-item">
+
+            <div class="context-icon regra">
+                <i class="bi bi-shield-check"></i>
+            </div>
+
+            <div>
+                <small class="text-muted d-block">
+                    Tipo
+                </small>
+
+                <strong class="text-dark">
+                    Regra específica
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- TÍTULO DA SEÇÃO -->
+    <!-- ===================================================== -->
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+
+        <div>
+
+            <h5 class="fw-bold text-dark mb-1">
+                Regras do banco
+            </h5>
+
+            <span class="text-muted small">
+                Consulte abaixo as condições operacionais cadastradas.
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- CARDS PRINCIPAIS -->
+    <!-- ===================================================== -->
+
+    <div class="row g-3 mb-3">
+
+
+        <!-- VALORES -->
+
+        <div class="col-12 col-lg-6">
+
+            <div class="rule-card rule-card-blue h-100">
+
+                <div class="rule-card-header">
+
+                    <div class="rule-card-icon">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+
+                    <div>
+
+                        <span class="rule-card-label">
+                            Valores
+                        </span>
+
+                        <h6 class="fw-bold text-dark mb-0">
+                            Valores e limite operacional
+                        </h6>
+
+                    </div>
+
+                </div>
+
+                <div class="rule-card-body">
+
+                    @if (!string.IsNullOrWhiteSpace(Model?.RegrasValores))
+                    {
+                        <span class="rule-text">
+                            @Model.RegrasValores
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="text-muted small">
+                            Nenhuma regra cadastrada.
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- IDADE -->
+
+        <div class="col-12 col-lg-6">
+
+            <div class="rule-card rule-card-purple h-100">
+
+                <div class="rule-card-header">
+
+                    <div class="rule-card-icon">
+                        <i class="bi bi-person-vcard"></i>
+                    </div>
+
+                    <div>
+
+                        <span class="rule-card-label">
+                            Idade
+                        </span>
+
+                        <h6 class="fw-bold text-dark mb-0">
+                            Idade e prazo máximo
+                        </h6>
+
+                    </div>
+
+                </div>
+
+                <div class="rule-card-body">
+
+                    @if (!string.IsNullOrWhiteSpace(Model?.RegraIdade))
+                    {
+                        <span class="rule-text">
+                            @Model.RegraIdade
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="text-muted small">
+                            Nenhuma regra cadastrada.
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- PORTABILIDADE -->
+    <!-- ===================================================== -->
+
+    <div class="section-title mb-3">
+
+        <div class="section-title-icon">
+            <i class="bi bi-arrow-left-right"></i>
+        </div>
+
+        <div>
+
+            <h5 class="fw-bold text-dark mb-0">
+                Regras de Portabilidade
+            </h5>
+
+            <small class="text-muted">
+                Bancos e condições específicas para operações de portabilidade.
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <div class="row g-3 mb-4">
+                
+        <div class="col-12 col-lg-4">
+
+            <div class="rule-card rule-card-blue h-100">
+
+                <div class="rule-card-header">
+
+                    <div class="rule-card-icon">
+                        <i class="bi bi-info-circle-fill"></i>
+                    </div>
+
+                    <div>
+
+                        <span class="general-rule-label">
+                            Regra geral
+                        </span>
+
+                        <h6 class="fw-bold text-dark mb-2">
+                            Condições gerais de portabilidade
+                        </h6>
+
+                    </div>
+
+                </div>
+
+                <div class="rule-card-body">
+
+                    @if (!string.IsNullOrWhiteSpace(Model?.BancoRegraGeral))
+                    {
+                        <div class="general-rule-text">
+                            @Model.BancoRegraGeral
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted small">
+                            Nenhuma regra geral cadastrada.
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-12 col-lg-4">
+
+            <div class="rule-card rule-card-warning h-100">
+
+                <div class="rule-card-header">
+
+                    <div class="rule-card-icon">
+                        <i class="bi bi-exclamation-circle"></i>
+                    </div>
+
+                    <div>
+
+                        <span class="rule-card-label">
+                            Condições especiais
+                        </span>
+
+                        <h6 class="fw-bold text-dark mb-0">
+                            Bancos portados com regra
+                        </h6>
+
+                    </div>
+
+                </div>
+
+                <div class="rule-card-body">
+
+                    @if (!string.IsNullOrWhiteSpace(Model?.BancoComRegra))
+                    {
+                        <span class="rule-text">
+                            @Model.BancoComRegra
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="text-muted small">
+                            Nenhuma regra específica cadastrada.
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- NÃO PORTADOS -->
+
+        <div class="col-12 col-lg-4">
+
+            <div class="rule-card rule-card-danger h-100">
+
+                <div class="rule-card-header">
+
+                    <div class="rule-card-icon">
+                        <i class="bi bi-x-circle"></i>
+                    </div>
+
+                    <div>
+
+                        <span class="rule-card-label">
+                            Restrições
+                        </span>
+
+                        <h6 class="fw-bold text-dark mb-0">
+                            Bancos não portados
+                        </h6>
+
+                    </div>
+
+                </div>
+
+                <div class="rule-card-body">
+
+                    @if (!string.IsNullOrWhiteSpace(Model?.BancoNaoPortado))
+                    {
+                        <span class="rule-text">
+                            @Model.BancoNaoPortado
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="text-muted small">
+                            Nenhuma restrição cadastrada.
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="mt-4 mb-4">
+
+        <a class="btn btn-link text-decoration-none text-secondary d-inline-flex align-items-center gap-2 fw-medium p-0 btn-back-hover"
+           asp-controller="RegraBanco"
+           asp-action="Index">
+
+            <i class="bi bi-arrow-left-short fs-4"></i>
+
+            <span class="small">
+                Voltar às Regras
+            </span>
+
+        </a>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- RODAPÉ -->
+    <!-- ===================================================== -->
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 pt-3 border-top border-light-subtle">
+
+        <div class="text-muted small">
+
+            <i class="bi bi-shield-check me-1"></i>
+
+            Regras cadastradas para:
+
+            <strong class="text-dark">
+                @banco
+            </strong>
+
+            —
+
+            <strong class="text-dark">
+                @promotora
+            </strong>
+
+        </div>     
+        
+        
+
+        </div>
+    
+
+</div>
+
+
+<style>
+
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+
+    .tracking-tight {
+        letter-spacing: -0.5px;
+    }
+
+
+    .tracking-wide {
+        letter-spacing: 0.8px;
+    }
+
+
+    /* ========================================= */
+    /* ÍCONE DO CABEÇALHO */
+    /* ========================================= */
+
+    .rule-icon {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 1rem;
+    }
+
+
+    .separator-dot {
+        color: #adb5bd;
+    }
+
+
+    .promotora-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: #f1f3f5;
+        color: #495057;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+
+    /* ========================================= */
+    /* CAIXA DE ATUALIZAÇÃO */
+    /* ========================================= */
+
+    .update-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.06);
+        border-radius: 12px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+    }
+
+
+    .update-icon {
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9px;
+        background: #f8f9fa;
+        color: #6c757d;
+    }
+
+
+    /* ========================================= */
+    /* CONTEXTO BANCO / PROMOTORA */
+    /* ========================================= */
+
+    .context-card {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding: 18px 22px;
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.05);
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+    }
+
+
+    .context-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+    }
+
+
+    .context-divider {
+        width: 1px;
+        height: 42px;
+        background: rgba(0,0,0,0.07);
+    }
+
+
+    .context-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        font-size: 1.05rem;
+    }
+
+
+        .context-icon.banco {
+            background: #e7f1ff;
+            color: #0d6efd;
+        }
+
+
+        .context-icon.promotora {
+            background: #f3e8ff;
+            color: #8b5cf6;
+        }
+
+
+        .context-icon.regra {
+            background: #e9f7ef;
+            color: #198754;
+        }
+
+
+    /* ========================================= */
+    /* TÍTULOS */
+    /* ========================================= */
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+
+    .section-title-icon {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: #f8f9fa;
+        color: #495057;
+    }
+
+
+    /* ========================================= */
+    /* CARDS DE REGRAS */
+    /* ========================================= */
+
+    .rule-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid rgba(0,0,0,0.05);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+
+        .rule-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.07);
+        }
+
+
+    .rule-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 18px 20px 12px 20px;
+    }
+
+
+    .rule-card-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+
+    .rule-card-label {
+        display: block;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: #6c757d;
+        margin-bottom: 2px;
+    }
+
+
+    .rule-card-body {
+        padding: 10px 20px 20px 70px;
+        min-height: 70px;
+    }
+
+
+    .rule-text {
+        display: block;
+        color: #343a40;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        white-space: pre-line;
+    }
+
+
+    /* ========================================= */
+    /* CORES DOS CARDS */
+    /* ========================================= */
+
+    .rule-card-blue .rule-card-icon {
+        background: #e7f1ff;
+        color: #0d6efd;
+    }
+
+
+    .rule-card-purple .rule-card-icon {
+        background: #f3e8ff;
+        color: #8b5cf6;
+    }
+
+
+    .rule-card-danger .rule-card-icon {
+        background: #fdecec;
+        color: #dc3545;
+    }
+
+
+    .rule-card-warning .rule-card-icon {
+        background: #fff3cd;
+        color: #997404;
+    }
+
+
+    /* ========================================= */
+    /* REGRA GERAL */
+    /* ========================================= */
+
+    .general-rule-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 20px 22px;
+        border-radius: 16px;
+        background: #f8f9fa;
+        border: 1px solid rgba(0,0,0,0.06);
+    }
+
+
+    .general-rule-icon {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #212529;
+        color: #fff;
+    }
+
+
+    .general-rule-label {
+        display: block;
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: #6c757d;
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+
+
+    .general-rule-text {
+        color: #343a40;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        white-space: pre-line;
+    }
+
+
+    /* ========================================= */
+    /* BOTÃO VOLTAR */
+    /* ========================================= */
+
+    .btn-back-hover {
+        transition: all 0.2s ease;
+    }
+
+
+        .btn-back-hover:hover {
+            background: #f1f3f5;
+            color: #212529 !important;
+            transform: translateX(-2px);
+        }
+
+
+    /* ========================================= */
+    /* RESPONSIVO */
+    /* ========================================= */
+
+    @@media (max-width: 768px) {
+
+        .context-card {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 15px;
+        }
+
+        .context-divider {
+            width: 100%;
+            height: 1px;
+        }
+
+        .rule-card-body {
+            padding-left: 20px;
+        }
+
+        .update-box {
+            width: 100%;
+        }
+    }
+
+</style>

@@ -28,10 +28,6 @@ namespace LiberaMais.Data
 
         public DbSet<Financa> financas { get; set; }
 
-        //public DbSet<Receita> receitas { get; set; }
-
-        //public DbSet<Despesa> despesas { get; set; }
-
         public DbSet<PromotoraBanco> PromotoraBancos { get; set; }
 
         public DbSet<Util> utils { get; set; }
@@ -48,6 +44,12 @@ namespace LiberaMais.Data
 
         public DbSet<Historico> Historico { get; set; }
 
+        public DbSet<Agendamento> Agendamento { get; set; }
+
+        public DbSet<RegraBanco>  RegraBanco { get; set; }
+
+        public DbSet<TaxaCoeficiente> TaxaCoeficiente { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new VendaMap());
@@ -57,17 +59,12 @@ namespace LiberaMais.Data
             modelBuilder.Entity<Cliente>().ToTable("Cliente");
             modelBuilder.Entity<Endereco>().HasKey(e => e.Id);
             modelBuilder.Entity<Endereco>().ToTable("Endereco");
-            //modelBuilder.Entity<Venda>().HasKey(j => j.Id);
             modelBuilder.Entity<Promotora>().HasKey(j => j.Id);
             modelBuilder.Entity<Promotora>().ToTable("Promotora");
             modelBuilder.Entity<Banco>().HasKey(j => j.Id);
             modelBuilder.Entity<Banco>().ToTable("Banco");
             modelBuilder.Entity<Financa>().HasKey(j => j.Id);
             modelBuilder.Entity<Financa>().ToTable("Financa");
-            //modelBuilder.Entity<Receita>().HasKey(j => j.Id);
-            //modelBuilder.Entity<Receita>().ToTable("Receita");
-            //modelBuilder.Entity<Despesa>().HasKey(j => j.Id);
-            //modelBuilder.Entity<Despesa>().ToTable("Despesa");
             modelBuilder.Entity<UsuarioModel>().ToTable("Usuarios");
             modelBuilder.Entity<PromotoraBanco>().HasKey(j => j.Id);
             modelBuilder.Entity<PromotoraBanco>().ToTable("PromotoraBanco");
@@ -85,6 +82,13 @@ namespace LiberaMais.Data
             modelBuilder.Entity<Acionamento>().ToTable("Acionamento");
             modelBuilder.Entity<Historico>().HasKey(h => h.Id);
             modelBuilder.Entity<Historico>().ToTable("Historico");
+            modelBuilder.Entity<Agendamento>().HasKey(a => a.Id);
+            modelBuilder.Entity<Agendamento>().ToTable("Agendamento");
+            modelBuilder.Entity<RegraBanco>().HasKey(r => r.Id);
+            modelBuilder.Entity<RegraBanco>().ToTable("RegraBanco");
+            modelBuilder.Entity<TaxaCoeficiente>().HasKey(t => t.Id);
+            modelBuilder.Entity<TaxaCoeficiente>().ToTable("TaxaCoeficiente");
+
 
 
 

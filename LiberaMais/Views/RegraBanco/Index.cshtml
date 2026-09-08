@@ -1,0 +1,1089 @@
+﻿@model IEnumerable<RegraBanco>
+
+@{
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Regras de Bancos";
+
+    var isAdmin = ViewBag.IsAdmin;
+}
+
+<div class="container-fluid py-4 inner-system-page">
+
+    <!-- CABEÇALHO -->
+
+    <div class="page-header mb-4">
+
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+
+            <div class="d-flex align-items-center gap-3">
+
+                <div class="page-icon">
+                    <i class="bi bi-bank2"></i>
+                </div>
+
+                <div>
+
+                    <h3 class="fw-bold text-dark mb-1 tracking-tight">
+                        Regras Gerais de Bancos
+                    </h3>
+
+                    <p class="text-muted small mb-0">
+                        Gerencie as regras e condições cadastradas para cada banco.
+                    </p>
+
+                </div>
+
+            </div>
+
+            @if (isAdmin)
+            {
+                <a asp-controller="RegraBanco"
+                   asp-action="Criar"
+                   class="btn btn-dark d-flex align-items-center justify-content-center gap-2 px-4 py-2 rounded-3 shadow-sm btn-adicionar">
+
+                    <i class="bi bi-plus-lg"></i>
+
+                    <span class="fw-semibold small">
+                        Adicionar Regra
+                    </span>
+
+                </a>
+            }
+            
+
+        </div>
+
+    </div>
+
+
+
+    <!-- MENSAGENS -->
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso"
+             class="alert mensagem-alerta mensagem-sucesso border-0 shadow-sm rounded-3 mb-4">
+
+            <div class="d-flex align-items-center gap-2">
+
+                <div class="alerta-icon sucesso">
+                    <i class="bi bi-check-lg"></i>
+                </div>
+
+                <div>
+                    <div class="fw-semibold small">
+                        Operação realizada
+                    </div>
+
+                    <div class="small text-muted">
+                        @TempData["MensagemSucesso"]
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro"
+             class="alert mensagem-alerta mensagem-erro border-0 shadow-sm rounded-3 mb-4">
+
+            <div class="d-flex align-items-center gap-2">
+
+                <div class="alerta-icon erro">
+                    <i class="bi bi-exclamation-lg"></i>
+                </div>
+
+                <div>
+                    <div class="fw-semibold small">
+                        Não foi possível concluir
+                    </div>
+
+                    <div class="small text-muted">
+                        @TempData["MensagemErro"]
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    }
+    <div class="row mb-3">
+        <div class="col-md-5 col-lg-4">
+            <form asp-action="Index" method="get" class="d-flex gap-2">
+                <div class="input-group input-group-sm shadow-sm rounded-3 overflow-hidden border">
+                    <span class="input-group-text bg-white border-0 text-muted small">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" name="nome" value="@ViewBag.NomeAtual"
+                           class="form-control border-0 small ps-1"
+                           placeholder="Buscar por Nome..." />
+                </div>
+                <button type="submit" class="btn btn-dark btn-sm px-3 fw-semibold rounded-3 shadow-sm">Buscar</button>
+
+                @if (!string.IsNullOrWhiteSpace(ViewBag.NomeAtual as string))
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 rounded-3 d-inline-flex align-items-center justify-content-center">
+                        Limpar
+                    </a>
+                }
+            </form>
+        </div>
+    </div>
+
+
+
+
+    <!-- CARD PRINCIPAL -->
+
+    <div class="card tabela-card border-0 shadow-sm rounded-4 overflow-hidden">
+
+        <!-- TOPO DO CARD -->
+
+        <div class="card-topo px-4 py-3">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <div class="d-flex align-items-center gap-2">
+
+                        <i class="bi bi-list-check text-secondary"></i>
+
+                        <span class="fw-semibold text-dark">
+                            Regras cadastradas
+                        </span>
+
+                    </div>
+
+                    <small class="text-muted">
+                        Clique em uma linha para visualizar os detalhes.
+                    </small>
+
+                </div>
+
+
+                @if (Model != null && Model.Any())
+                {
+                    <div class="quantidade-registros">
+
+                        <i class="bi bi-database me-1"></i>
+
+                        @Model.Count() registro(s)
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-custom align-middle mb-0"
+                       style="width: 100%">
+
+                    <thead>
+
+                        <tr>
+
+                            <th scope="col" class="ps-4">
+                                Banco
+                            </th>
+
+                            <th scope="col">
+                                Promotora
+                            </th>
+
+                            <th scope="col">
+                                Última atualização
+                            </th>
+
+                            @if (isAdmin)
+                            {
+                                <th scope="col" class="text-center pe-4">
+                                    Ações
+                                </th>
+                            }                            
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+
+                            foreach (var item in Model)
+                            {
+
+                                <tr class="linha-clicavel"
+                                    data-href="@Url.Action("Detalhe", "RegraBanco", new { id = item.Id })">
+
+
+                                    <!-- BANCO -->
+
+                                    <td class="ps-4">
+
+                                        <div class="d-flex align-items-center gap-3">
+
+                                            <div class="banco-icon">
+
+                                                <i class="bi bi-bank"></i>
+
+                                            </div>
+
+                                            <div>
+
+                                                <div class="fw-bold text-dark banco-nome">
+
+                                                    @item.PromotoraBanco?.Banco?.Nome
+
+                                                </div>
+
+                                                <small class="text-muted">
+                                                    Regra bancária
+                                                </small>
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+
+                                    <!-- PROMOTORA -->
+
+                                    <td>
+
+                                        <div class="d-flex align-items-center gap-2">
+
+                                            <div class="promotora-icon">
+
+                                                <i class="bi bi-building"></i>
+
+                                            </div>
+
+                                            <span class="fw-semibold text-dark">
+
+                                                @item.PromotoraBanco?.Promotora?.Nome
+
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+
+
+                                    <!-- DATA -->
+
+                                    <td>
+
+                                        <div class="data-atualizacao">
+
+                                            <i class="bi bi-calendar3"></i>
+
+                                            <div>
+
+                                                <div class="fw-semibold text-dark small">
+
+                                                    @item.DataAtualizacao.ToString("dd/MM/yyyy")
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+                                    @if (isAdmin)
+                                    {
+
+                                        <td class="text-center pe-4">
+
+                                            <div class="acoes">
+
+                                                <a asp-controller="RegraBanco"
+                                                   asp-action="Editar"
+                                                   asp-route-id="@item.Id"
+                                                   class="btn-acao btn-editar"
+                                                   title="Editar">
+
+                                                    <i class="bi bi-pencil-square"></i>
+
+                                                </a>
+
+
+                                                <button type="button"
+                                                        class="btn-acao btn-excluir"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#modalExcluir_@item.Id"
+                                                        title="Excluir">
+
+                                                    <i class="bi bi-trash3"></i>
+
+                                                </button>
+
+                                            </div>
+
+                                        </td>
+                                    }
+
+
+                                </tr>
+
+
+
+                                <!-- MODAL EXCLUSÃO -->
+
+                                <div class="modal fade"
+                                     id="modalExcluir_@item.Id"
+                                     tabindex="-1"
+                                     aria-hidden="true">
+
+                                    <div class="modal-dialog modal-dialog-centered">
+
+                                        <div class="modal-content modal-exclusao border-0 shadow-lg rounded-4">
+
+
+                                            <div class="modal-header border-0 px-4 pt-4 pb-2">
+
+                                                <div class="d-flex align-items-center gap-3">
+
+                                                    <div class="modal-danger-icon">
+
+                                                        <i class="bi bi-trash3"></i>
+
+                                                    </div>
+
+                                                    <div>
+
+                                                        <h5 class="modal-title fw-bold text-dark fs-5 mb-0">
+                                                            Confirmar exclusão
+                                                        </h5>
+
+                                                        <small class="text-muted">
+                                                            Esta ação não poderá ser desfeita.
+                                                        </small>
+
+                                                    </div>
+
+                                                </div>
+
+
+                                                <button type="button"
+                                                        class="btn-close"
+                                                        data-bs-dismiss="modal"
+                                                        aria-label="Close">
+                                                </button>
+
+                                            </div>
+
+
+
+                                            <div class="modal-body px-4 py-3 text-start">
+
+                                                <p class="mb-2 text-secondary">
+
+                                                    Deseja realmente remover a regra referente ao banco
+
+                                                    <strong class="text-dark">
+                                                        @item.PromotoraBanco?.Banco?.Nome
+                                                    </strong>
+
+                                                    da promotora
+
+                                                    <strong class="text-dark">
+                                                        @item.PromotoraBanco?.Promotora?.Nome
+                                                    </strong>?
+
+                                                </p>
+
+
+                                                <div class="aviso-exclusao">
+
+                                                    <i class="bi bi-exclamation-triangle me-2"></i>
+
+                                                    <span>
+                                                        Esta ação removerá permanentemente todas as informações desta regra.
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+
+
+
+                                            <div class="modal-footer border-0 d-flex justify-content-end gap-2 px-4 pb-4 pt-2">
+
+                                                <button type="button"
+                                                        class="btn btn-light border px-4 py-2 rounded-3 small fw-semibold text-secondary"
+                                                        data-bs-dismiss="modal">
+
+                                                    Cancelar
+
+                                                </button>
+
+
+                                                <form asp-action="Apagar"
+                                                      method="post"
+                                                      class="d-inline m-0">
+
+                                                    <input type="hidden"
+                                                           name="id"
+                                                           value="@item.Id" />
+
+
+                                                    <button type="submit"
+                                                            class="btn btn-danger border-0 px-4 py-2 rounded-3 small fw-semibold btn-confirmar-exclusao">
+
+                                                        <i class="bi bi-trash3 me-1"></i>
+
+                                                        Confirmar exclusão
+
+                                                    </button>
+
+                                                </form>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            }
+
+                        }
+
+                        else
+                        {
+
+                            <tr>
+
+                                <td colspan="4"
+                                    class="empty-state">
+
+                                    <div class="empty-icon">
+
+                                        <i class="bi bi-bank"></i>
+
+                                    </div>
+
+                                    <div class="fw-semibold text-dark mb-1">
+                                        Nenhuma regra cadastrada
+                                    </div>
+
+                                    <div class="text-muted small mb-3">
+                                        Ainda não existem regras de bancos cadastradas no sistema.
+                                    </div>
+
+                                    <a asp-controller="RegraBanco"
+                                       asp-action="Criar"
+                                       class="btn btn-dark btn-sm px-3 py-2 rounded-3">
+
+                                        <i class="bi bi-plus-lg me-1"></i>
+
+                                        Adicionar primeira regra
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- VOLTAR -->
+
+    <div class="mt-4">
+
+        <a class="btn btn-link text-decoration-none text-secondary d-inline-flex align-items-center gap-2 fw-medium p-0 btn-back-hover"
+           asp-controller="Promotora"
+           asp-action="Index">
+
+            <i class="bi bi-arrow-left-short fs-4"></i>
+
+            <span class="small">
+                Voltar às promotoras
+            </span>
+
+        </a>
+
+    </div>
+
+</div>
+
+
+
+<style>
+
+    /* ==========================================
+           BASE
+           ========================================== */
+
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+
+    .tracking-tight {
+        letter-spacing: -0.5px;
+    }
+
+
+
+    /* ==========================================
+           CABEÇALHO
+           ========================================== */
+
+    .page-header {
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+
+    .page-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: #f1f3f5;
+        color: #343a40;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        flex-shrink: 0;
+    }
+
+
+    .btn-adicionar {
+        transition: all 0.2s ease;
+    }
+
+
+        .btn-adicionar:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.12) !important;
+        }
+
+
+
+    /* ==========================================
+           ALERTAS
+           ========================================== */
+
+    .mensagem-alerta {
+        padding: 13px 16px;
+        background: #fff;
+    }
+
+
+    .mensagem-sucesso {
+        border-left: 4px solid #198754 !important;
+    }
+
+
+    .mensagem-erro {
+        border-left: 4px solid #dc3545 !important;
+    }
+
+
+    .alerta-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+
+        .alerta-icon.sucesso {
+            background: rgba(25, 135, 84, 0.1);
+            color: #198754;
+        }
+
+
+        .alerta-icon.erro {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+
+
+    /* ==========================================
+           CARD DA TABELA
+           ========================================== */
+
+    .tabela-card {
+        background: #fff;
+    }
+
+
+    .card-topo {
+        background: #fff;
+        border-bottom: 1px solid #edf0f2;
+    }
+
+
+    .quantidade-registros {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        color: #6c757d;
+        border-radius: 20px;
+        padding: 5px 11px;
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+
+
+
+    /* ==========================================
+           TABELA
+           ========================================== */
+
+    .table-custom {
+        color: #212529;
+    }
+
+
+        .table-custom thead {
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+
+        .table-custom th {
+            font-size: 0.70rem;
+            font-weight: 700;
+            color: #6c757d;
+            padding: 13px 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.55px;
+            white-space: nowrap;
+        }
+
+
+        .table-custom tbody tr {
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+
+            .table-custom tbody tr:last-child {
+                border-bottom: none;
+            }
+
+
+        .table-custom td {
+            padding: 15px 10px;
+        }
+
+
+
+    /* ==========================================
+           LINHAS
+           ========================================== */
+
+    .linha-clicavel {
+        cursor: pointer;
+        transition: background-color 0.18s ease;
+    }
+
+
+        .linha-clicavel:hover {
+            background-color: #fafbfc !important;
+        }
+
+
+            .linha-clicavel:hover .banco-icon {
+                background: #212529;
+                color: #fff;
+                transform: scale(1.04);
+            }
+
+
+            .linha-clicavel:hover .banco-nome {
+                color: #000 !important;
+            }
+
+
+
+    /* ==========================================
+           ÍCONE DO BANCO
+           ========================================== */
+
+    .banco-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        background: #f1f3f5;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+        transition: all 0.18s ease;
+        flex-shrink: 0;
+    }
+
+
+    .banco-nome {
+        font-size: 0.9rem;
+    }
+
+
+
+    /* ==========================================
+           PROMOTORA
+           ========================================== */
+
+    .promotora-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: #f8f9fa;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.82rem;
+        flex-shrink: 0;
+    }
+
+
+
+    /* ==========================================
+           DATA
+           ========================================== */
+
+    .data-atualizacao {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+
+        .data-atualizacao > i {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+
+
+
+    /* ==========================================
+           BOTÕES DE AÇÃO
+           ========================================== */
+
+    .acoes {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+
+    .btn-acao {
+        width: 35px;
+        height: 35px;
+        border: none;
+        background: transparent;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9px;
+        text-decoration: none;
+        transition: all 0.18s ease;
+    }
+
+
+        .btn-acao:hover {
+            transform: translateY(-1px);
+        }
+
+
+    .btn-editar {
+        color: #0d6efd;
+    }
+
+
+        .btn-editar:hover {
+            background: rgba(13, 110, 253, 0.09);
+            color: #0b5ed7;
+        }
+
+
+    .btn-excluir {
+        color: #dc3545;
+    }
+
+
+        .btn-excluir:hover {
+            background: rgba(220, 53, 69, 0.09);
+            color: #bb2d3b;
+        }
+
+
+
+    /* ==========================================
+           ESTADO VAZIO
+           ========================================== */
+
+    .empty-state {
+        text-align: center;
+        padding: 65px 20px !important;
+    }
+
+
+    .empty-icon {
+        width: 58px;
+        height: 58px;
+        margin: 0 auto 14px;
+        border-radius: 16px;
+        background: #f8f9fa;
+        color: #adb5bd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.45rem;
+    }
+
+
+
+    /* ==========================================
+           MODAL
+           ========================================== */
+
+    .modal-exclusao {
+        overflow: hidden;
+    }
+
+
+    .modal-danger-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 11px;
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+
+    .aviso-exclusao {
+        display: flex;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 11px 13px;
+        border-radius: 9px;
+        background: #fff8f8;
+        color: #842029;
+        font-size: 0.78rem;
+        border: 1px solid rgba(220, 53, 69, 0.12);
+    }
+
+
+    .btn-confirmar-exclusao {
+        background-color: #dc3545;
+        transition: all 0.18s ease;
+    }
+
+
+        .btn-confirmar-exclusao:hover {
+            background-color: #bb2d3b;
+            transform: translateY(-1px);
+        }
+
+
+
+    /* ==========================================
+           BOTÃO VOLTAR
+           ========================================== */
+
+    .btn-back-hover {
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+
+        .btn-back-hover:hover {
+            color: #212529 !important;
+            transform: translateX(-3px);
+        }
+
+
+
+    /* ==========================================
+           RESPONSIVIDADE
+           ========================================== */
+
+    @@media (max-width: 768px) {
+        .page-header
+
+    {
+        padding-bottom: 16px;
+    }
+
+
+    .page-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 11px;
+        font-size: 1.1rem;
+    }
+
+
+    .table-custom th {
+        font-size: 0.65rem;
+    }
+
+
+    .table-custom td {
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+
+    .card-topo {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    }
+</style>
+
+
+
+@section Scripts {
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+
+            /* ==========================================
+               LINHAS CLICÁVEIS
+               ========================================== */
+
+            const linhas =
+                document.querySelectorAll(".linha-clicavel");
+
+
+            linhas.forEach(function (linha) {
+
+
+                linha.addEventListener("click", function (event) {
+
+
+                    /*
+                     * Se clicou em um botão ou link,
+                     * mantém o comportamento normal.
+                     */
+
+                    if (event.target.closest("a, button")) {
+
+                        return;
+
+                    }
+
+
+                    const destino =
+                        linha.dataset.href;
+
+
+                    if (destino) {
+
+                        window.location.href =
+                            destino;
+
+                    }
+
+                });
+
+            });
+
+
+
+            /* ==========================================
+               MENSAGENS TEMPORÁRIAS
+               ========================================== */
+
+            setTimeout(function () {
+
+
+                var alertas = [
+
+                    document.getElementById("alertaSucesso"),
+
+                    document.getElementById("alertaErro")
+
+                ];
+
+
+                alertas.forEach(function (alerta) {
+
+
+                    if (alerta) {
+
+
+                        alerta.style.transition =
+                            "opacity 0.5s ease";
+
+
+                        alerta.style.opacity =
+                            "0";
+
+
+                        setTimeout(function () {
+
+                            alerta.style.display =
+                                "none";
+
+                        }, 500);
+
+                    }
+
+                });
+
+
+            }, 3000);
+
+
+        });
+
+    </script>
+
+}

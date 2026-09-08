@@ -1,0 +1,287 @@
+﻿@using LiberaMais.Models.Enums
+@model TaxaCoeficiente
+
+@{
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Cadastrar Taxa";
+}
+
+<div class="container-fluid py-4 inner-system-page">
+
+    <!-- CABEÇALHO -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold text-dark mb-1" style="font-size: 1.6rem;">
+                Nova Taxa
+            </h2>
+
+            <small class="text-muted">
+                Cadastre a taxa, o coeficiente, a operação e defina se estará ativa.
+            </small>
+        </div>
+    </div>
+
+
+    <!-- MENSAGEM DE SUCESSO -->
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso"
+             class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small">
+
+            <i class="bi bi-check-circle-fill"></i>
+            @TempData["MensagemSucesso"]
+
+        </div>
+    }
+
+
+    <!-- MENSAGEM DE ERRO -->
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro"
+             class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small">
+
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            @TempData["MensagemErro"]
+
+        </div>
+    }
+
+
+    <div class="row">
+
+        <div class="col-12">
+
+            <div class="card shadow-sm border-0 rounded-4">
+
+                <div class="card-body p-4">
+
+                    <form asp-controller="TaxaCoeficiente"
+                          asp-action="Criar"
+                          method="post">
+
+                        <div class="row g-4">
+
+
+                            <!-- OPERAÇÃO -->
+                            <div class="col-md-4">
+
+                                <label asp-for="Operacao"
+                                       class="form-label small fw-bold text-muted">
+
+                                    OPERAÇÃO *
+
+                                </label>
+
+                                <select asp-for="Operacao"
+                                        class="form-select rounded-3 py-2"
+                                        asp-items="Html.GetEnumSelectList<OperacaoEnum>()"
+                                        required>
+
+                                    <option value="">
+                                        Selecione a operação
+                                    </option>
+
+                                </select>
+
+                                <span asp-validation-for="Operacao"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+
+                            <!-- TAXA -->
+                            <div class="col-md-4">
+
+                                <label asp-for="Taxa"
+                                       class="form-label small fw-bold text-muted">
+
+                                    TAXA
+
+                                </label>
+
+                                <input asp-for="Taxa"
+                                       type="text"
+                                       class="form-control rounded-3 py-2"
+                                       placeholder="Ex: 1,85 108X..." />
+
+                                <span asp-validation-for="Taxa"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+
+                            <!-- COEFICIENTE -->
+                            <div class="col-md-4">
+
+                                <label asp-for="Coeficiente"
+                                       class="form-label small fw-bold text-muted">
+
+                                    COEFICIENTE
+
+                                </label>
+
+                                <input asp-for="Coeficiente"
+                                       type="text"
+                                       inputmode="decimal"
+                                       class="form-control rounded-3 py-2"
+                                       placeholder="Ex: 0,02350" />
+
+                                <span asp-validation-for="Coeficiente"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+
+                            <!-- STATUS -->
+                            <div class="col-md-4">
+
+                                <label asp-for="Ativo"
+                                       class="form-label small fw-bold text-muted">
+
+                                    STATUS
+
+                                </label>
+
+                                <div class="form-check form-switch mt-2">
+
+                                    <input asp-for="Ativo"
+                                           class="form-check-input"
+                                           style="width: 3em; height: 1.5em;" />
+
+                                    <label asp-for="Ativo"
+                                           class="form-check-label ms-2">
+
+                                        Taxa ativa
+
+                                    </label>
+
+                                </div>
+
+                                <small class="text-muted">
+
+                                    Taxas ativas estarão disponíveis na calculadora.
+
+                                </small>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <hr class="my-4" />
+
+
+                        <!-- BOTÕES -->
+                        <div class="d-flex justify-content-end gap-2">
+
+                            <a asp-action="Index"
+                               class="btn btn-outline-secondary px-4 rounded-3">
+
+                                Voltar
+
+                            </a>
+
+
+                            <button type="submit"
+                                    class="btn btn-dark px-4 rounded-3 shadow-sm">
+
+                                Salvar Taxa
+
+                            </button>
+
+                        </div>
+
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+
+<script>
+
+    window.addEventListener('load', function () {
+
+        setTimeout(function () {
+
+            var alertas = [
+                document.getElementById("alertaSucesso"),
+                document.getElementById("alertaErro")
+            ];
+
+
+            alertas.forEach(function (alerta) {
+
+                if (alerta) {
+
+                    alerta.style.transition = "opacity 0.5s ease";
+
+                    alerta.style.opacity = "0";
+
+
+                    setTimeout(function () {
+
+                        alerta.style.display = "none";
+
+                    }, 500);
+
+                }
+
+            });
+
+        }, 3000);
+
+    });
+
+</script>
+
+<!-- ============================================================
+     ESTILOS
+============================================================ -->
+
+<style>
+
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+
+    .form-control,
+    .form-select {
+        border: 1px solid #dee2e6;
+    }
+
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #212529;
+            box-shadow: 0 0 0 0.2rem rgba(33, 37, 41, 0.1);
+        }
+
+
+    .form-check-input {
+        cursor: pointer;
+    }
+
+
+        .form-check-input:checked {
+            background-color: #212529;
+            border-color: #212529;
+        }
+
+</style>

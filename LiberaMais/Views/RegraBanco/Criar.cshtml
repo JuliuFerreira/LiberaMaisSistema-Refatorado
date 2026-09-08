@@ -1,0 +1,296 @@
+﻿@using LiberaMais.Models
+@model RegraBanco
+
+@{
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Nova Regra de Banco";
+}
+
+<div class="container-fluid py-4 inner-system-page">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-light-subtle">
+        <div>
+            <h3 class="fw-bold text-dark mb-1 tracking-tight">
+                Nova Regra de Banco
+            </h3>
+
+            <p class="text-muted small mb-0">
+                Cadastre as regras específicas para um banco vinculado a uma promotora.
+            </p>
+        </div>
+    </div>
+
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+
+        <form asp-controller="RegraBanco"
+              asp-action="Criar"
+              method="post">
+
+            <div class="row g-4">
+
+
+                <!-- BANCO / PROMOTORA -->
+
+                <div class="col-12 col-md-6">
+
+                    <label asp-for="PromotoraBancoId"
+                           class="form-label text-muted fw-bold small text-uppercase">
+
+                        Banco / Promotora
+
+                    </label>
+
+                    <select asp-for="PromotoraBancoId"
+                            class="form-select border-light-subtle rounded-3 small py-2">
+
+                        <option value="">
+                            Selecione...
+                        </option>
+
+                        @foreach (PromotoraBanco promotoraBanco in ViewBag.PromotoraBanco)
+                        {
+                            <option value="@promotoraBanco.Id">
+                                @promotoraBanco?.Promotora?.Nome - @promotoraBanco?.Banco?.Nome
+                            </option>
+                        }
+
+                    </select>
+
+                    <span asp-validation-for="PromotoraBancoId"
+                          class="text-danger small mt-1 d-block">
+                    </span>
+
+                </div>
+
+
+                <!-- DATA -->
+
+                <div class="col-12 col-md-6">
+
+                    <label asp-for="DataAtualizacao"
+                           class="form-label small fw-bold text-muted">
+
+                        Data de Atualização
+
+                    </label>
+
+                    <input asp-for="DataAtualizacao"
+                           type="date"
+                           class="form-control rounded-3 py-2" />
+
+                    <span asp-validation-for="DataAtualizacao"
+                          class="text-danger small">
+                    </span>
+
+                </div>
+
+
+                <!-- REGRAS DE VALORES -->
+
+                <div class="col-6">
+
+                    <label asp-for="RegrasValores"
+                           class="form-label text-muted fw-bold small text-uppercase">
+
+                        Regras de Valores
+
+                    </label>
+
+                    <textarea asp-for="RegrasValores"
+                              class="form-control border-light-subtle rounded-3 rule-textarea"
+                              rows="4"
+                              placeholder="Informe as regras de valores, limites, parcelas, valores mínimos e máximos..."></textarea>
+
+                    <span asp-validation-for="RegrasValores"
+                          class="text-danger small">
+                    </span>
+
+                </div>
+
+
+                <!-- REGRAS DE IDADE -->
+
+                <div class="col-6">
+
+                    <label asp-for="RegraIdade"
+                           class="form-label text-muted fw-bold small text-uppercase">
+
+                        Regras de Idade
+
+                    </label>
+
+                    <textarea asp-for="RegraIdade"
+                              class="form-control border-light-subtle rounded-3 rule-textarea"
+                              rows="4"
+                              placeholder="Informe as regras de idade e prazo máximo..."></textarea>
+
+                    <span asp-validation-for="RegraIdade"
+                          class="text-danger small">
+                    </span>
+
+                </div>
+
+                <div class="col-12 col-lg-4">
+
+                    <label asp-for="BancoRegraGeral"
+                           class="form-label text-muted fw-bold small text-uppercase">
+
+                        Regra Geral para Portabilidade
+
+                    </label>
+
+                    <textarea asp-for="BancoRegraGeral"
+                              class="form-control border-light-subtle rounded-3 rule-textarea"
+                              rows="5"
+                              placeholder="Informe a regra geral aplicada para portar..."></textarea>
+
+                    <span asp-validation-for="BancoRegraGeral"
+                          class="text-danger small">
+                    </span>
+
+                </div>
+
+                <!-- BANCOS COM REGRA -->
+
+                <div class="col-12 col-lg-4">
+
+                    <label asp-for="BancoComRegra"
+                           class="form-label text-muted fw-bold small text-uppercase">
+
+                        Bancos Com Regra para Portar
+
+                    </label>
+
+                    <textarea asp-for="BancoComRegra"
+                              class="form-control border-light-subtle rounded-3 rule-textarea"
+                              rows="5"
+                              placeholder="Informe os bancos que possuem regras específicas para portabilidade..."></textarea>
+
+                    <span asp-validation-for="BancoComRegra"
+                          class="text-danger small">
+                    </span>
+
+                </div>
+
+                <!-- BANCOS NÃO PORTADOS -->
+
+                <div class="col-12 col-lg-4">
+
+                    <label asp-for="BancoNaoPortado"
+                           class="form-label text-muted fw-bold small text-uppercase">
+
+                        Bancos Não Portados
+
+                    </label>
+
+                    <textarea asp-for="BancoNaoPortado"
+                              class="form-control border-light-subtle rounded-3 rule-textarea"
+                              rows="5"
+                              placeholder="Informe os bancos que não podem ser portados..."></textarea>
+
+                    <span asp-validation-for="BancoNaoPortado"
+                          class="text-danger small">
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+            <hr class="my-4 border-light-subtle" />
+
+
+            <div class="d-flex justify-content-end gap-2">
+
+                <a asp-controller="RegraBanco"
+                   asp-action="Index"
+                   class="btn btn-light border rounded-3 px-4 py-2">
+
+                    Cancelar
+
+                </a>
+
+                <button type="submit"
+                        class="btn btn-dark border-0 px-4 py-2 rounded-3 fw-semibold">
+
+                    Salvar Cadastro
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .tracking-tight {
+        letter-spacing: -0.5px;
+    }
+
+
+    /* ========================================= */
+    /* CAMPOS DE REGRAS */
+    /* ========================================= */
+
+    .rule-textarea {
+        min-height: 110px;
+        resize: vertical;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        padding: 12px 14px;
+        color: #343a40;
+        background-color: #fff;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+
+        .rule-textarea:focus {
+            border-color: #adb5bd;
+            box-shadow: 0 0 0 0.15rem rgba(0, 0, 0, 0.05);
+        }
+
+
+        .rule-textarea::placeholder {
+            color: #adb5bd;
+            font-size: 0.85rem;
+        }
+
+
+    /* ========================================= */
+    /* SELECT */
+    /* ========================================= */
+
+    .form-select:focus,
+    .form-control:focus {
+        border-color: #adb5bd;
+        box-shadow: 0 0 0 0.15rem rgba(0, 0, 0, 0.05);
+    }
+
+
+    /* ========================================= */
+    /* RESPONSIVO */
+    /* ========================================= */
+
+    @@media (max-width: 768px) {
+
+        .card {
+            padding: 1.25rem !important;
+        }
+
+        .rule-textarea {
+            min-height: 120px;
+        }
+    }
+
+</style>

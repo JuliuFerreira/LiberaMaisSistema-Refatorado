@@ -54,7 +54,10 @@
             <div class="alerta-texto small">
                 <span class="fw-bold text-danger me-1">Atenção:</span> Existem comissões pendentes além do prazo.
             </div>
-            <a asp-action="PorStatus" asp-route-status="Pago" class="btn btn-sm btn-outline-danger btn-atraso-acao ms-auto fw-semibold small">
+            <a asp-action="PorStatus"
+               asp-route-status="Pago"
+               asp-route-atrasadas="true"
+               class="btn btn-sm btn-outline-danger btn-atraso-acao ms-auto fw-semibold small">
                 Verificar
             </a>
         </div>

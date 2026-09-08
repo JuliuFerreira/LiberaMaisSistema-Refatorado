@@ -1,0 +1,572 @@
+﻿@using LiberaMais.Models.Enums
+@model IEnumerable<TaxaCoeficiente>
+
+@{
+    Layout = "_LayoutSistema";
+    ViewData["Title"] = "Taxas";
+}
+
+<div class="container-fluid py-4 inner-system-page">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <div class="page-icon">
+                    <i class="bi bi-percent"></i>
+                </div>
+
+                <h2 class="fw-bold text-dark mb-0" style="font-size: 1.6rem;">
+                    Taxas e Coeficientes
+                </h2>
+            </div>
+
+            <small class="text-muted">
+                Gerencie as taxas e coeficientes utilizados no sistema.
+            </small>
+        </div>
+
+        <a asp-action="Criar"
+           class="btn btn-dark d-flex align-items-center gap-2 shadow-sm px-3 py-2 rounded-3 btn-adicionar">
+
+            <i class="bi bi-plus-lg"></i>
+
+            <span class="fw-semibold small">
+                Adicionar Taxa
+            </span>
+
+        </a>
+    </div>
+
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div id="alertaSucesso"
+             class="alert alert-success border-0 shadow-sm rounded-3 mb-4 small d-flex align-items-center gap-2">
+
+            <i class="bi bi-check-circle-fill fs-5"></i>
+
+            <span>
+                @TempData["MensagemSucesso"]
+            </span>
+
+        </div>
+    }
+
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div id="alertaErro"
+             class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 small d-flex align-items-center gap-2">
+
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+
+            <span>
+                @TempData["MensagemErro"]
+            </span>
+
+        </div>
+    }
+
+    <div class="card card-table shadow-sm border-0 mb-3">
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-custom align-middle mb-0">
+
+                    <thead>
+                        <tr>
+
+                            <th class="ps-4">
+                                Operação
+                            </th>
+
+                            <th class="ps-4">
+                                Taxa
+                            </th>
+
+                            <th>
+                                Coeficiente
+                            </th>
+
+                            <th>
+                                Ativo
+                            </th>
+
+                            <th class="text-center pe-4">
+                                Ações
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var taxas in Model)
+                            {
+                                <tr>
+
+
+                                    <td class="ps-4">
+
+                                        <div class="d-flex align-items-center gap-2">
+                                                                                       
+
+                                            <span class="fw-bold text-dark">
+                                                @taxas.Operacao.GetDisplayName()
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+                                    <!-- Taxa -->
+                                    <td class="ps-4">
+
+                                        <div class="d-flex align-items-center gap-2">
+
+                                            <div class="taxa-icon">
+                                                <i class="bi bi-percent"></i>
+                                            </div>
+
+                                            <span class="fw-bold text-dark">
+                                                @taxas.Taxa
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+                                    <!-- Coeficiente -->
+                                    <td>
+
+                                        <span class="coeficiente-value">
+                                            @taxas.Coeficiente.ToString(
+                                            "0.########",
+                                                                        System.Globalization.CultureInfo.GetCultureInfo("pt-BR")
+                                                                        )
+                                </span>
+
+                            </td>
+
+                            <!-- Ativo -->
+                            <td>
+
+                                @if (taxas.Ativo)
+                                        {
+                                            <span class="badge status-ativo px-3 py-2 rounded-pill">
+                                                <i class="bi bi-check-circle-fill me-1"></i>
+                                                Ativo
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge status-inativo px-3 py-2 rounded-pill">
+                                                <i class="bi bi-dash-circle-fill me-1"></i>
+                                                Inativo
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <!-- Ações -->
+                                    <td class="text-center pe-4"
+                                        onclick="event.stopPropagation();">
+
+                                        <!-- Editar -->
+                                        <a asp-action="Editar"
+                                           asp-route-id="@taxas.Id"
+                                           class="btn btn-sm btn-outline-primary border-0 action-button me-1"
+                                           title="Editar">
+
+                                            <i class="bi bi-pencil-square"></i>
+
+                                        </a>
+
+                                        <!-- Excluir -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger border-0 action-button"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalExcluir_@taxas.Id"
+                                                title="Excluir">
+
+                                            <i class="bi bi-trash"></i>
+
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+
+                                <!-- Modal de Exclusão -->
+                                <div class="modal fade"
+                                     id="modalExcluir_@taxas.Id"
+                                     tabindex="-1"
+                                     aria-hidden="true"
+                                     onclick="event.stopPropagation();">
+
+                                    <div class="modal-dialog modal-dialog-centered">
+
+                                        <div class="modal-content border-0 shadow-lg modal-custom">
+
+                                            <div class="modal-header border-0 px-4 pt-4">
+
+                                                <div class="d-flex align-items-center gap-3">
+
+                                                    <div class="modal-icon">
+                                                        <i class="bi bi-trash"></i>
+                                                    </div>
+
+                                                    <h5 class="modal-title fw-bold mb-0">
+                                                        Confirmar Exclusão
+                                                    </h5>
+
+                                                </div>
+
+                                                <button type="button"
+                                                        class="btn-close"
+                                                        data-bs-dismiss="modal"
+                                                        aria-label="Close">
+                                                </button>
+
+                                            </div>
+
+                                            <div class="modal-body px-4 py-4">
+
+                                                <p class="text-muted mb-0">
+
+                                                    Deseja realmente remover a taxa
+
+                                                    <strong class="text-dark">
+                                                        @taxas.Taxa
+                                                    </strong>?
+
+                                                </p>
+
+                                            </div>
+
+                                            <div class="modal-footer border-0 px-4 pb-4">
+
+                                                <button type="button"
+                                                        class="btn btn-light border"
+                                                        data-bs-dismiss="modal">
+
+                                                    Cancelar
+
+                                                </button>
+
+                                                <form asp-action="Apagar"
+                                                      method="post"
+                                                      class="d-inline">
+
+                                                    <input type="hidden"
+                                                           name="id"
+                                                           value="@taxas.Id" />
+
+                                                    <button type="submit"
+                                                            class="btn btn-danger">
+
+                                                        <i class="bi bi-trash me-1"></i>
+                                                        Confirmar Exclusão
+
+                                                    </button>
+
+                                                </form>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+
+                                <td colspan="4"
+                                    class="text-center text-muted py-5">
+
+                                    <div class="empty-state">
+
+                                        <div class="empty-icon mb-3">
+                                            <i class="bi bi-percent"></i>
+                                        </div>
+
+                                        <div class="fw-semibold text-dark mb-1">
+                                            Nenhuma taxa cadastrada
+                                        </div>
+
+                                        <small>
+                                            Cadastre uma nova taxa para começar.
+                                        </small>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Voltar -->
+    <div class="mt-4">
+
+        <a asp-controller="Apps"
+           asp-action="Index"
+           class="text-decoration-none text-muted fw-medium d-flex align-items-center gap-1 voltar-link">
+
+            <i class="bi bi-arrow-left"></i>
+            Voltar
+
+        </a>
+
+    </div>
+
+</div>
+
+<script>
+
+    window.addEventListener('load', function () {
+
+        setTimeout(function () {
+
+            var alertas = [
+                document.getElementById("alertaSucesso"),
+                document.getElementById("alertaErro")
+            ];
+
+            alertas.forEach(function (alerta) {
+
+                if (alerta) {
+
+                    alerta.style.transition = "opacity 0.5s ease";
+                    alerta.style.opacity = "0";
+
+                    setTimeout(function () {
+                        alerta.style.display = "none";
+                    }, 500);
+
+                }
+
+            });
+
+        }, 3000);
+
+    });
+
+</script>
+
+<style>
+
+    .inner-system-page {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    /* Cabeçalho */
+
+    .page-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: #f1f3f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #212529;
+        font-size: 1.1rem;
+    }
+
+    .btn-adicionar {
+        transition: all 0.2s ease;
+    }
+
+        .btn-adicionar:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.12) !important;
+        }
+
+    /* Card */
+
+    .card-table {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05);
+        background: #fff;
+    }
+
+    /* Tabela */
+
+    .table-custom {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+        .table-custom thead {
+            background: #f8f9fa;
+        }
+
+        .table-custom th {
+            font-size: 0.78rem;
+            color: #6c757d;
+            padding: 15px 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            font-weight: 700;
+            border-bottom: 1px solid #e9ecef;
+            white-space: nowrap;
+        }
+
+        .table-custom td {
+            padding: 15px 10px;
+            font-size: 0.92rem;
+            border-bottom: 1px solid #f0f1f2;
+        }
+
+        .table-custom tbody tr {
+            transition: background-color 0.15s ease;
+        }
+
+            .table-custom tbody tr:hover {
+                background-color: #fafbfc;
+            }
+
+            .table-custom tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+    /* Ícone da taxa */
+
+    .taxa-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: #f1f3f5;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+    }
+
+    /* Coeficiente */
+
+    .coeficiente-value {
+        font-weight: 600;
+        color: #343a40;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Status */
+
+    .status-ativo {
+        background-color: #dff5e7;
+        color: #198754;
+        font-weight: 600;
+    }
+
+    .status-inativo {
+        background-color: #e9ecef;
+        color: #6c757d;
+        font-weight: 600;
+    }
+
+    /* Botões de ação */
+
+    .action-button {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .btn-outline-primary {
+        color: #0d6efd;
+    }
+
+        .btn-outline-primary:hover {
+            background-color: #0d6efd;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+    .btn-outline-danger {
+        color: #dc3545;
+    }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+    /* Modal */
+
+    .modal-custom {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .modal-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: #fce8e8;
+        color: #dc3545;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .modal-footer .btn {
+        border-radius: 8px;
+        padding: 8px 16px;
+    }
+
+    /* Estado vazio */
+
+    .empty-state {
+        padding: 10px;
+    }
+
+    .empty-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        background: #f1f3f5;
+        color: #adb5bd;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+    }
+
+    /* Voltar */
+
+    .voltar-link {
+        transition: all 0.2s ease;
+    }
+
+        .voltar-link:hover {
+            color: #212529 !important;
+            transform: translateX(-2px);
+        }
+
+</style>
